@@ -39,3 +39,4 @@ src/timezone/data/*			-whitespace
 src/tools/pg_bsd_indent/*		-whitespace
 src/tools/pg_bsd_indent/tests/*		-whitespace
 src/tools/pg_bsd_indent/*.[ch]		whitespace=-blank-at-eol,-blank-at-eof,tabwidth=8
+graphify-out/graph.json merge=graphify

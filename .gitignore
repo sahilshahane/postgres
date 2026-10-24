@@ -43,3 +43,8 @@ lib*.pc
 /Release/
 /tmp_install/
 /portlock/
+
+# graphify knowledge graph outputs and Claude Code integration
+graphify-out*/
+/.claude/
+/CLAUDE.md
