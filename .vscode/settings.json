@@ -1,0 +1,7 @@
+{
+  // Exact compiler flags per file, so IntelliSense and "Go to Definition" work
+  "C_Cpp.default.compileCommands": "${workspaceFolder}/build/compile_commands.json",
+  "files.associations": { "*.h": "c" },
+  "files.watcherExclude": { "**/build/**": true, "**/graphify-out/**": true },
+  "search.exclude": { "**/build/**": true, "**/graphify-out/**": true }
+}

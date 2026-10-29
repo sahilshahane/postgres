@@ -1,0 +1,38 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      // Attach to a running backend. Get its pid with: SELECT pg_backend_pid();
+      "name": "PG: attach to backend",
+      "type": "cppdbg",
+      "request": "attach",
+      "program": "${env:HOME}/pgdev/install/bin/postgres",
+      "processId": "${command:pickProcess}",
+      "MIMode": "gdb",
+      "miDebuggerPath": "/usr/bin/gdb",
+      "setupCommands": [
+        { "text": "-enable-pretty-printing", "ignoreFailures": true },
+        // PostgreSQL uses these signals internally (latches, timeouts); don't stop on them
+        { "text": "handle SIGUSR1 SIGUSR2 SIGPIPE SIGALRM noprint nostop pass", "ignoreFailures": true },
+        // A failed ereport(PANIC/ERROR) lands here, so you see where it came from
+        { "text": "break errfinish if errordata[errordata_stack_depth].elevel >= 21", "ignoreFailures": true }
+      ]
+    },
+    {
+      // One process, no postmaster: type SQL into the terminal. Stop the server first (same data dir).
+      "name": "PG: single-user mode",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${env:HOME}/pgdev/install/bin/postgres",
+      "args": ["--single", "-D", "${env:HOME}/pgdev/data", "postgres"],
+      "cwd": "${workspaceFolder}",
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "miDebuggerPath": "/usr/bin/gdb",
+      "setupCommands": [
+        { "text": "-enable-pretty-printing", "ignoreFailures": true },
+        { "text": "handle SIGUSR1 SIGUSR2 SIGPIPE SIGALRM noprint nostop pass", "ignoreFailures": true }
+      ]
+    }
+  ]
+}

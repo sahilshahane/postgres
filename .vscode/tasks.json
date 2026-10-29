@@ -1,0 +1,45 @@
+{
+  "version": "2.0.0",
+  "options": {
+    "env": { "PGDEV": "${env:HOME}/pgdev", "PGPORT": "5433" }
+  },
+  "tasks": [
+    {
+      "label": "PG: configure (once)",
+      "type": "shell",
+      "command": "meson setup build --prefix=$PGDEV/install --buildtype=debug -Dcassert=true -Dliburing=enabled",
+      "problemMatcher": []
+    },
+    {
+      "label": "PG: build + install",
+      "type": "shell",
+      "command": "ninja -C build install",
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": { "base": "$gcc", "fileLocation": ["relative", "${workspaceFolder}/build"] }
+    },
+    {
+      "label": "PG: initdb (once)",
+      "type": "shell",
+      "command": "$PGDEV/install/bin/initdb -D $PGDEV/data",
+      "problemMatcher": []
+    },
+    {
+      "label": "PG: start",
+      "type": "shell",
+      "command": "$PGDEV/install/bin/pg_ctl -D $PGDEV/data -l $PGDEV/server.log start",
+      "problemMatcher": []
+    },
+    {
+      "label": "PG: stop",
+      "type": "shell",
+      "command": "$PGDEV/install/bin/pg_ctl -D $PGDEV/data stop -m fast",
+      "problemMatcher": []
+    },
+    {
+      "label": "PG: psql",
+      "type": "shell",
+      "command": "$PGDEV/install/bin/psql postgres",
+      "problemMatcher": []
+    }
+  ]
+}
