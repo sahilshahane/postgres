@@ -30,6 +30,24 @@ enum WalSyncMethod
 };
 extern PGDLLIMPORT int wal_sync_method;
 
+/* WAL write methods */
+typedef enum WalIoMethod
+{
+	WAL_IO_METHOD_SYNC = 0,		/* pwrite() + fsync under WALWriteLock */
+	WAL_IO_METHOD_AIO,			/* O_DSYNC writes via the AIO subsystem */
+} WalIoMethod;
+extern PGDLLIMPORT int wal_io_method;
+extern PGDLLIMPORT int wal_io_max_inflight;
+
+/* upper limit for wal_io_max_inflight, size of the in-flight write tracker */
+#define XLOG_AIO_MAX_INFLIGHT 64
+
+/* AIO target and completion callback for WAL writes, see xlog.c */
+struct PgAioTargetInfo;
+struct PgAioHandleCallbacks;
+extern PGDLLIMPORT const struct PgAioTargetInfo aio_wal_target_info;
+extern PGDLLIMPORT const struct PgAioHandleCallbacks aio_wal_writev_cb;
+
 extern PGDLLIMPORT XLogRecPtr ProcLastRecPtr;
 extern PGDLLIMPORT XLogRecPtr XactLastRecEnd;
 extern PGDLLIMPORT XLogRecPtr XactLastCommitEnd;

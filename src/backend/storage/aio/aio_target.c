@@ -14,6 +14,7 @@
 
 #include "postgres.h"
 
+#include "access/xlog.h"
 #include "storage/aio.h"
 #include "storage/aio_internal.h"
 #include "storage/smgr.h"
@@ -27,6 +28,7 @@ static const PgAioTargetInfo *pgaio_target_info[] = {
 		.name = "invalid",
 	},
 	[PGAIO_TID_SMGR] = &aio_smgr_target_info,
+	[PGAIO_TID_WAL] = &aio_wal_target_info,
 };
 
 

@@ -258,6 +258,9 @@
                                         #   fsync
                                         #   fsync_writethrough
                                         #   open_sync
+#wal_io_method = sync                   # sync, aio
+                                        # (change requires restart)
+#wal_io_max_inflight = 1                # max concurrent WAL writes with aio
 #full_page_writes = on                  # recover from partial page writes
 #wal_log_hints = off                    # also do full page writes of non-critical updates
                                         # (change requires restart)

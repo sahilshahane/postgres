@@ -1,0 +1,7 @@
+epoch 1 (power cut): 25094 acknowledged commits all present (25097 committed groups found)
+epoch 2 (power cut): 26216 acknowledged commits all present (26217 committed groups found)
+epoch 3 (power cut): 25242 acknowledged commits all present (25249 committed groups found)
+epoch 4 (power cut): 17577 acknowledged commits all present (17577 committed groups found)
+epoch 5 (power cut): 13751 acknowledged commits all present (13754 committed groups found)
+epoch 6 (power cut): 9605 acknowledged commits all present (9610 committed groups found)
+OK: 6 crashes, 117485 acknowledged commits verified; 325 segments archived, 2662 still .ready

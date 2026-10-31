@@ -1122,6 +1122,21 @@ pgaio_have_staged(void)
 }
 
 /*
+ * Can this backend start a new IO right now without violating the AIO API?
+ *
+ * Returns false if AIO is not initialized in this process or if an IO handle
+ * has been handed out but not yet defined (only one handle may be in that
+ * state, see pgaio_io_acquire()).  Code that must not fail, e.g. WAL writes,
+ * can use this to decide to fall back to synchronous IO.
+ */
+bool
+pgaio_can_start_io(void)
+{
+	return pgaio_my_backend != NULL &&
+		pgaio_my_backend->handed_out_io == NULL;
+}
+
+/*
  * Submit all staged but not yet submitted IOs.
  *
  * Unless in batch mode, this never needs to be called, as IOs get submitted

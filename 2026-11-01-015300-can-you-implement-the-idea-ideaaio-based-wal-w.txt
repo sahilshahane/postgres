@@ -1,0 +1,1550 @@
+  ⎿  SessionStart:startup hook error
+  ⎿  Failed with non-blocking status code: /bin/sh: 1: node: not found
+
+❯ <ide_opened_file>The user opened the file
+  /media/sahil/newvolume/dbms-project/.dir-locals.el in the IDE. This may or
+  may not be related to the current task.</ide_opened_file>
+
+❯ can you implement the idea @"idea/AIO-based WAL Writes in PostgreSQL Today
+  vs. Proposed.md"
+
+  and also verify it
+  ⎿  Read idea/AIO-based WAL Writes in PostgreSQL Today vs. Proposed.md (195
+     lines)
+  ⎿  UserPromptSubmit hook error
+  ⎿  Failed with non-blocking status code: /bin/sh: 1: node: not found
+
+● I'll start by getting oriented in the tree: version, build state, and the
+  relevant code.
+
+  Listed 1 directory, ran 2 shell commands (ctrl+o to expand)
+
+● The tree is PG 20devel (master), not REL_18, so line numbers in the doc will
+  differ. Let me read the AIO API and the WAL write path.
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● Now the WAL write path in xlog.c.
+
+  Read 1 file, ran 1 shell command (ctrl+o to expand)
+
+● Now the AIO internals: handle acquisition, wait semantics, targets/callbacks,
+  and how worker mode reopens files.
+
+  Ran 4 shell commands (ctrl+o to expand)
+
+● Now callbacks, aio_io.c, and how the worker reopens and which processes have
+  AIO.
+
+  Ran 7 shell commands (ctrl+o to expand)
+
+● I've finished reading the WAL write path and the AIO subsystem, and I'm
+  settling on a design: a new wal_io_method GUC (default sync) with
+  O_DSYNC-based async writes tracked by a shared range tracker. Next I'll check
+  how GUCs are defined and a few remaining AIO details.
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● Now let me check the existing build configuration and whether it's current.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● The existing build directory is stale, pointing at another checkout, and
+  Perl's IPC::Run is missing, so the TAP tests can't run. I'll leave your build
+  and ~/pgdev untouched, start a fresh baseline build in the scratchpad, and
+  write the crash tests as standalone scripts.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● While that builds, the AIO subsystem hooks: a new WAL target and a WAL write
+  completion callback ID.
+
+● Bash(cd /media/sahil/newvolume/dbms-project/src && python3 - <<'EOF'
+      import re…)
+  ⎿  Updated src/include/storage/aio.h (+5 -2)
+      118          /* intentionally the zero value, to help catch zeroed
+           memory etc */
+      119          PGAIO_TID_INVALID = 0,
+      120          PGAIO_TID_SMGR,
+      121 +        PGAIO_TID_WAL,
+      122  } PgAioTargetID;
+      123
+      123 -#define PGAIO_TID_COUNT (PGAIO_TID_SMGR + 1)
+      124 +#define PGAIO_TID_COUNT (PGAIO_TID_WAL + 1)
+      125
+      126
+      127  /*
+     ...
+      199          PGAIO_HCB_SHARED_BUFFER_READV,
+      200
+      201          PGAIO_HCB_LOCAL_BUFFER_READV,
+      202 +
+      203 +        PGAIO_HCB_WAL_WRITEV,
+      204  } PgAioHandleCallbackID;
+      205
+      203 -#define PGAIO_HCB_MAX   PGAIO_HCB_LOCAL_BUFFER_READV
+      206 +#define PGAIO_HCB_MAX   PGAIO_HCB_WAL_WRITEV
+      207  StaticAssertDecl(PGAIO_HCB_MAX < (1 << PGAIO_RESULT_ID_BITS),
+      208                                   "PGAIO_HCB_MAX is too big for
+            PGAIO_RESULT_ID_BITS");
+      209
+  ⎿  Updated src/include/storage/aio_types.h (+6 -0)
+      69                  bool            is_temp:1;      /* proc can be
+          inferred by owning AIO */
+      70                  bool            skip_fsync:1;
+      71          }                       smgr;
+      72 +
+      73 +        struct
+      74 +        {
+      75 +                uint64          segno;          /* WAL segment
+         +number (XLogSegNo) */
+      76 +                uint32          tli;            /* timeline of
+         +the segment (TimeLineID) */
+      77 +        }                       wal;
+      78  } PgAioTargetData;
+      79
+      80
+  ⎿  Updated src/backend/storage/aio/aio_target.c (+2 -0)
+      14
+      15  #include "postgres.h"
+      16
+      17 +#include "access/xlog.h"
+      18  #include "storage/aio.h"
+      19  #include "storage/aio_internal.h"
+      20  #include "storage/smgr.h"
+     ...
+      28                  .name = "invalid",
+      29          },
+      30          [PGAIO_TID_SMGR] = &aio_smgr_target_info,
+      31 +        [PGAIO_TID_WAL] = &aio_wal_target_info,
+      32  };
+      33
+      34
+  ⎿  Updated src/backend/storage/aio/aio_callback.c (+3 -0)
+      15
+      16  #include "postgres.h"
+      17
+      18 +#include "access/xlog.h"
+      19  #include "miscadmin.h"
+      20  #include "storage/aio.h"
+      21  #include "storage/aio_internal.h"
+     ...
+      46          CALLBACK_ENTRY(PGAIO_HCB_SHARED_BUFFER_READV, aio_share
+          d_buffer_readv_cb),
+      47
+      48          CALLBACK_ENTRY(PGAIO_HCB_LOCAL_BUFFER_READV, aio_local_
+          buffer_readv_cb),
+      49 +
+      50 +        CALLBACK_ENTRY(PGAIO_HCB_WAL_WRITEV, aio_wal_writev_cb)
+         +,
+      51  #undef CALLBACK_ENTRY
+      52  };
+      53
+
+● Now xlog.h declarations and the GUC entries.
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● Bash(python3 - <<'EOF'
+      p='backend/utils/misc/guc_parameters.dat'; s=open(p).read()…)
+  ⎿  Updated src/backend/utils/misc/guc_parameters.dat (+17 -0)
+      3501    boot_val => 'true',
+      3502  },
+      3503
+      3504 +{ name => 'wal_io_max_inflight', type => 'int', context => 'P
+           +GC_SIGHUP', group => 'WAL_SETTINGS',
+      3505 +  short_desc => 'Maximum number of asynchronous WAL writes in
+           + flight at once.',
+      3506 +  long_desc => 'Only used when "wal_io_method" is "aio".',
+      3507 +  variable => 'wal_io_max_inflight',
+      3508 +  boot_val => '16',
+      3509 +  min => '1',
+      3510 +  max => 'XLOG_AIO_MAX_INFLIGHT',
+      3511 +},
+      3512 +
+      3513 +{ name => 'wal_io_method', type => 'enum', context => 'PGC_PO
+           +STMASTER', group => 'WAL_SETTINGS',
+      3514 +  short_desc => 'Selects the method used for writing WAL to d
+           +isk.',
+      3515 +  long_desc => 'With "aio", WAL is written using the asynchro
+           +nous I/O subsystem (see "io_method") with O_DSYNC, allowing s
+           +everal WAL writes to be in flight at once.',
+      3516 +  variable => 'wal_io_method',
+      3517 +  boot_val => 'WAL_IO_METHOD_SYNC',
+      3518 +  options => 'wal_io_method_options',
+      3519 +},
+      3520 +
+      3521  { name => 'wal_keep_size', type => 'int', context => 'PGC_SIG
+            HUP', group => 'REPLICATION_SENDING',
+      3522    short_desc => 'Sets the size of WAL files held for standby
+            servers.',
+      3523    flags => 'GUC_UNIT_MB',
+  ⎿  Updated src/backend/utils/misc/guc_tables.c (+1 -0)
+      527  extern const struct config_enum_entry archive_mode_options[];
+      528  extern const struct config_enum_entry recovery_target_action_o
+           ptions[];
+      529  extern const struct config_enum_entry wal_sync_method_options[
+           ];
+      530 +extern const struct config_enum_entry wal_io_method_options[];
+      531  extern const struct config_enum_entry dynamic_shared_memory_op
+           tions[];
+      532
+      533  /*
+  ⎿  Updated src/backend/utils/misc/postgresql.conf.sample (+3 -0)
+      258                                          #   fsync
+      259                                          #   fsync_writethrough
+      260                                          #   open_sync
+      261 +#wal_io_method = sync                  # sync, aio
+      262 +                                        # (change requires res
+          +tart)
+      263 +#wal_io_max_inflight = 16              # max concurrent WAL wr
+          +ites with aio
+      264  #full_page_writes = on                  # recover from partial
+            page writes
+      265  #wal_log_hints = off                    # also do full page wr
+           ites of non-critical updates
+      266                                          # (change requires res
+           tart)
+  ⎿  Updated src/include/access/xlog.h (+18 -0)
+      30  };
+      31  extern PGDLLIMPORT int wal_sync_method;
+      32
+      33 +/* WAL write methods */
+      34 +typedef enum WalIoMethod
+      35 +{
+      36 +        WAL_IO_METHOD_SYNC = 0,         /* pwrite() + fsync und
+         +er WALWriteLock */
+      37 +        WAL_IO_METHOD_AIO,                      /* O_DSYNC writ
+         +es via the AIO subsystem */
+      38 +} WalIoMethod;
+      39 +extern PGDLLIMPORT int wal_io_method;
+      40 +extern PGDLLIMPORT int wal_io_max_inflight;
+      41 +
+      42 +/* upper limit for wal_io_max_inflight, size of the in-flight w
+         +rite tracker */
+      43 +#define XLOG_AIO_MAX_INFLIGHT 64
+      44 +
+      45 +/* AIO target and completion callback for WAL writes, see xlog.
+         +c */
+      46 +struct PgAioTargetInfo;
+      47 +struct PgAioHandleCallbacks;
+      48 +extern PGDLLIMPORT const struct PgAioTargetInfo aio_wal_target_
+         +info;
+      49 +extern PGDLLIMPORT const struct PgAioHandleCallbacks aio_wal_wr
+         +itev_cb;
+      50 +
+      51  extern PGDLLIMPORT XLogRecPtr ProcLastRecPtr;
+      52  extern PGDLLIMPORT XLogRecPtr XactLastRecEnd;
+      53  extern PGDLLIMPORT XLogRecPtr XactLastCommitEnd;
+
+● Bash(python3 - <<'EOF'
+      p='backend/utils/misc/postgresql.conf.sample'; s=open(p).read()…)
+  ⎿  Updated src/backend/utils/misc/postgresql.conf.sample (+3 -3)
+      258                                          #   fsync
+      259                                          #   fsync_writethrough
+      260                                          #   open_sync
+      261 -#wal_io_method = sync                  # sync, aio
+      262 -                                        # (change requires res
+          -tart)
+      263 -#wal_io_max_inflight = 16              # max concurrent WAL wr
+          -ites with aio
+      261 +#wal_io_method = sync                   # sync, aio
+      262 +                                        # (change requires res
+          +tart)
+      263 +#wal_io_max_inflight = 16               # max concurrent WAL w
+          +rites with aio
+      264  #full_page_writes = on                  # recover from partial
+            page writes
+      265  #wal_log_hints = off                    # also do full page wr
+           ites of non-critical updates
+      266                                          # (change requires res
+           tart)
+
+● The core design is settled. Before writing the xlog.c changes, I need to rule
+  out a hazard: if buffer manager flushes WAL while holding an unstarted AIO
+  handle, the WAL write's handle acquisition would fail inside a critical
+  section and escalate to a PANIC.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Background command "Configure and build baseline in scratchpad" completed
+(exit code 0)
+  ⎿  UserPromptSubmit hook error
+  ⎿  Failed with non-blocking status code: /bin/sh: 1: node: not found
+
+● Baseline build finished. Continuing the handle-acquisition check:
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● The normal bufmgr path is safe with no WAL flush before the AIO start, but two
+  edge cases remain: leaked handles during abort and a possible deadlock in
+  batch-mode eviction. I'll add a pgaio_can_start_io() probe with a synchronous
+  fallback and call pgaio_submit_staged() right after starting a WAL write.
+
+  Ran 1 shell command (ctrl+o to expand)
+● Add the small AIO helper:
+
+● Bash(cd /media/sahil/newvolume/dbms-project/src; python3 - <<'EOF'
+      p='backend/storage/aio/aio.c'; s=open(p).read()…)
+  ⎿  Updated src/backend/storage/aio/aio.c (+15 -0)
+      1122  }
+      1123
+      1124  /*
+      1125 + * Can this backend start a new IO right now without violatin
+           +g the AIO API?
+      1126 + *
+      1127 + * Returns false if AIO is not initialized in this process or
+           + if an IO handle
+      1128 + * has been handed out but not yet defined (only one handle m
+           +ay be in that
+      1129 + * state, see pgaio_io_acquire()).  Code that must not fail,
+           +e.g. WAL writes,
+      1130 + * can use this to decide to fall back to synchronous IO.
+      1131 + */
+      1132 +bool
+      1133 +pgaio_can_start_io(void)
+      1134 +{
+      1135 +        return pgaio_my_backend != NULL &&
+      1136 +                pgaio_my_backend->handed_out_io == NULL;
+      1137 +}
+      1138 +
+      1139 +/*
+      1140   * Submit all staged but not yet submitted IOs.
+      1141   *
+      1142   * Unless in batch mode, this never needs to be called, as IO
+            s get submitted
+  ⎿  Updated src/include/storage/aio.h (+1 -0)
+      352  extern void pgaio_exit_batchmode(void);
+      353  extern void pgaio_submit_staged(void);
+      354  extern bool pgaio_have_staged(void);
+      355 +extern bool pgaio_can_start_io(void);
+      356
+      357
+      358
+
+● Now the main part in xlog.c. First the includes, GUC variables, and shared
+  tracker struct.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Bash(cd /media/sahil/newvolume/dbms-project/src/backend/access/transam;
+      python3 - <<'EOF'
+      p='xlog.c'; s=open(p).read()…)
+  ⎿  Updated src/backend/access/transam/xlog.c (+60 -0)
+      85  #include "replication/snapbuild.h"
+      86  #include "replication/walreceiver.h"
+      87  #include "replication/walsender.h"
+      88 +#include "storage/aio.h"
+      89  #include "storage/bufmgr.h"
+      90  #include "storage/fd.h"
+      91  #include "storage/ipc.h"
+     ...
+      136  bool            wal_recycle = true;
+      137  bool            log_checkpoints = true;
+      138  int                     wal_sync_method = DEFAULT_WAL_SYNC_MET
+           HOD;
+      139 +int                     wal_io_method = WAL_IO_METHOD_SYNC;
+      140 +int                     wal_io_max_inflight = 16;
+      141  int                     wal_level = WAL_LEVEL_REPLICA;
+      142  int                     CommitDelay = 0;        /* precommit d
+           elay in microseconds */
+      143  int                     CommitSiblings = 5; /* # concurrent xa
+           cts needed to sleep */
+     ...
+      193          {NULL, 0, false}
+      194  };
+      195
+      196 +const struct config_enum_entry wal_io_method_options[] = {
+      197 +        {"sync", WAL_IO_METHOD_SYNC, false},
+      198 +#ifdef O_DSYNC
+      199 +        {"aio", WAL_IO_METHOD_AIO, false},
+      200 +#endif
+      201 +        {NULL, 0, false}
+      202 +};
+      203
+      204 +
+      205  /*
+      206   * Although only "on", "off", and "always" are documented,
+      207   * we accept all the likely variants of "on" and "off".
+     ...
+      463  } XLogCtlInsert;
+      464
+      465  /*
+      466 + * State of one asynchronous WAL write, see "Asynchronous WAL
+          +writes" below.
+      467 + */
+      468 +typedef enum XLogAioWriteStatus
+      469 +{
+      470 +        XLOG_AIO_WRITE_INFLIGHT = 1,    /* submitted, not yet
+          +completed */
+      471 +        XLOG_AIO_WRITE_DONE,            /* completed, data is
+          +durable */
+      472 +        XLOG_AIO_WRITE_FAILED,          /* completed with an e
+          +rror */
+     … 51 more lines (ctrl+o to expand)
+
+● Now the core: issuer, completion callback, range-tracker advance, waits,
+  segment-completion processing, and worker reopen.
+
+● Bash(cd /media/sahil/newvolume/dbms-project/src/backend/access/transam; cat >
+      /tmp/claude-1000/-media-sahil-newvolume-dbms-project/381e466a-6ab2-420a-9d
+      dd-64760482f4…)
+  ⎿  1 file changed (binary, mode only or too large to show)
+
+● Now wire it into the existing functions: prototypes, XLogWrite, XLogFlush,
+  AdvanceXLInsertBuffer, XLogBackgroundFlush, XLogFileClose, get_sync_bit, shmem
+  init and startup.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Bash(cd /media/sahil/newvolume/dbms-project/src/backend/access/transam;
+      python3 - <<'EOF'
+      p='xlog.c'; s=open(p).read()…)
+  ⎿  Updated src/backend/access/transam/xlog.c (+80 -1)
+      818  static void AdvanceXLInsertBuffer(XLogRecPtr upto, TimeLineID
+           tli,
+      819
+               bool opportunistic);
+      820  static void XLogWrite(XLogwrtRqst WriteRqst, TimeLineID tli, b
+           ool flexible);
+      821 +static inline bool XLogAioEnabled(void);
+      822 +static void XLogAioIssue(XLogRecPtr upto, TimeLineID tli);
+      823 +static bool XLogAioWaitFlush(XLogRecPtr upto);
+      824 +static void XLogAioReap(void);
+      825 +static bool XLogAioSegmentsPending(void);
+      826 +static void XLogAioProcessFinishedSegments(TimeLineID tli);
+      827 +static void XLogFlushAio(XLogRecPtr record, TimeLineID insertT
+          +LI);
+      828  static bool InstallXLogFileSegment(XLogSegNo *segno, char *tmp
+           path,
+      829
+                bool find_free, XLogSegNo max_segno,
+      830
+                TimeLineID tli);
+     ...
+      2227                                          WriteRqst.Flush = Inv
+            alidXLogRecPtr;
+      2228                                          XLogWrite(WriteRqst,
+            tli, false);
+      2229                                          LWLockRelease(WALWrit
+            eLock);
+      2230 +
+      2231 +                                        /*
+      2232 +                                         * With AIO the write
+           + has only been started, wait for it.
+      2233 +                                         * The buffer can onl
+           +y be reused once it's done.
+      2234 +                                         */
+      2235 +                                        if (XLogAioEnabled())
+      2236 +                                                XLogAioWaitFl
+           +ush(OldPageRqstPtr);
+      2237                                          pgWalUsage.wal_buffer
+            s_full++;
+      2238                                          TRACE_POSTGRESQL_WAL_
+            BUFFER_WRITE_DIRTY_DONE();
+      2239
+     ...
+      2474          Assert(CritSectionCount > 0);
+      2475
+      2476          /*
+      2477 +         * With wal_io_method = aio, just start the writes.
+           +They are durable once
+      2478 +         * complete, so there's no separate flush, and the co
+           +mpletion advances
+      2479 +         * the shared Write/Flush positions.  Callers wait as
+           + needed.
+      2480 +         */
+      2481 +        if (XLogAioEnabled())
+      2482 +        {
+      2483 +                XLogAioIssue(WriteRqst.Write, tli);
+      2484 +                return;
+      2485 +        }
+      2486 +
+      2487 +        /*
+     … 105 more lines (ctrl+o to expand)
+
+● Now build:
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Clean build with no warnings. Next, install, then run the main regression
+  suite with the AIO WAL path forced on, once per io_method (worker, io_uring,
+  sync).
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● I'll run pg_regress directly against the installed binaries with
+  --temp-config, launching the three io_method variants in parallel on separate
+  ports.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● All 239 regression tests pass with AIO enabled under each io_method, though
+  that doesn't confirm the AIO path ran or cover crash durability. I'm now
+  checking whether IPC::Run can be installed so the recovery TAP suite can run
+  with AIO forced on.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Downloaded IPC::Run (pure Perl) from CPAN into its own directory. I'll only
+  put its lib/ on PERL5LIB and won't run its build scripts. Checking that the
+  TAP cluster harness honours TEMP_CONFIG:
+
+  Ran 1 shell command (ctrl+o to expand)
+  ⎿  Blocked by auto mode
+     │ Auto mode: [Code from External]
+
+● The sandbox blocked the downloaded IPC::Run, so I'll write my own crash
+  harness instead. While re-reviewing, I spotted a race where the tracker entry
+  was published before the IO started, letting a waiter hit an "IO in wrong
+  state" error that becomes a PANIC; I'll publish only after submission and
+  re-run the advance step.
+
+● Bash(cd /media/sahil/newvolume/dbms-project/src/backend/access/transam;
+      python3 - <<'EOF'
+      p='xlog.c'; s=open(p).read()…)
+  ⎿  Updated src/backend/access/transam/xlog.c (+18 -5)
+      3395                          iov[0].iov_base = XLogCtl->pages + st
+            artidx * (Size) XLOG_BLCKSZ;
+      3396                          iov[0].iov_len = w->nbytes;
+      3397
+      3398 -                        /* publish the entry before the IO ca
+           -n possibly complete */
+      3398 +                        /*
+      3399 +                         * The completion callback needs the
+           +entry, which may run before
+      3400 +                         * pgaio_io_start_writev() returns.
+      3401 +                         */
+      3402                          SpinLockAcquire(&XLogCtl->aio_lck);
+      3403                          pgaio_io_get_wref(ioh, &w->wref);
+      3404                          w->status = XLOG_AIO_WRITE_INFLIGHT;
+      3402 -                        XLogCtl->aioNext = seqno + 1;
+      3405                          SpinLockRelease(&XLogCtl->aio_lck);
+      3406
+      3405 -                        pg_atomic_write_u64(&XLogCtl->aioIssu
+           -edUpTo, end);
+      3406 -
+      3407                          pgaio_io_start_writev(ioh, openLogFil
+            e, 1, offset);
+      3408
+      3409                          /*
+     ...
+      3413                           */
+      3414                          pgaio_submit_staged();
+      3415
+      3416 +                        /*
+      3417 +                         * Only now make the write visible to
+           + waiters: before it was
+      3418 +                         * started, waiting for it via the wa
+           +it reference would fail.  If
+      3419 +                         * it already completed, the completi
+           +on couldn't retire it, as it
+      3420 +                         * wasn't part of [aioHead, aioNext)
+           +yet, so try that again.
+      3421 +                         */
+      3422 +                        SpinLockAcquire(&XLogCtl->aio_lck);
+      3423 +                        XLogCtl->aioNext = seqno + 1;
+      3424 +                        XLogAioAdvanceLocked();
+      3425 +                        SpinLockRelease(&XLogCtl->aio_lck);
+      3426 +
+      3427 +                        pg_atomic_write_u64(&XLogCtl->aioIssu
+           +edUpTo, end);
+      3428 +
+      3429                          pgstat_count_io_op(IOOBJECT_WAL, IOCO
+            NTEXT_NORMAL, IOOP_WRITE,
+      3417 -                                                           1,
+           - w->nbytes);
+      3430 +                                                           1,
+           + iov[0].iov_len);
+      3431                  }
+      3432                  else
+     … 1 more lines (ctrl+o to expand)
+
+● The handle's iov may already be recycled once the IO starts, so I'll read the
+  byte count from a local instead. I'm also adding a DEBUG2 log for writes that
+  complete while an older one is still in flight, so the tests can show that
+  out-of-order completion happens and is held back.
+
+● Bash(cd /media/sahil/newvolume/dbms-project/src/backend/access/transam;
+      python3 - <<'EOF'
+      p='xlog.c'; s=open(p).read()…)
+  ⎿  Updated src/backend/access/transam/xlog.c (+9 -1)
+      2970  XLogAioCompleteWrite(uint64 seqno, int result)
+      2971  {
+      2972          XLogAioWrite *w = XLogAioSlot(seqno);
+      2973 +        uint64          head;
+      2974 +        XLogRecPtr      flushed;
+      2975
+      2976          /*
+      2977           * The slot's descriptive fields can't change while t
+            he write is in
+     ...
+      2984                  result = XLogAioFinishShortWrite(w, result);
+      2985
+      2986          SpinLockAcquire(&XLogCtl->aio_lck);
+      2987 +        head = XLogCtl->aioHead;
+      2988          if (result == (int) w->nbytes)
+      2989                  w->status = XLOG_AIO_WRITE_DONE;
+      2990          else
+     ...
+      2993                  w->error = result < 0 ? -result : EIO;
+      2994          }
+      2995          XLogAioAdvanceLocked();
+      2996 +        flushed = pg_atomic_read_u64(&XLogCtl->logFlushResult
+           +);
+      2997          SpinLockRelease(&XLogCtl->aio_lck);
+      2998 +
+      2999 +        if (seqno != head && flushed < w->end)
+      3000 +                elog(DEBUG2, "WAL write %" PRIu64 " up to %X/
+           +%08X completed before write %" PRIu64 ", flush position held
+           +at %X/%08X",
+      3001 +                         seqno, LSN_FORMAT_ARGS(w->end), head
+           +, LSN_FORMAT_ARGS(flushed));
+      3002  }
+      3003
+      3004  static PgAioResult
+     ...
+      3435                          pg_atomic_write_u64(&XLogCtl->aioIssu
+            edUpTo, end);
+      3436
+      3437                          pgstat_count_io_op(IOOBJECT_WAL, IOCO
+            NTEXT_NORMAL, IOOP_WRITE,
+      3430 -                                                           1,
+           - iov[0].iov_len);
+      3438 +                                                           1,
+           + npages * XLOG_BLCKSZ);
+      3439                  }
+      3440                  else
+      3441                  {
+
+● Bash(cd /media/sahil/newvolume/dbms-project/src/backend/access/transam;
+      python3 - <<'EOF'
+      p='xlog.c'; s=open(p).read()…)
+  ⎿  Updated src/backend/access/transam/xlog.c (+4 -2)
+      2970  XLogAioCompleteWrite(uint64 seqno, int result)
+      2971  {
+      2972          XLogAioWrite *w = XLogAioSlot(seqno);
+      2973 +        XLogRecPtr      end = w->end;
+      2974          uint64          head;
+      2975          XLogRecPtr      flushed;
+      2976
+     ...
+      2997          flushed = pg_atomic_read_u64(&XLogCtl->logFlushResult
+            );
+      2998          SpinLockRelease(&XLogCtl->aio_lck);
+      2999
+      2999 -        if (seqno != head && flushed < w->end)
+      3000 +        /* once retired, the slot may be reused; only use loc
+           +al copies here */
+      3001 +        if (seqno != head && flushed < end)
+      3002                  elog(DEBUG2, "WAL write %" PRIu64 " up to %X/
+            %08X completed before write %" PRIu64 ", flush position held
+            at %X/%08X",
+      3001 -                         seqno, LSN_FORMAT_ARGS(w->end), head
+           -, LSN_FORMAT_ARGS(flushed));
+      3003 +                         seqno, LSN_FORMAT_ARGS(end), head, L
+           +SN_FORMAT_ARGS(flushed));
+      3004  }
+      3005
+      3006  static PgAioResult
+
+● The rebuild is clean, and I'm moving on to the crash-durability harness, which
+  uses libpq via ctypes. It runs 16 concurrent clients, SIGKILLs the server at
+  random points, and checks that every acknowledged commit survives recovery,
+  with small WAL segments and archiving on.
+
+  Made 1 scratchpad edit +212, ran 3 shell commands (ctrl+o to expand)
+
+● Epoch 1 passed with all 3178 acknowledged commits present, but assertion
+  failures and a startup failure on a still-attached shared memory segment have
+  appeared. I'm checking the log next.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● I found the cause: it's a genuine PostgreSQL issue, not a harness bug, since
+  its children call setsid() and survive my killpg. I'm now checking how the
+  tree handles exit-on-postmaster-death inside critical sections.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● The tree has no critical-section handling on the postmaster-death exit path,
+  so I'll follow the quickdie() precedent and use _exit(2) in waiteventset.c
+  when that happens inside a critical section. Recovery already treats that as a
+  crash, so it's safe, and it closes a latent hazard that WAL AIO is the first
+  to hit.
+
+  Ran 1 shell command (ctrl+o to expand)
+● Bash(cd /media/sahil/newvolume/dbms-project/src/backend/storage/ipc; python3 -
+      <<'EOF'
+      import re…)
+  ⎿  Updated src/backend/storage/ipc/waiteventset.c (+22 -5)
+      232  }
+      233
+      234
+      235 +
+      236  /*
+      237 + * Exit because the postmaster died, for WL_EXIT_ON_PM_DEATH.
+      238 + *
+      239 + * Inside a critical section, shared memory may be in an inter
+          +mediate state,
+      240 + * e.g. while a backend waits for the WAL containing its commi
+          +t record to be
+      241 + * written (an AIO wait may sleep here).  Running the regular
+          +exit callbacks
+      242 + * would then e.g. try to abort an already WAL-logged commit.
+          + Exit without
+      243 + * cleanup instead, like quickdie() does; to recovery this loo
+          +ks like a crash.
+      244 + */
+      245 +pg_noreturn static void
+      246 +ExitOnPostmasterDeath(void)
+      247 +{
+      248 +        if (CritSectionCount > 0)
+      249 +                _exit(2);
+      250 +        proc_exit(1);
+      251 +}
+      252 +/*
+      253   * Initialize the process-local wait event infrastructure.
+      254   *
+      255   * This must be called once during startup of any process that
+            can wait on
+     ...
+      1278                          if (!PostmasterIsAliveInternal())
+      1279                          {
+      1280                                  if (set->exit_on_postmaster_d
+            eath)
+      1264 -                                        proc_exit(1);
+      1281 +                                        ExitOnPostmasterDeath
+           +();
+      1282                                  occurred_events->fd = PGINVAL
+            ID_SOCKET;
+      1283                                  occurred_events->events = WL_
+            POSTMASTER_DEATH;
+      1284                                  occurred_events++;
+     ...
+      1360          if (unlikely(set->report_postmaster_not_running))
+      1361          {
+      1362                  if (set->exit_on_postmaster_death)
+      1346 -                        proc_exit(1);
+      1363 +                        ExitOnPostmasterDeath();
+      1364                  occurred_events->fd = PGINVALID_SOCKET;
+      1365                  occurred_events->events = WL_POSTMASTER_DEATH
+            ;
+      1366                  return 1;
+     … 24 more lines (ctrl+o to expand)
+
+● All five sites are fixed. I'm now setting up the test harness to alternate
+  between a full-cluster crash and killing just the postmaster.
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● The log still had entries from the earlier run, and the output stopped after
+  epoch 1. Clearing the log on startup and looking at the full output:
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Epoch 1 passed with all 8044 acknowledged commits intact, but epoch 2
+  (postmaster-only kill) hung, which I suspect is LWLocks left held after
+  _exit(2) inside a critical section. I'll reproduce the hang and inspect the
+  stuck processes with gdb to confirm.
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● ptrace_scope=1 blocks gdb attach, so I'll use wchan and process titles
+  instead. Semaphore/futex waits mean LWLock waits; ep_poll means latch waits.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● The stuck backends are all waiting on LWLocks, because a process exited
+  mid-commit while holding one during WAL I/O. Exiting immediately would either
+  leave zombie backends or risk corrupting WAL, so the safe fix is to let the
+  wait finish before dying; I'm now checking whether the IO workers can still
+  complete that I/O after the postmaster dies.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● IO workers only exit on postmaster death while idle; queued I/O gets processed
+  first. Let me check what submission does when no worker can take the I/O:
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Submissions queue even when no worker is alive, so I/O queued near postmaster
+  death can be stranded. I'll keep critical sections alive until in-flight WAL
+  writes finish, and have new submissions run synchronously with workers
+  draining their queues before exit.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Bash(cd /media/sahil/newvolume/dbms-project/src/backend/storage; python3 -
+      <<'EOF'
+      p='aio/method_worker.c'; s=open(p).read()…)
+  ⎿  Updated src/backend/storage/aio/method_worker.c (+30 -4)
+      490          for (int i = 0; i < num_staged_ios; i++)
+      491                  pgaio_io_prepare_submit(staged_ios[i]);
+      492
+      493 -        if (LWLockConditionalAcquire(AioWorkerSubmissionQueueL
+          -ock, LW_EXCLUSIVE))
+      493 +        /*
+      494 +         * Once the postmaster has died, workers exit as soon
+          +as they run out of
+      495 +         * work, and no new ones get started.  The IO could th
+          +en never be
+      496 +         * executed, but the submitter may be waiting for it i
+          +n a critical
+      497 +         * section, e.g. for a WAL write.  Execute it synchron
+          +ously instead.
+      498 +         */
+      499 +        if (unlikely(!PostmasterIsAlive()))
+      500          {
+      501 +                synchronous_ios = staged_ios;
+      502 +                nsync = num_staged_ios;
+      503 +        }
+      504 +        else if (LWLockConditionalAcquire(AioWorkerSubmissionQ
+          +ueueLock, LW_EXCLUSIVE))
+      505 +        {
+      506                  for (int i = 0; i < num_staged_ios; ++i)
+      507                  {
+      508                          Assert(!pgaio_worker_needs_synchronous
+           _execution(staged_ios[i]));
+     ...
+      1020                          set_ps_display(cmd);
+      1021  #endif
+      1022
+      1012 -                        if (WaitLatch(MyLatch, WL_LATCH_SET |
+           - WL_EXIT_ON_PM_DEATH | WL_TIMEOUT,
+      1013 -                                                  timeout_ms,
+      1014 -                                                  WAIT_EVENT_
+           -IO_WORKER_MAIN) == WL_TIMEOUT)
+      1023 +                        rc = WaitLatch(MyLatch, WL_LATCH_SET
+           +| WL_POSTMASTER_DEATH | WL_TIMEOUT,
+      1024 +                                                   timeout_ms
+           +,
+      1025 +                                                   WAIT_EVENT
+           +_IO_WORKER_MAIN);
+      1026 +                        if (rc & WL_POSTMASTER_DEATH)
+      1027                          {
+      1028 +                                /*
+      1029 +                                 * Don't exit while IOs are q
+           +ueued: their issuers may be
+      1030 +                                 * waiting for them in a crit
+           +ical section (e.g. WAL writes),
+      1031 +                                 * and nobody else would exec
+           +ute them.  The queue is checked
+      1032 +                                 * again at the top of the lo
+           +op.
+      1033 +                                 */
+      1034 +                                LWLockAcquire(AioWorkerSubmis
+           +sionQueueLock, LW_EXCLUSIVE);
+      1035 +                                queue_depth = pgaio_worker_su
+           +bmission_queue_depth();
+      1036 +                                LWLockRelease(AioWorkerSubmis
+           +sionQueueLock);
+     … 8 more lines (ctrl+o to expand)
+
+● Bash(cd /media/sahil/newvolume/dbms-project/src/backend/storage; python3 -
+      <<'EOF'
+      p='aio/method_worker.c'; s=open(p).read()…)
+  ⎿  Updated src/backend/storage/aio/method_worker.c (+1 -0)
+      969                  else
+      970                  {
+      971                          int                     timeout_ms;
+      972 +                        int                     rc;
+      973
+      974                          /* Cancel new worker request if pendin
+           g. */
+      975                          pgaio_worker_cancel_grow();
+  ⎿  Updated src/backend/storage/ipc/waiteventset.c (+22 -8)
+      236  /*
+      237   * Exit because the postmaster died, for WL_EXIT_ON_PM_DEATH.
+      238   *
+      239 - * Inside a critical section, shared memory may be in an inter
+          -mediate state,
+      240 - * e.g. while a backend waits for the WAL containing its commi
+          -t record to be
+      241 - * written (an AIO wait may sleep here).  Running the regular
+          -exit callbacks
+      242 - * would then e.g. try to abort an already WAL-logged commit.
+          - Exit without
+      243 - * cleanup instead, like quickdie() does; to recovery this loo
+          -ks like a crash.
+      239 + * Inside a critical section, exiting is not safe: shared memo
+          +ry may be in an
+      240 + * intermediate state, e.g. while a backend waits for the WAL
+          +containing its
+      241 + * commit record to be written (AIO waits may sleep here).  Th
+          +e regular exit
+      242 + * callbacks would then e.g. try to abort an already WAL-logge
+          +d commit, while
+      243 + * exiting without them would leave LWLocks held forever.  Ins
+          +tead, keep
+      244 + * waiting, polling, so that the IO can complete and the criti
+          +cal section can
+      245 + * be left; the process will exit at its next wait outside of
+          +it.  Like
+      246 + * SyncRepWaitForLSN(), we can't just exit in the middle of a
+          +commit.  If that
+      247 + * doesn't happen in a reasonable time, exit without cleanup l
+          +ike quickdie()
+      248 + * does; to recovery this looks like a crash.
+      249   */
+      245 -pg_noreturn static void
+      250 +static void
+      251  ExitOnPostmasterDeath(void)
+      252  {
+      248 -        if (CritSectionCount > 0)
+      253 +        static pg_time_t crit_pm_death_since = 0;
+      254 +
+      255 +        if (CritSectionCount == 0)
+      256 +                proc_exit(1);
+      257 +
+      258 +        if (crit_pm_death_since == 0)
+      259 +                crit_pm_death_since = (pg_time_t) time(NULL);
+      260 +        else if ((pg_time_t) time(NULL) - crit_pm_death_since
+          +> 30)
+      261                  _exit(2);
+      250 -        proc_exit(1);
+      262 +
+      263 +        /* the postmaster death event stays set, avoid busy-lo
+          +oping */
+      264 +        pg_usleep(10 * 1000L);
+      265  }
+      266  /*
+      267   * Initialize the process-local wait event infrastructure.
+
+● Built cleanly. Rerunning the crash test with alternating whole-crash and
+  postmaster-death epochs:
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● All 8 crash tests passed, with 69,832 acknowledged commits verified and no
+  errors or hangs, though the cp-based archiver is falling behind (1125 segments
+  still waiting). Next I'll run a non-crash pgbench test to confirm every WAL
+  segment is archived contiguously and parses cleanly with pg_waldump, and to
+  check pg_aios for overlapping WAL writes.
+
+  Made 1 scratchpad edit +63, ran 1 shell command (ctrl+o to expand)
+
+● All three io_methods passed, with every segment archived and no PANICs or
+  TRAPs. Out-of-order completions were held back as expected: 485 in worker
+  mode, 42 in io_uring, none in sync mode. The "625 in flight" figure for worker
+  mode was a bug in my query, since it counted completed-but-unreclaimed
+  handles, so I'm re-sampling only the truly in-flight ones.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Several WAL writes are in flight at once, up to three in these samples, and
+  out-of-order completions are being held back correctly. Next I'll start a
+  non-assert release build for benchmarking, run the crash test under three I/O
+  configurations, and re-run the regression suite on the default sync path to
+  confirm my recent edits caused no regressions.
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● io_uring with O_DIRECT passed all 6 crashes. But io_uring failed after epoch 4
+  and sync mode failed right away. Investigating:
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Both failures came from a harness race, where a process disappeared between
+  the existence check and the read, so the error was ProcessLookupError rather
+  than FileNotFoundError. There's no server-side fault; I'm fixing the harness
+  and re-running those two tests.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Background command "Build release (non-assert) for benchmarks" completed (exit
+code 0)
+  ⎿  UserPromptSubmit hook error
+  ⎿  Failed with non-blocking status code: /bin/sh: 1: node: not found
+
+● All crash runs passed: 28 crashes across 4 configurations, with about 137k
+  acknowledged commits verified and no PANIC, TRAP or hang, and the release
+  build is done. Next I'm running the regression suite with the default sync I/O
+  method, plus the isolation suite with AIO enabled.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Both regression suites passed: 239 of 239 on the default path and 134 of 134
+  with AIO WAL isolation. Next I'll run pgbench write-heavy benchmarks on the
+  release build across four configurations (sync with fdatasync or
+  open_datasync, and aio with io_uring or worker) at 1, 8, 32 and 128 clients.
+
+  Made 1 scratchpad edit +45, ran 1 shell command (ctrl+o to expand)
+
+● Results are mixed: AIO matches stock at 1 and 128 clients but is about 40%
+  slower at 8–32. I suspect the same-page write rule is the cause, so I'm
+  switching buffered I/O to write only the issued byte range and implementing
+  that now.
+
+  Read 1 file, ran 1 shell command (ctrl+o to expand)
+● Bash(cd /media/sahil/newvolume/dbms-project/src/backend/access/transam;
+      python3 - <<'EOF'
+      p='xlog.c'; s=open(p).read()…)
+  ⎿  Updated src/backend/access/transam/xlog.c (+50 -18)
+      480          XLogSegNo       segno;
+      481          uint32          offset;                 /* file offset
+            of first byte written */
+      482          uint32          nbytes;                 /* number of b
+           ytes written */
+      483 -        int                     bufidx;                 /* WAL
+          - buffer index of first page */
+      483 +        Size            bufoff;                 /* offset of f
+          +irst byte in XLogCtl->pages */
+      484          XLogAioWriteStatus status;
+      485          int                     error;                  /* err
+           no, if status is FAILED */
+      486          PgAioWaitRef wref;                      /* to wait for
+            the write to complete */
+     ...
+      2811   *   recycles a WAL buffer once Write has passed it, a buffer
+             can't be reused
+      2812   *   while a write is still reading from it.
+      2813   *
+      2814 - * - Writes always cover whole WAL pages.  If the next write
+           -starts in the
+      2815 - *   middle of a page, that page was also covered by the prev
+           -ious write; the
+      2816 - *   new write is only submitted once the previous one comple
+           -ted, so that the
+      2817 - *   two can't be reordered by the kernel or device, which co
+           -uld leave the
+      2818 - *   older version of the page on disk.
+      2814 + * - Writes never overlap while in flight, as the kernel or d
+           +evice could
+      2815 + *   reorder them, leaving the older version of the data on d
+           +isk.  With
+      2816 + *   buffered IO, each write covers exactly the newly issued
+           +bytes, so writes
+      2817 + *   never overlap and several writes of the same page can be
+           + in flight; this
+      2818 + *   is what allows small commits to be pipelined.  The bytes
+           + after the end
+      2819 + *   of the last record on a page are not written, unlike wit
+           +h synchronous
+      2820 + *   writes; recovery doesn't need them to be zero, as the re
+           +cord header
+      2821 + *   checks (xl_prev, CRC) detect the end of WAL, like for WA
+           +L written by a
+      2822 + *   walreceiver.  With direct IO, writes have to cover whole
+           + pages; if the
+      2823 + *   next write starts in the middle of a page, that page was
+           + also covered by
+      2824 + *   the previous write, and the new write is only submitted
+           +once the
+      2825 + *   previous one completed.
+      2826   *
+      2827   * - The number of writes in flight is limited by wal_io_max_
+            inflight.
+      2828   *
+     ...
+      2945          if (fd < 0)
+      2946                  return -errno;
+      2947
+      2941 -        from = XLogCtl->pages + w->bufidx * (Size) XLOG_BLCKS
+           -Z;
+      2948 +        from = XLogCtl->pages + w->bufoff;
+      2949          while (done < w->nbytes)
+      2950          {
+      2951                  ssize_t         written;
+     ...
+      3211  }
+     … 96 more lines (ctrl+o to expand)
+
+● The safety argument doesn't fully hold: with pure byte-range writes, stale
+  bytes from earlier passes can remain past the end of WAL on the same page, so
+  recovery could replay a stale record. I'll adjust the fix so the first write
+  to a page zeroes its tail, keeping most of the pipelining.
+
+● Bash(cd /media/sahil/newvolume/dbms-project/src/backend/access/transam;
+      python3 - <<'EOF'
+      p='xlog.c'; s=open(p).read()…)
+  ⎿  Updated src/backend/access/transam/xlog.c (+67 -34)
+      636          pg_atomic_uint64 aioIssuedUpTo;
+      637          XLogRecPtr      aioSegDoneUpTo;
+      638          XLogAioWrite aioWrites[XLOG_AIO_MAX_INFLIGHT];
+      639 +
+      640 +        /*
+      641 +         * aioZeroedUpTo is the end of the last page that a wr
+          +ite has covered
+      642 +         * completely, i.e. including the zeroes after the las
+          +t record on it, and
+      643 +         * aioZeroingSeq that write's number (or PG_UINT64_MAX
+          +).  Changed by the
+      644 +         * issuer while holding both WALWriteLock and aio_lck.
+      645 +         */
+      646 +        XLogRecPtr      aioZeroedUpTo;
+      647 +        uint64          aioZeroingSeq;
+      648  } XLogCtlData;
+      649
+      650  /*
+     ...
+      2820   *   recycles a WAL buffer once Write has passed it, a buffer
+             can't be reused
+      2821   *   while a write is still reading from it.
+      2822   *
+      2814 - * - Writes never overlap while in flight, as the kernel or d
+           -evice could
+      2815 - *   reorder them, leaving the older version of the data on d
+           -isk.  With
+      2816 - *   buffered IO, each write covers exactly the newly issued
+           -bytes, so writes
+      2817 - *   never overlap and several writes of the same page can be
+           - in flight; this
+      2818 - *   is what allows small commits to be pipelined.  The bytes
+           - after the end
+      2819 - *   of the last record on a page are not written, unlike wit
+           -h synchronous
+      2820 - *   writes; recovery doesn't need them to be zero, as the re
+           -cord header
+      2821 - *   checks (xl_prev, CRC) detect the end of WAL, like for WA
+           -L written by a
+      2822 - *   walreceiver.  With direct IO, writes have to cover whole
+           - pages; if the
+      2823 - *   next write starts in the middle of a page, that page was
+           - also covered by
+      2824 - *   the previous write, and the new write is only submitted
+           -once the
+      2825 - *   previous one completed.
+      2823 + * - Writes with different contents for the same bytes are ne
+           +ver in flight
+      2824 + *   at the same time, as the kernel or device could reorder
+           +them, leaving
+      2825 + *   the older version on disk.  Like synchronous writes, the
+           + bytes after the
+      2826 + *   last record on a page must be zeroes on disk, so that st
+           +ale data from an
+      2827 + *   earlier use of the segment (or from before a crash) can'
+           +t be mistaken
+      2828 + *   for valid WAL.  With buffered IO, the write that first r
+           +eaches a page
+      2829 + *   writes it through its end, i.e. including the zeroes (th
+           +e "zeroing
+      2830 + *   write", see aioZeroedUpTo); later writes of that page on
+           +ly write the
+      2831 + *   newly issued bytes.  Only the first of those overlaps th
+           +e zeroing write
+      2832 + *   and has to wait for it to complete; the following ones d
+           +on't overlap
+     … 142 more lines (ctrl+o to expand)
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Pipelining dropped throughput to 11–14k TPS at 32 clients, below both the
+  serialized version's 18–19k and stock's roughly 30k, because many small
+  concurrent O_DSYNC writes cost more here than one batched flush. I'm now
+  sweeping the in-flight cap to find the balance between batching and
+  concurrency.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● At a small cap, AIO matches stock at 32 clients and beats it at 128, but still
+  trails at 8 clients. I found that my issuer computes its write size before
+  waiting on the lock, so WAL inserted during the wait gets pushed to the next
+  round; I'll move the waits ahead of that calculation.
+
+● Bash(cd /media/sahil/newvolume/dbms-project/src/backend/access/transam;
+      python3 - <<'EOF'
+      p='xlog.c'; s=open(p).read()…)
+  ⎿  Updated src/backend/access/transam/xlog.c (+15 -6)
+      3581          {
+      3582                  XLogRecPtr      WriteRqstPtr;
+      3583                  XLogRecPtr      insertpos;
+      3584 +                uint64          head;
+      3585
+      3586                  RefreshXLogWriteResult(LogwrtResult);
+      3587                  if (record <= LogwrtResult.Flush)
+     ...
+      3594                          continue;
+      3595                  }
+      3596
+      3597 +                /*
+      3598 +                 * If issuing would have to wait, for a zeroi
+           +ng write or for the
+      3599 +                 * number of writes in flight to go down, wai
+           +t now, before deciding
+      3600 +                 * how far to write and without holding the l
+           +ock.  WAL inserted in
+      3601 +                 * the meantime then goes into the same write
+           +, which is how group
+      3602 +                 * commit happens with AIO, and the waits hap
+           +pen concurrently.
+      3603 +                 */
+      3604 +                XLogAioWaitForZeroingWrite();
+      3605 +                if (XLogAioInflight(&head) >= (uint64) wal_io
+           +_max_inflight)
+      3606 +                {
+      3607 +                        XLogAioWaitForWrite(head);
+      3608 +                        continue;
+      3609 +                }
+      3610 +
+      3611                  /* try to write later additions to XLOG as we
+            ll, see XLogFlush() */
+      3612                  WriteRqstPtr = record;
+      3613                  SpinLockAcquire(&XLogCtl->info_lck);
+     ...
+      3616                  SpinLockRelease(&XLogCtl->info_lck);
+      3617                  insertpos = WaitXLogInsertionsToFinish(WriteR
+            qstPtr);
+      3618
+      3604 -                /*
+      3605 -                 * If the write would have to wait for a zero
+           -ing write, do the waiting
+      3606 -                 * before getting the lock.
+      3607 -                 */
+      3608 -                XLogAioWaitForZeroingWrite();
+      3609 -
+      3619                  if (!LWLockAcquireOrWait(WALWriteLock, LW_EXC
+            LUSIVE))
+      3620                          continue;
+      3621
+  ⎿  (timeout 10m)
+
+● With the inflight limit set to 1, io_uring now matches stock at 8 and 32
+  clients and beats it at 128 (about 27k vs 23k). Since more concurrency still
+  hurts, I suspect each O_DSYNC write triggers a full device cache flush, so I'm
+  checking whether the NVMe supports FUA.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● The drive has a volatile write-back cache and supports FUA, so
+  O_DIRECT|O_DSYNC overwrites will be benchmarked with debug_io_direct=wal.
+  Since the code has changed, I'm now re-running the full correctness suite in
+  parallel.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● All the changes pass: regression under both io_methods, 22 more crashes
+  covering about 77k acknowledged commits, and archive and pg_waldump checks in
+  buffered and O_DIRECT modes, with no PANIC or TRAP. I'm now running the final
+  benchmark as a median of 3 runs, including O_DIRECT variants of stock and AIO.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● While the rest of the benchmark runs, I'll document the two new GUCs in
+  config.sgml next to wal_sync_method:
+
+  Read 1 file, ran 1 shell command (ctrl+o to expand)
+
+● I'll write the docs once the benchmark finishes, since the right default for
+  wal_io_max_inflight depends on its results.
+
+  Read 1 file (ctrl+o to expand)
+
+● Update(doc/src/sgml/config.sgml)
+  ⎿  Added 58 lines
+      3588          This parameter can only be set in the <filename>postg
+            resql.conf</filename>
+      3589          file or on the server command line.
+      3590         </para>
+      3591 +       <para>
+      3592 +        This parameter is ignored if <xref linkend="guc-wal-i
+           +o-method"/> is
+      3593 +        <literal>aio</literal>.
+      3594 +       </para>
+      3595        </listitem>
+      3596       </varlistentry>
+      3597
+      3598 +     <varlistentry id="guc-wal-io-method" xreflabel="wal_io_m
+           +ethod">
+      3599 +      <term><varname>wal_io_method</varname> (<type>enum</typ
+           +e>)
+      3600 +      <indexterm>
+      3601 +       <primary><varname>wal_io_method</varname> configuratio
+           +n parameter</primary>
+      3602 +      </indexterm>
+      3603 +      </term>
+      3604 +      <listitem>
+      3605 +       <para>
+      3606 +        Selects how WAL is written to disk.  With <literal>sy
+           +nc</literal>
+      3607 +        (the default), the process flushing WAL writes it wit
+           +h
+      3608 +        <function>pwrite()</function> and then forces it to d
+           +isk according to
+      3609 +        <xref linkend="guc-wal-sync-method"/>, while holding
+           +a lock that
+      3610 +        prevents other processes from writing WAL at the same
+           + time.
+      3611 +       </para>
+      3612 +       <para>
+      3613 +        With <literal>aio</literal>, WAL is written using the
+           + asynchronous I/O
+      3614 +        subsystem selected by <xref linkend="guc-io-method"/>
+           +, to WAL files
+      3615 +        opened with <symbol>O_DSYNC</symbol> (and with
+      3616 +        <symbol>O_DIRECT</symbol> if <xref linkend="guc-debug
+           +-io-direct"/>
+      3617 +        includes <literal>wal</literal>), so that a completed
+           + write is
+      3618 +        durable.  Writes are started without waiting for them
+           + to complete,
+      3619 +        several of them can be in progress at the same time (
+           +see
+      3620 +        <xref linkend="guc-wal-io-max-inflight"/>), and they
+           +may complete in
+      3621 +        any order; WAL is only considered flushed up to the e
+           +nd of the
+      3622 +        longest sequence of completed writes.  A transaction
+           +commit is still
+      3623 +        only reported once its WAL has been flushed.
+      3624 +       </para>
+      3625 +       <para>
+      3626 +        This parameter can only be set at server start.
+      3627 +       </para>
+      3628 +      </listitem>
+      3629 +     </varlistentry>
+      3630 +
+      3631 +     <varlistentry id="guc-wal-io-max-inflight" xreflabel="wa
+           +l_io_max_inflight">
+      3632 +      <term><varname>wal_io_max_inflight</varname> (<type>int
+           +eger</type>)
+      3633 +      <indexterm>
+      3634 +       <primary><varname>wal_io_max_inflight</varname> config
+           +uration parameter</primary>
+      3635 +      </indexterm>
+      3636 +      </term>
+      3637 +      <listitem>
+      3638 +       <para>
+      3639 +        The maximum number of WAL writes that can be in progr
+           +ess at the same
+      3640 +        time when <xref linkend="guc-wal-io-method"/> is
+      3641 +        <literal>aio</literal>.  Allowing more writes in prog
+           +ress can help on
+      3642 +        storage with high latency that can process many reque
+           +sts in parallel,
+      3643 +        but on storage where each synchronous write forces th
+           +e device's write
+      3644 +        cache to be flushed, fewer, larger writes are usually
+           + faster.  The
+      3645 +        default is WAL_IO_MAX_INFLIGHT_DEFAULT, the maximum i
+           +s 64.
+      3646 +        This parameter can only be set in the <filename>postg
+           +resql.conf</filename>
+      3647 +        file or on the server command line.
+      3648 +       </para>
+      3649 +      </listitem>
+      3650 +     </varlistentry>
+      3651 +
+      3652       <varlistentry id="guc-full-page-writes" xreflabel="full_
+            page_writes">
+      3653        <term><varname>full_page_writes</varname> (<type>boolea
+            n</type>)
+      3654        <indexterm>
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Both doc anchors exist. Waiting for the benchmark to finish.
+
+  Read 1 file (ctrl+o to expand)
+
+● Monitor(remaining benchmark result rows)
+  ⎿  Monitor started · task bwc3q93y6 · timeout 900s
+
+● The benchmark is still running; the last three configurations will arrive
+  through the monitor.
+
+● Monitor event: "remaining benchmark result rows"
+  aio worker inflight=1           2301    12640    28533    27049
+  ⎿  UserPromptSubmit hook error
+  ⎿  Failed with non-blocking status code: /bin/sh: 1: node: not found
+
+● Two configurations left (the O_DIRECT AIO variants).
+
+● Monitor event: "remaining benchmark result rows"
+  aio uring inflight=1+DIO        2624    14746    30424    29877
+  ⎿  UserPromptSubmit hook error
+  ⎿  Failed with non-blocking status code: /bin/sh: 1: node: not found
+
+● One more configuration (O_DIRECT with 4 writes in flight) to go.
+
+● Monitor event: "remaining benchmark result rows"
+  aio uring inflight=4+DIO        2701    13478    28602    26861
+  ⎿  UserPromptSubmit hook error
+  ⎿  Failed with non-blocking status code: /bin/sh: 1: node: not found
+● All results are in. wal_io_max_inflight = 1 is the best setting on this drive,
+  so I'll make it the default and update the sample config and docs to match.
+
+● Bash(cd /media/sahil/newvolume/dbms-project; python3 - <<'EOF'
+      import re…)
+  ⎿  Updated src/backend/utils/misc/guc_parameters.dat (+1 -1)
+      3505    short_desc => 'Maximum number of asynchronous WAL writes in
+             flight at once.',
+      3506    long_desc => 'Only used when "wal_io_method" is "aio".',
+      3507    variable => 'wal_io_max_inflight',
+      3508 -  boot_val => '16',
+      3508 +  boot_val => '1',
+      3509    min => '1',
+      3510    max => 'XLOG_AIO_MAX_INFLIGHT',
+      3511  },
+  ⎿  Updated src/backend/access/transam/xlog.c (+1 -1)
+      137  bool            log_checkpoints = true;
+      138  int                     wal_sync_method = DEFAULT_WAL_SYNC_MET
+           HOD;
+      139  int                     wal_io_method = WAL_IO_METHOD_SYNC;
+      140 -int                     wal_io_max_inflight = 16;
+      140 +int                     wal_io_max_inflight = 1;
+      141  int                     wal_level = WAL_LEVEL_REPLICA;
+      142  int                     CommitDelay = 0;        /* precommit d
+           elay in microseconds */
+      143  int                     CommitSiblings = 5; /* # concurrent xa
+           cts needed to sleep */
+  ⎿  Updated src/backend/utils/misc/postgresql.conf.sample (+1 -1)
+      260                                          #   open_sync
+      261  #wal_io_method = sync                   # sync, aio
+      262                                          # (change requires res
+           tart)
+      263 -#wal_io_max_inflight = 16               # max concurrent WAL w
+          -rites with aio
+      263 +#wal_io_max_inflight = 1                # max concurrent WAL w
+          +rites with aio
+      264  #full_page_writes = on                  # recover from partial
+            page writes
+      265  #wal_log_hints = off                    # also do full page wr
+           ites of non-critical updates
+      266                                          # (change requires res
+           tart)
+  ⎿  Updated doc/src/sgml/config.sgml (+1 -1)
+      3642          storage with high latency that can process many reque
+            sts in parallel,
+      3643          but on storage where each synchronous write forces th
+            e device's write
+      3644          cache to be flushed, fewer, larger writes are usually
+             faster.  The
+      3645 -        default is WAL_IO_MAX_INFLIGHT_DEFAULT, the maximum i
+           -s 64.
+      3645 +        default is 1, the maximum is 64.
+      3646          This parameter can only be set in the <filename>postg
+            resql.conf</filename>
+      3647          file or on the server command line.
+      3648         </para>
+  ⎿  (timeout 10m)
+
+● Background command "Final median-of-3 benchmark across configs" completed
+(exit code 0)
+  ⎿  UserPromptSubmit hook error
+  ⎿  Failed with non-blocking status code: /bin/sh: 1: node: not found
+
+● Monitor "remaining benchmark result rows" stream ended
+  ⎿  UserPromptSubmit hook error
+  ⎿  Failed with non-blocking status code: /bin/sh: 1: node: not found
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● I've implemented the idea. Setting wal_io_method = aio turns it on; the
+  default stays sync, which leaves the old path unchanged. All the checks below
+  passed, including the crash tests: every commit the server acknowledged
+  survived. One limit: the crash tests kill processes but can't cut power, so
+  the "completed means durable" part rests on O_DSYNC rather than being tested
+  directly. On this laptop's drive it matches the old path at low concurrency
+  and is up to 31% faster at 128 clients. The changes are uncommitted in your
+  working tree (13 files).
+
+  How it works
+
+  The core is in xlog.c (src/backend/access/transam/xlog.c#L2788):
+  - Durable writes: in AIO mode, WAL files are opened with O_DSYNC, or
+    O_DIRECT|O_DSYNC if debug_io_direct=wal. A finished write is already on
+    disk, so no separate fdatasync is needed.
+  - Starting writes: XLogAioIssue (src/backend/access/transam/xlog.c#L3322) runs
+    under WALWriteLock, starts the write and returns without waiting. It
+    records each write in a small shared list ordered by LSN.
+  - The core rule: when a write finishes, XLogAioAdvanceLocked
+    (src/backend/access/transam/xlog.c#L2912) moves the "durable up to" pointer
+    only to the end of the unbroken run of finished writes, as the doc's "core
+    rule" requires.
+  - No buffer reuse during a write: the "written up to" pointer also only moves
+    when writes finish, so a WAL buffer can't be reused while the disk is still
+    reading it.
+  - Waiting: XLogFlushAio (src/backend/access/transam/xlog.c#L3578) does no I/O
+    itself. It waits on the oldest write still in flight.
+  - Same page, two writes: two writes covering the same bytes of a WAL page are
+    never in flight together. The first write to reach a page also writes zeros
+    over the rest of it, as today's code does. With buffered I/O, later small
+    commits on that page are disjoint byte ranges and can go in parallel.
+  - Other cases handled:
+    - writes are split at segment boundaries
+    - archiving notifications are sent only once a whole segment is durable
+    - short writes are finished synchronously
+    - failures PANIC, as today
+    - if no AIO handle is available, the write is done synchronously
+    - IO workers reopen the WAL file themselves
+  - New settings: wal_io_method (sync / aio) and wal_io_max_inflight (default 1,
+    max 64), both documented in config.sgml.
+
+  Bugs testing found, and the fixes
+
+  1. Wait before submit: another backend could start waiting on a write before
+     it was submitted, which would PANIC. Now a write only becomes visible to
+     waiters after it is submitted.
+  2. Postmaster death mid-commit: if the postmaster died while a backend was
+     waiting for its WAL inside a commit, the backend ran its exit cleanup and
+     tried to abort a commit already recorded in WAL. In waiteventset.c
+     (src/backend/storage/ipc/waiteventset.c#L251), a backend in that state now
+     keeps waiting until its write finishes. If nothing finishes within 30
+     seconds, it exits immediately, which looks like a crash to recovery. In
+     method_worker.c (src/backend/storage/aio/method_worker.c#L499), IO workers
+     now finish their queue before exiting, and once the postmaster is dead new
+     I/O runs synchronously. Exiting immediately without the 30-second wait was
+     not enough: backends waiting on locks hung forever.
+  3. Stale WAL after a crash: writing only the new bytes could leave old WAL
+     from before a crash right after the new end of WAL. Recovery might have
+     replayed it. That is why the first write to each page zeros the rest of it.
+
+  Verification
+
+  - Regression tests: 239/239 pass with AIO under each io_method (worker,
+    io_uring, sync), and with the default path.
+  - Isolation tests: 134/134 pass with AIO.
+  - Crash tests (my own script): 16 clients write and record every commit the
+    server acknowledges; the server is killed and recovered; every recorded
+    commit must be present and complete. Half the kills hit the whole cluster,
+    half only the postmaster. About 50 crashes and more than 200,000
+    acknowledged commits across worker, io_uring, O_DIRECT and sync: nothing
+    lost, no PANIC, no assertion failure, no hang.
+  - Archive check: every segment reached the archive with no gaps, and
+    pg_waldump reads the archived WAL cleanly from start to end, in both
+    buffered and O_DIRECT modes.
+  - Out-of-order completion: it really happens (hundreds of times per run in the
+    logs) and the durable pointer correctly holds back each time.
+
+  Benchmark
+
+  pgbench -N, transactions per second (median of 3 runs), on a WDC SN530 NVMe
+  with ext4:
+
+  ┌──────────────────────────────────────┬──────┬───────┬───────┬───────┐
+  │                config                │  1   │   8   │  32   │  128  │
+  ├──────────────────────────────────────┼──────┼───────┼───────┼───────┤
+  │ stock fdatasync                      │ 2315 │ 14168 │ 28189 │ 22833 │
+  ├──────────────────────────────────────┼──────┼───────┼───────┼───────┤
+  │ stock open_datasync + O_DIRECT       │ 2523 │ 15219 │ 27035 │ 21072 │
+  ├──────────────────────────────────────┼──────┼───────┼───────┼───────┤
+  │ AIO io_uring, 1 in flight            │ 2211 │ 12124 │ 28103 │ 26796 │
+  ├──────────────────────────────────────┼──────┼───────┼───────┼───────┤
+  │ AIO worker, 1 in flight              │ 2301 │ 12640 │ 28533 │ 27049 │
+  ├──────────────────────────────────────┼──────┼───────┼───────┼───────┤
+  │ AIO io_uring, 1 in flight + O_DIRECT │ 2624 │ 14746 │ 30424 │ 29877 │
+  └──────────────────────────────────────┴──────┴───────┴───────┴───────┘
+
+  - Best case: AIO with O_DIRECT is level with stock or ahead at every client
+    count, and 31% faster at 128 clients.
+  - More writes in flight is slower here: with 16 in flight, 32 clients drop to
+    about 18k TPS. Each O_DSYNC write flushes this drive's write cache, so
+    fewer, larger writes win. That is why the default is 1.
+  - Not tested where AIO should help most: I couldn't test high-latency storage
+    such as cloud disks. Simulating it needs root, and so does true power-loss
+    testing.
+
+  Not tested
+
+  - The short-write and synchronous-fallback paths have no targeted tests.
+  - The partial-page copy from Thomas Munro's patch is not implemented, so
+    O_DIRECT on checksumming filesystems such as btrfs is unsafe.
+  - PostgreSQL's own recovery test suite (Perl TAP) wasn't run: it needs the
+    Perl module IPC::Run, and the sandbox blocked loading the copy I downloaded.
+    Running sudo apt install libipc-run-perl would let you run it with
+    TEMP_CONFIG pointing at a file that sets wal_io_method = aio.
+
+  I left your build/ and ~/pgdev alone; the test builds, crash script and
+  benchmark scripts are in /tmp/claude-1000/-media-sahil-newvolume-dbms-project/
+  381e466a-6ab2-420a-9ddd-64760482f422/scratchpad/.

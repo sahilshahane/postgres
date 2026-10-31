@@ -3588,6 +3588,64 @@ include_dir 'conf.d'
         This parameter can only be set in the <filename>postgresql.conf</filename>
         file or on the server command line.
        </para>
+       <para>
+        This parameter is ignored if <xref linkend="guc-wal-io-method"/> is
+        <literal>aio</literal>.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry id="guc-wal-io-method" xreflabel="wal_io_method">
+      <term><varname>wal_io_method</varname> (<type>enum</type>)
+      <indexterm>
+       <primary><varname>wal_io_method</varname> configuration parameter</primary>
+      </indexterm>
+      </term>
+      <listitem>
+       <para>
+        Selects how WAL is written to disk.  With <literal>sync</literal>
+        (the default), the process flushing WAL writes it with
+        <function>pwrite()</function> and then forces it to disk according to
+        <xref linkend="guc-wal-sync-method"/>, while holding a lock that
+        prevents other processes from writing WAL at the same time.
+       </para>
+       <para>
+        With <literal>aio</literal>, WAL is written using the asynchronous I/O
+        subsystem selected by <xref linkend="guc-io-method"/>, to WAL files
+        opened with <symbol>O_DSYNC</symbol> (and with
+        <symbol>O_DIRECT</symbol> if <xref linkend="guc-debug-io-direct"/>
+        includes <literal>wal</literal>), so that a completed write is
+        durable.  Writes are started without waiting for them to complete,
+        several of them can be in progress at the same time (see
+        <xref linkend="guc-wal-io-max-inflight"/>), and they may complete in
+        any order; WAL is only considered flushed up to the end of the
+        longest sequence of completed writes.  A transaction commit is still
+        only reported once its WAL has been flushed.
+       </para>
+       <para>
+        This parameter can only be set at server start.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry id="guc-wal-io-max-inflight" xreflabel="wal_io_max_inflight">
+      <term><varname>wal_io_max_inflight</varname> (<type>integer</type>)
+      <indexterm>
+       <primary><varname>wal_io_max_inflight</varname> configuration parameter</primary>
+      </indexterm>
+      </term>
+      <listitem>
+       <para>
+        The maximum number of WAL writes that can be in progress at the same
+        time when <xref linkend="guc-wal-io-method"/> is
+        <literal>aio</literal>.  Allowing more writes in progress can help on
+        storage with high latency that can process many requests in parallel,
+        but on storage where each synchronous write forces the device's write
+        cache to be flushed, fewer, larger writes are usually faster.  The
+        default is 1, the maximum is 64.
+        This parameter can only be set in the <filename>postgresql.conf</filename>
+        file or on the server command line.
+       </para>
       </listitem>
      </varlistentry>
 

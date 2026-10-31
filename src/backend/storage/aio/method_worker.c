@@ -490,7 +490,18 @@ pgaio_worker_submit(uint16 num_staged_ios, PgAioHandle **staged_ios)
 	for (int i = 0; i < num_staged_ios; i++)
 		pgaio_io_prepare_submit(staged_ios[i]);
 
-	if (LWLockConditionalAcquire(AioWorkerSubmissionQueueLock, LW_EXCLUSIVE))
+	/*
+	 * Once the postmaster has died, workers exit as soon as they run out of
+	 * work, and no new ones get started.  The IO could then never be
+	 * executed, but the submitter may be waiting for it in a critical
+	 * section, e.g. for a WAL write.  Execute it synchronously instead.
+	 */
+	if (unlikely(!PostmasterIsAlive()))
+	{
+		synchronous_ios = staged_ios;
+		nsync = num_staged_ios;
+	}
+	else if (LWLockConditionalAcquire(AioWorkerSubmissionQueueLock, LW_EXCLUSIVE))
 	{
 		for (int i = 0; i < num_staged_ios; ++i)
 		{
@@ -958,6 +969,7 @@ IoWorkerMain(const void *startup_data, size_t startup_data_len)
 		else
 		{
 			int			timeout_ms;
+			int			rc;
 
 			/* Cancel new worker request if pending. */
 			pgaio_worker_cancel_grow();
@@ -1009,9 +1021,24 @@ IoWorkerMain(const void *startup_data, size_t startup_data_len)
 			set_ps_display(cmd);
 #endif
 
-			if (WaitLatch(MyLatch, WL_LATCH_SET | WL_EXIT_ON_PM_DEATH | WL_TIMEOUT,
-						  timeout_ms,
-						  WAIT_EVENT_IO_WORKER_MAIN) == WL_TIMEOUT)
+			rc = WaitLatch(MyLatch, WL_LATCH_SET | WL_POSTMASTER_DEATH | WL_TIMEOUT,
+						   timeout_ms,
+						   WAIT_EVENT_IO_WORKER_MAIN);
+			if (rc & WL_POSTMASTER_DEATH)
+			{
+				/*
+				 * Don't exit while IOs are queued: their issuers may be
+				 * waiting for them in a critical section (e.g. WAL writes),
+				 * and nobody else would execute them.  The queue is checked
+				 * again at the top of the loop.
+				 */
+				LWLockAcquire(AioWorkerSubmissionQueueLock, LW_EXCLUSIVE);
+				queue_depth = pgaio_worker_submission_queue_depth();
+				LWLockRelease(AioWorkerSubmissionQueueLock);
+				if (queue_depth == 0)
+					proc_exit(1);
+			}
+			else if (rc == WL_TIMEOUT)
 			{
 				/* WL_TIMEOUT */
 				if (pgaio_worker_can_timeout())

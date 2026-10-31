@@ -15,6 +15,7 @@
 
 #include "postgres.h"
 
+#include "access/xlog.h"
 #include "miscadmin.h"
 #include "storage/aio.h"
 #include "storage/aio_internal.h"
@@ -45,6 +46,8 @@ static const PgAioHandleCallbacksEntry aio_handle_cbs[] = {
 	CALLBACK_ENTRY(PGAIO_HCB_SHARED_BUFFER_READV, aio_shared_buffer_readv_cb),
 
 	CALLBACK_ENTRY(PGAIO_HCB_LOCAL_BUFFER_READV, aio_local_buffer_readv_cb),
+
+	CALLBACK_ENTRY(PGAIO_HCB_WAL_WRITEV, aio_wal_writev_cb),
 #undef CALLBACK_ENTRY
 };
 

@@ -1,0 +1,9 @@
+code_version,io_method,direct_io,tps,max_wal_writes_inflight_sampled,out_of_order_completions,segments_archived,segments_missing,pg_waldump
+v1,worker,no,9795,,485,578,0,ok
+v1,io_uring,no,9347,,42,554,0,ok
+v1,sync,no,5374,1,0,364,0,ok
+v1,worker,no,9018,3,409,543,0,ok
+v1,io_uring,no,7102,3,42,446,0,ok
+v3,worker,no,,3,678,435,0,ok
+v3,io_uring,no,,3,100,412,0,ok
+v3,io_uring,yes,,3,129,365,0,ok

@@ -1,0 +1,15 @@
+code_version,config,clients,wait_event,samples
+v3,aio io_uring inflight=1,8,LWLock:AioUringCompletion,481
+v3,aio io_uring inflight=1,8,LWLock:WALWrite,163
+v3,aio io_uring inflight=1,8,Activity:WalWriterMain,89
+v3,aio io_uring inflight=1,8,IO:AioIoUringExecution,78
+v3,aio io_uring inflight=1,8,CPU,52
+v4-step1 (reaper only),stock fdatasync,32,LWLock:WALWrite,1689
+v4-step1 (reaper only),stock fdatasync,32,CPU,94
+v4-step1 (reaper only),stock fdatasync,32,IO:WalSync,34
+v4-step1 (reaper only),aio io_uring inflight=1,32,LWLock:WALWrite,1315
+v4-step1 (reaper only),aio io_uring inflight=1,32,IO:WalWrite,505
+v4-step1 (reaper only),aio io_uring inflight=1,32,IO:AioIoUringExecution,36
+v4,aio io_uring inflight=1,32,IO:WalWrite,803
+v4,aio io_uring inflight=1,32,LWLock:WALWrite,792
+v4,aio io_uring inflight=1,32,CPU,138

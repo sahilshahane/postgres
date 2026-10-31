@@ -1,0 +1,10 @@
+code_version,suite,wal_io_method,io_method,passed,total
+v1,regress,aio,worker,239,239
+v1,regress,aio,io_uring,239,239
+v1,regress,aio,sync,239,239
+v1,regress,sync,worker,239,239
+v1,isolation,aio,worker,134,134
+v3,regress,aio,worker,239,239
+v3,regress,aio,io_uring,239,239
+v4,regress,aio,worker,239,239
+v4,regress,aio,io_uring,239,239

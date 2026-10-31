@@ -1,0 +1,20 @@
+code_version,test,io_method,extra_settings,crashes,acknowledged_commits,lost_commits,result
+v1,process kill (all / postmaster alternating),worker,,8,69832,0,pass
+v1,process kill (all / postmaster alternating),io_uring,,8,26140,0,pass
+v1,process kill (all / postmaster alternating),sync,,6,12536,0,pass
+v1,process kill (all / postmaster alternating),io_uring,debug_io_direct=wal,6,28308,0,pass
+v3,process kill (all / postmaster alternating),sync,,4,8526,0,pass
+v3,process kill (all / postmaster alternating),io_uring,,6,13936,0,pass
+v3,process kill (all / postmaster alternating),io_uring,debug_io_direct=wal,6,32164,0,pass
+v3,process kill (all / postmaster alternating),worker,,6,22099,0,pass
+v3,power cut (dm-flakey),stock wal_io_method=sync,,8,60850,0,pass
+v3,power cut (dm-flakey),worker,,8,45101,0,pass
+v3,power cut (dm-flakey),io_uring,,8,45998,0,pass
+v3,power cut (dm-flakey),io_uring,debug_io_direct=wal,8,43438,0,pass
+v3,power cut (dm-flakey) - negative control,worker,fsync=off,1,,,unrecoverable cluster (expected)
+v4,process kill (all / postmaster alternating),io_uring,,6,15043,0,pass
+v4,process kill (all / postmaster alternating),worker,,6,22046,0,pass
+v4,process kill (all / postmaster alternating),io_uring,debug_io_direct=wal,6,28401,0,pass
+v4,power cut (dm-flakey),worker,,6,117485,0,pass
+v4,power cut (dm-flakey),io_uring,,6,124239,0,pass
+v4,power cut (dm-flakey),io_uring,debug_io_direct=wal,6,114086,0,pass

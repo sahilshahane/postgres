@@ -1,0 +1,11 @@
+measurement,value,unit,notes
+pg_test_fsync open_datasync 8kB,4533.785,ops/s,"local NVMe, 221 us/op"
+pg_test_fsync fdatasync 8kB,3917.634,ops/s,"local NVMe, 255 us/op"
+pg_test_fsync fsync 8kB,2690.759,ops/s,"local NVMe, 372 us/op"
+pg_test_fsync open_sync 8kB,2742.316,ops/s,"local NVMe, 365 us/op"
+"O_DSYNC 2MB write, aligned",5.2,ms/write,4ms write-through dm-delay device
+"O_DSYNC 2MB write, unaligned (+1234)",5.0,ms/write,4ms write-through dm-delay device
+"O_DSYNC 2MB write, overlapping previous tail page",5.1,ms/write,4ms write-through dm-delay device
+big txn c=32 stock: WAL writes per 10s,1024,writes,"v4-step2; 2097 kB/write, pwrite 0.31 ms, fdatasync 5.07 ms"
+big txn c=32 aio io_uring inflight=1: WAL writes per 10s,649,writes,v4-step2; 2014 kB/write
+big txn c=32 aio worker inflight=1: WAL writes per 10s,584,writes,v4-step2; 1937 kB/write

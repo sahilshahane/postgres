@@ -1,0 +1,5 @@
+epoch 1 (all killed): 2370 acknowledged commits all present (2370 committed groups found)
+epoch 2 (postmaster killed): 2307 acknowledged commits all present (2307 committed groups found)
+epoch 3 (all killed): 1230 acknowledged commits all present (1231 committed groups found)
+epoch 4 (postmaster killed): 2619 acknowledged commits all present (2619 committed groups found)
+OK: 4 crashes, 8526 acknowledged commits verified; 212 segments archived, 0 still .ready

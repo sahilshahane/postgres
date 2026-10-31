@@ -118,9 +118,10 @@ typedef enum PgAioTargetID
 	/* intentionally the zero value, to help catch zeroed memory etc */
 	PGAIO_TID_INVALID = 0,
 	PGAIO_TID_SMGR,
+	PGAIO_TID_WAL,
 } PgAioTargetID;
 
-#define PGAIO_TID_COUNT (PGAIO_TID_SMGR + 1)
+#define PGAIO_TID_COUNT (PGAIO_TID_WAL + 1)
 
 
 /*
@@ -198,9 +199,11 @@ typedef enum PgAioHandleCallbackID
 	PGAIO_HCB_SHARED_BUFFER_READV,
 
 	PGAIO_HCB_LOCAL_BUFFER_READV,
+
+	PGAIO_HCB_WAL_WRITEV,
 } PgAioHandleCallbackID;
 
-#define PGAIO_HCB_MAX	PGAIO_HCB_LOCAL_BUFFER_READV
+#define PGAIO_HCB_MAX	PGAIO_HCB_WAL_WRITEV
 StaticAssertDecl(PGAIO_HCB_MAX < (1 << PGAIO_RESULT_ID_BITS),
 				 "PGAIO_HCB_MAX is too big for PGAIO_RESULT_ID_BITS");
 
@@ -349,6 +352,7 @@ extern void pgaio_enter_batchmode(void);
 extern void pgaio_exit_batchmode(void);
 extern void pgaio_submit_staged(void);
 extern bool pgaio_have_staged(void);
+extern bool pgaio_can_start_io(void);
 
 
 

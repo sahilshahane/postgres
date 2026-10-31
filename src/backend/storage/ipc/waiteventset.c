@@ -232,6 +232,37 @@ ResourceOwnerForgetWaitEventSet(ResourceOwner owner, WaitEventSet *set)
 }
 
 
+
+/*
+ * Exit because the postmaster died, for WL_EXIT_ON_PM_DEATH.
+ *
+ * Inside a critical section, exiting is not safe: shared memory may be in an
+ * intermediate state, e.g. while a backend waits for the WAL containing its
+ * commit record to be written (AIO waits may sleep here).  The regular exit
+ * callbacks would then e.g. try to abort an already WAL-logged commit, while
+ * exiting without them would leave LWLocks held forever.  Instead, keep
+ * waiting, polling, so that the IO can complete and the critical section can
+ * be left; the process will exit at its next wait outside of it.  Like
+ * SyncRepWaitForLSN(), we can't just exit in the middle of a commit.  If that
+ * doesn't happen in a reasonable time, exit without cleanup like quickdie()
+ * does; to recovery this looks like a crash.
+ */
+static void
+ExitOnPostmasterDeath(void)
+{
+	static pg_time_t crit_pm_death_since = 0;
+
+	if (CritSectionCount == 0)
+		proc_exit(1);
+
+	if (crit_pm_death_since == 0)
+		crit_pm_death_since = (pg_time_t) time(NULL);
+	else if ((pg_time_t) time(NULL) - crit_pm_death_since > 30)
+		_exit(2);
+
+	/* the postmaster death event stays set, avoid busy-looping */
+	pg_usleep(10 * 1000L);
+}
 /*
  * Initialize the process-local wait event infrastructure.
  *
@@ -1261,7 +1292,7 @@ WaitEventSetWaitBlock(WaitEventSet *set, int cur_timeout,
 			if (!PostmasterIsAliveInternal())
 			{
 				if (set->exit_on_postmaster_death)
-					proc_exit(1);
+					ExitOnPostmasterDeath();
 				occurred_events->fd = PGINVALID_SOCKET;
 				occurred_events->events = WL_POSTMASTER_DEATH;
 				occurred_events++;
@@ -1343,7 +1374,7 @@ WaitEventSetWaitBlock(WaitEventSet *set, int cur_timeout,
 	if (unlikely(set->report_postmaster_not_running))
 	{
 		if (set->exit_on_postmaster_death)
-			proc_exit(1);
+			ExitOnPostmasterDeath();
 		occurred_events->fd = PGINVALID_SOCKET;
 		occurred_events->events = WL_POSTMASTER_DEATH;
 		return 1;
@@ -1415,7 +1446,7 @@ WaitEventSetWaitBlock(WaitEventSet *set, int cur_timeout,
 			set->report_postmaster_not_running = true;
 
 			if (set->exit_on_postmaster_death)
-				proc_exit(1);
+				ExitOnPostmasterDeath();
 			occurred_events->fd = PGINVALID_SOCKET;
 			occurred_events->events = WL_POSTMASTER_DEATH;
 			occurred_events++;
@@ -1545,7 +1576,7 @@ WaitEventSetWaitBlock(WaitEventSet *set, int cur_timeout,
 			if (!PostmasterIsAliveInternal())
 			{
 				if (set->exit_on_postmaster_death)
-					proc_exit(1);
+					ExitOnPostmasterDeath();
 				occurred_events->fd = PGINVALID_SOCKET;
 				occurred_events->events = WL_POSTMASTER_DEATH;
 				occurred_events++;
@@ -1756,7 +1787,7 @@ WaitEventSetWaitBlock(WaitEventSet *set, int cur_timeout,
 			if (!PostmasterIsAliveInternal())
 			{
 				if (set->exit_on_postmaster_death)
-					proc_exit(1);
+					ExitOnPostmasterDeath();
 				occurred_events->fd = PGINVALID_SOCKET;
 				occurred_events->events = WL_POSTMASTER_DEATH;
 				occurred_events++;

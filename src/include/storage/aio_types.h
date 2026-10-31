@@ -69,6 +69,12 @@ typedef union PgAioTargetData
 		bool		is_temp:1;	/* proc can be inferred by owning AIO */
 		bool		skip_fsync:1;
 	}			smgr;
+
+	struct
+	{
+		uint64		segno;		/* WAL segment number (XLogSegNo) */
+		uint32		tli;		/* timeline of the segment (TimeLineID) */
+	}			wal;
 } PgAioTargetData;
 
 
