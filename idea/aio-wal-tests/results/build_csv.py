@@ -11,7 +11,12 @@ Code versions (see README.md):
   v3  v2 + "zeroing write" rule, in-flight cap / zeroing waits done before
       taking WALWriteLock
   v4  v3 + single "reaper" waiter, no waiting under WALWriteLock (nowait
-      issue), max write size 1 MB -> 32 MB.   == the final code
+      issue), max write size 1 MB -> 32 MB.
+  v5  v4 + fsync operation in the AIO subsystem; with wal_sync_method =
+      fdatasync/fsync, WAL is written to the page cache and fsync'ed via AIO
+      (with open_datasync/open_sync, the O_DSYNC scheme of v4 is used);
+      IO workers don't drop queued IO after postmaster death.  == the final code
+      Throughput for v5 is in throughput_v5.csv, written by scripts/bench.sh.
 """
 import csv, os, re
 
@@ -273,6 +278,16 @@ CRASH = [
     ("v4", "power cut (dm-flakey)", "worker", "", 6, 117485, 0, "pass"),
     ("v4", "power cut (dm-flakey)", "io_uring", "", 6, 124239, 0, "pass"),
     ("v4", "power cut (dm-flakey)", "io_uring", "debug_io_direct=wal", 6, 114086, 0, "pass"),
+    ("v5", "process kill (all / postmaster alternating)", "io_uring", "fsync scheme", 6, 19136, 0, "pass"),
+    ("v5", "process kill (all / postmaster alternating)", "io_uring", "fsync scheme, debug_io_direct=wal", 6, 18199, 0, "pass"),
+    ("v5", "process kill (all / postmaster alternating)", "io_uring", "wal_sync_method=open_datasync", 4, 9643, 0, "pass"),
+    ("v5-pre (before worker race fix)", "process kill (all / postmaster alternating)", "worker", "fsync scheme", 6, 20732, 0, "FAIL: backends hung after postmaster death (IO workers exited with fsync queued)"),
+    ("v5", "process kill (all / postmaster alternating)", "worker", "fsync scheme", 12, 50978, 0, "pass"),
+    ("v5", "process kill (all / postmaster alternating)", "worker", "fsync scheme, wal_io_max_inflight=16", 12, 58413, 0, "pass"),
+    ("v5", "process kill (all / postmaster alternating)", "io_uring", "fsync scheme", 12, 45803, 0, "pass"),
+    ("v5", "power cut (dm-flakey)", "worker", "fsync scheme", 6, 118526, 0, "pass"),
+    ("v5", "power cut (dm-flakey)", "io_uring", "fsync scheme", 6, 110291, 0, "pass"),
+    ("v5", "power cut (dm-flakey)", "io_uring", "fsync scheme, debug_io_direct=wal", 6, 86466, 0, "pass"),
 ]
 
 REGRESS = [
@@ -286,6 +301,9 @@ REGRESS = [
     ("v3", "regress", "aio", "io_uring", 239, 239),
     ("v4", "regress", "aio", "worker", 239, 239),
     ("v4", "regress", "aio", "io_uring", 239, 239),
+    ("v5", "regress", "aio (fsync scheme)", "worker", 239, 239),
+    ("v5", "regress", "aio (fsync scheme)", "io_uring", 239, 239),
+    ("v5", "regress", "aio (open_datasync)", "io_uring", 239, 239),
 ]
 
 # steady-state archive + pg_waldump test (pgbench -c 32, 8s, 1MB segments)
@@ -299,6 +317,9 @@ STEADY = [
     ("v3", "worker", "no", "", 3, 678, 435, 0, "ok"),
     ("v3", "io_uring", "no", "", 3, 100, 412, 0, "ok"),
     ("v3", "io_uring", "yes", "", 3, 129, 365, 0, "ok"),
+    ("v5 (fsync scheme)", "worker", "no", "", 16, "", 412, 0, "ok"),
+    ("v5 (fsync scheme)", "io_uring", "no", "", 16, "", 446, 0, "ok"),
+    ("v5 (fsync scheme)", "io_uring", "yes", "", "", "", 438, 0, "ok"),
 ]
 
 # micro measurements

@@ -8,3 +8,6 @@ v3,regress,aio,worker,239,239
 v3,regress,aio,io_uring,239,239
 v4,regress,aio,worker,239,239
 v4,regress,aio,io_uring,239,239
+v5,regress,aio (fsync scheme),worker,239,239
+v5,regress,aio (fsync scheme),io_uring,239,239
+v5,regress,aio (open_datasync),io_uring,239,239

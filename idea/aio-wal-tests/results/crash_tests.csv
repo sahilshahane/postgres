@@ -18,3 +18,13 @@ v4,process kill (all / postmaster alternating),io_uring,debug_io_direct=wal,6,28
 v4,power cut (dm-flakey),worker,,6,117485,0,pass
 v4,power cut (dm-flakey),io_uring,,6,124239,0,pass
 v4,power cut (dm-flakey),io_uring,debug_io_direct=wal,6,114086,0,pass
+v5,process kill (all / postmaster alternating),io_uring,fsync scheme,6,19136,0,pass
+v5,process kill (all / postmaster alternating),io_uring,"fsync scheme, debug_io_direct=wal",6,18199,0,pass
+v5,process kill (all / postmaster alternating),io_uring,wal_sync_method=open_datasync,4,9643,0,pass
+v5-pre (before worker race fix),process kill (all / postmaster alternating),worker,fsync scheme,6,20732,0,FAIL: backends hung after postmaster death (IO workers exited with fsync queued)
+v5,process kill (all / postmaster alternating),worker,fsync scheme,12,50978,0,pass
+v5,process kill (all / postmaster alternating),worker,"fsync scheme, wal_io_max_inflight=16",12,58413,0,pass
+v5,process kill (all / postmaster alternating),io_uring,fsync scheme,12,45803,0,pass
+v5,power cut (dm-flakey),worker,fsync scheme,6,118526,0,pass
+v5,power cut (dm-flakey),io_uring,fsync scheme,6,110291,0,pass
+v5,power cut (dm-flakey),io_uring,"fsync scheme, debug_io_direct=wal",6,86466,0,pass

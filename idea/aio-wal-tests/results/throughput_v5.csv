@@ -1,0 +1,99 @@
+run,code_version,storage,latency_ms,write_cache,workload,stat,config,wal_io_method,io_method,wal_io_max_inflight,direct_io,wal_sync_method,clients,tps,latency_avg_ms
+dev4ms_writethrough_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,pgbench -N scale 20,single 12s,stock fdatasync,sync,,,no,fdatasync,1,244,4.098
+dev4ms_writethrough_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,pgbench -N scale 20,single 12s,stock fdatasync,sync,,,no,fdatasync,8,998,8.017
+dev4ms_writethrough_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,pgbench -N scale 20,single 12s,stock fdatasync,sync,,,no,fdatasync,32,3963,8.076
+dev4ms_writethrough_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,pgbench -N scale 20,single 12s,stock fdatasync,sync,,,no,fdatasync,128,15609,8.201
+dev4ms_writethrough_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,pgbench -N scale 20,single 12s,stock open_datasync,sync,,,no,open_datasync,1,244,4.098
+dev4ms_writethrough_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,pgbench -N scale 20,single 12s,stock open_datasync,sync,,,no,open_datasync,8,997,8.021
+dev4ms_writethrough_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,pgbench -N scale 20,single 12s,stock open_datasync,sync,,,no,open_datasync,32,3963,8.075
+dev4ms_writethrough_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,pgbench -N scale 20,single 12s,stock open_datasync,sync,,,no,open_datasync,128,15620,8.195
+dev4ms_writethrough_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,pgbench -N scale 20,single 12s,aio dsync uring inflight=1,aio,io_uring,1,no,open_datasync,1,243,4.123
+dev4ms_writethrough_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,pgbench -N scale 20,single 12s,aio dsync uring inflight=1,aio,io_uring,1,no,open_datasync,8,985,8.118
+dev4ms_writethrough_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,pgbench -N scale 20,single 12s,aio dsync uring inflight=1,aio,io_uring,1,no,open_datasync,32,3842,8.328
+dev4ms_writethrough_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,pgbench -N scale 20,single 12s,aio dsync uring inflight=1,aio,io_uring,1,no,open_datasync,128,14327,8.934
+dev4ms_writethrough_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,pgbench -N scale 20,single 12s,aio fsync uring inflight=1,aio,io_uring,1,no,fdatasync,1,243,4.112
+dev4ms_writethrough_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,pgbench -N scale 20,single 12s,aio fsync uring inflight=1,aio,io_uring,1,no,fdatasync,8,965,8.294
+dev4ms_writethrough_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,pgbench -N scale 20,single 12s,aio fsync uring inflight=1,aio,io_uring,1,no,fdatasync,32,3273,9.776
+dev4ms_writethrough_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,pgbench -N scale 20,single 12s,aio fsync uring inflight=1,aio,io_uring,1,no,fdatasync,128,13531,9.460
+dev4ms_writethrough_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,pgbench -N scale 20,single 12s,aio fsync uring inflight=2,aio,io_uring,2,no,fdatasync,1,241,4.155
+dev4ms_writethrough_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,pgbench -N scale 20,single 12s,aio fsync uring inflight=2,aio,io_uring,2,no,fdatasync,8,629,12.719
+dev4ms_writethrough_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,pgbench -N scale 20,single 12s,aio fsync uring inflight=2,aio,io_uring,2,no,fdatasync,32,2510,12.749
+dev4ms_writethrough_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,pgbench -N scale 20,single 12s,aio fsync uring inflight=2,aio,io_uring,2,no,fdatasync,128,9520,13.446
+dev4ms_writethrough_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,pgbench -N scale 20,single 12s,aio fsync uring inflight=4,aio,io_uring,4,no,fdatasync,1,232,4.301
+dev4ms_writethrough_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,pgbench -N scale 20,single 12s,aio fsync uring inflight=4,aio,io_uring,4,no,fdatasync,8,517,15.473
+dev4ms_writethrough_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,pgbench -N scale 20,single 12s,aio fsync uring inflight=4,aio,io_uring,4,no,fdatasync,32,1874,17.073
+dev4ms_writethrough_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,pgbench -N scale 20,single 12s,aio fsync uring inflight=4,aio,io_uring,4,no,fdatasync,128,7394,17.311
+dev4ms_writethrough_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,pgbench -N scale 20,single 12s,aio fsync worker inflight=2,aio,worker,2,no,fdatasync,1,241,4.154
+dev4ms_writethrough_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,pgbench -N scale 20,single 12s,aio fsync worker inflight=2,aio,worker,2,no,fdatasync,8,637,12.562
+dev4ms_writethrough_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,pgbench -N scale 20,single 12s,aio fsync worker inflight=2,aio,worker,2,no,fdatasync,32,2511,12.745
+dev4ms_writethrough_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,pgbench -N scale 20,single 12s,aio fsync worker inflight=2,aio,worker,2,no,fdatasync,128,9684,13.218
+dev4ms_big_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,large txn (big.sql),single 12s,stock fdatasync,sync,,,no,fdatasync,1,146,6.865
+dev4ms_big_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,large txn (big.sql),single 12s,stock fdatasync,sync,,,no,fdatasync,8,462,17.322
+dev4ms_big_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,large txn (big.sql),single 12s,stock fdatasync,sync,,,no,fdatasync,32,776,41.254
+dev4ms_big_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,large txn (big.sql),single 12s,stock open_datasync,sync,,,no,open_datasync,1,135,7.424
+dev4ms_big_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,large txn (big.sql),single 12s,stock open_datasync,sync,,,no,open_datasync,8,357,22.412
+dev4ms_big_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,large txn (big.sql),single 12s,stock open_datasync,sync,,,no,open_datasync,32,710,45.070
+dev4ms_big_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,large txn (big.sql),single 12s,aio dsync uring inflight=1,aio,io_uring,1,no,open_datasync,1,142,7.055
+dev4ms_big_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,large txn (big.sql),single 12s,aio dsync uring inflight=1,aio,io_uring,1,no,open_datasync,8,406,19.699
+dev4ms_big_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,large txn (big.sql),single 12s,aio dsync uring inflight=1,aio,io_uring,1,no,open_datasync,32,733,43.663
+dev4ms_big_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,large txn (big.sql),single 12s,aio fsync uring inflight=1,aio,io_uring,1,no,fdatasync,1,152,6.566
+dev4ms_big_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,large txn (big.sql),single 12s,aio fsync uring inflight=1,aio,io_uring,1,no,fdatasync,8,398,20.081
+dev4ms_big_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,large txn (big.sql),single 12s,aio fsync uring inflight=1,aio,io_uring,1,no,fdatasync,32,662,48.366
+dev4ms_big_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,large txn (big.sql),single 12s,aio fsync uring inflight=2,aio,io_uring,2,no,fdatasync,1,161,6.199
+dev4ms_big_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,large txn (big.sql),single 12s,aio fsync uring inflight=2,aio,io_uring,2,no,fdatasync,8,381,21.025
+dev4ms_big_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,large txn (big.sql),single 12s,aio fsync uring inflight=2,aio,io_uring,2,no,fdatasync,32,644,49.687
+dev4ms_big_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,large txn (big.sql),single 12s,aio fsync uring inflight=4,aio,io_uring,4,no,fdatasync,1,143,6.980
+dev4ms_big_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,large txn (big.sql),single 12s,aio fsync uring inflight=4,aio,io_uring,4,no,fdatasync,8,319,25.116
+dev4ms_big_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,large txn (big.sql),single 12s,aio fsync uring inflight=4,aio,io_uring,4,no,fdatasync,32,605,52.930
+dev4ms_big_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,large txn (big.sql),single 12s,aio fsync worker inflight=2,aio,worker,2,no,fdatasync,1,151,6.615
+dev4ms_big_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,large txn (big.sql),single 12s,aio fsync worker inflight=2,aio,worker,2,no,fdatasync,8,363,22.044
+dev4ms_big_v5,v5,"dm-delay 4ms over loop (ext4)",4,write through,large txn (big.sql),single 12s,aio fsync worker inflight=2,aio,worker,2,no,fdatasync,32,617,51.862
+nvme_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),pgbench -N scale 20,median of 3 x 10s,stock fdatasync,sync,,,no,fdatasync,1,2285,0.438
+nvme_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),pgbench -N scale 20,median of 3 x 10s,stock fdatasync,sync,,,no,fdatasync,8,13142,0.609
+nvme_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),pgbench -N scale 20,median of 3 x 10s,stock fdatasync,sync,,,no,fdatasync,32,30903,1.035
+nvme_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),pgbench -N scale 20,median of 3 x 10s,stock fdatasync,sync,,,no,fdatasync,128,25847,4.952
+nvme_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),pgbench -N scale 20,median of 3 x 10s,stock open_datasync,sync,,,no,open_datasync,1,2292,0.436
+nvme_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),pgbench -N scale 20,median of 3 x 10s,stock open_datasync,sync,,,no,open_datasync,8,13533,0.591
+nvme_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),pgbench -N scale 20,median of 3 x 10s,stock open_datasync,sync,,,no,open_datasync,32,29642,1.080
+nvme_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),pgbench -N scale 20,median of 3 x 10s,stock open_datasync,sync,,,no,open_datasync,128,25751,4.971
+nvme_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),pgbench -N scale 20,median of 3 x 10s,aio dsync uring inflight=1,aio,io_uring,1,no,open_datasync,1,2309,0.433
+nvme_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),pgbench -N scale 20,median of 3 x 10s,aio dsync uring inflight=1,aio,io_uring,1,no,open_datasync,8,12794,0.625
+nvme_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),pgbench -N scale 20,median of 3 x 10s,aio dsync uring inflight=1,aio,io_uring,1,no,open_datasync,32,28473,1.124
+nvme_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),pgbench -N scale 20,median of 3 x 10s,aio dsync uring inflight=1,aio,io_uring,1,no,open_datasync,128,26197,4.886
+nvme_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),pgbench -N scale 20,median of 3 x 10s,aio fsync uring inflight=1,aio,io_uring,1,no,fdatasync,1,2287,0.437
+nvme_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),pgbench -N scale 20,median of 3 x 10s,aio fsync uring inflight=1,aio,io_uring,1,no,fdatasync,8,12669,0.631
+nvme_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),pgbench -N scale 20,median of 3 x 10s,aio fsync uring inflight=1,aio,io_uring,1,no,fdatasync,32,26676,1.200
+nvme_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),pgbench -N scale 20,median of 3 x 10s,aio fsync uring inflight=1,aio,io_uring,1,no,fdatasync,128,25924,4.937
+nvme_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),pgbench -N scale 20,median of 3 x 10s,aio fsync uring inflight=2,aio,io_uring,2,no,fdatasync,1,2292,0.436
+nvme_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),pgbench -N scale 20,median of 3 x 10s,aio fsync uring inflight=2,aio,io_uring,2,no,fdatasync,8,10448,0.766
+nvme_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),pgbench -N scale 20,median of 3 x 10s,aio fsync uring inflight=2,aio,io_uring,2,no,fdatasync,32,24874,1.286
+nvme_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),pgbench -N scale 20,median of 3 x 10s,aio fsync uring inflight=2,aio,io_uring,2,no,fdatasync,128,24792,5.163
+nvme_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),pgbench -N scale 20,median of 3 x 10s,aio fsync uring inflight=4,aio,io_uring,4,no,fdatasync,1,2279,0.439
+nvme_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),pgbench -N scale 20,median of 3 x 10s,aio fsync uring inflight=4,aio,io_uring,4,no,fdatasync,8,7006,1.142
+nvme_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),pgbench -N scale 20,median of 3 x 10s,aio fsync uring inflight=4,aio,io_uring,4,no,fdatasync,32,20930,1.529
+nvme_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),pgbench -N scale 20,median of 3 x 10s,aio fsync uring inflight=4,aio,io_uring,4,no,fdatasync,128,23780,5.383
+nvme_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),pgbench -N scale 20,median of 3 x 10s,aio fsync worker inflight=2,aio,worker,2,no,fdatasync,1,2260,0.443
+nvme_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),pgbench -N scale 20,median of 3 x 10s,aio fsync worker inflight=2,aio,worker,2,no,fdatasync,8,10572,0.757
+nvme_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),pgbench -N scale 20,median of 3 x 10s,aio fsync worker inflight=2,aio,worker,2,no,fdatasync,32,25273,1.266
+nvme_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),pgbench -N scale 20,median of 3 x 10s,aio fsync worker inflight=2,aio,worker,2,no,fdatasync,128,24162,5.298
+nvme_big_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),large txn (big.sql),median of 3 x 10s,stock fdatasync,sync,,,no,fdatasync,1,671,1.490
+nvme_big_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),large txn (big.sql),median of 3 x 10s,stock fdatasync,sync,,,no,fdatasync,8,714,11.207
+nvme_big_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),large txn (big.sql),median of 3 x 10s,stock fdatasync,sync,,,no,fdatasync,32,877,36.477
+nvme_big_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),large txn (big.sql),median of 3 x 10s,stock open_datasync,sync,,,no,open_datasync,1,453,2.209
+nvme_big_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),large txn (big.sql),median of 3 x 10s,stock open_datasync,sync,,,no,open_datasync,8,516,15.516
+nvme_big_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),large txn (big.sql),median of 3 x 10s,stock open_datasync,sync,,,no,open_datasync,32,746,42.902
+nvme_big_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),large txn (big.sql),median of 3 x 10s,aio dsync uring inflight=1,aio,io_uring,1,no,open_datasync,1,449,2.226
+nvme_big_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),large txn (big.sql),median of 3 x 10s,aio dsync uring inflight=1,aio,io_uring,1,no,open_datasync,8,529,15.135
+nvme_big_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),large txn (big.sql),median of 3 x 10s,aio dsync uring inflight=1,aio,io_uring,1,no,open_datasync,32,694,46.078
+nvme_big_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),large txn (big.sql),median of 3 x 10s,aio fsync uring inflight=1,aio,io_uring,1,no,fdatasync,1,496,2.016
+nvme_big_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),large txn (big.sql),median of 3 x 10s,aio fsync uring inflight=1,aio,io_uring,1,no,fdatasync,8,586,13.642
+nvme_big_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),large txn (big.sql),median of 3 x 10s,aio fsync uring inflight=1,aio,io_uring,1,no,fdatasync,32,731,43.779
+nvme_big_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),large txn (big.sql),median of 3 x 10s,aio fsync uring inflight=2,aio,io_uring,2,no,fdatasync,1,537,1.863
+nvme_big_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),large txn (big.sql),median of 3 x 10s,aio fsync uring inflight=2,aio,io_uring,2,no,fdatasync,8,625,12.799
+nvme_big_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),large txn (big.sql),median of 3 x 10s,aio fsync uring inflight=2,aio,io_uring,2,no,fdatasync,32,766,41.750
+nvme_big_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),large txn (big.sql),median of 3 x 10s,aio fsync uring inflight=4,aio,io_uring,4,no,fdatasync,1,506,1.978
+nvme_big_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),large txn (big.sql),median of 3 x 10s,aio fsync uring inflight=4,aio,io_uring,4,no,fdatasync,8,685,11.678
+nvme_big_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),large txn (big.sql),median of 3 x 10s,aio fsync uring inflight=4,aio,io_uring,4,no,fdatasync,32,740,43.265
+nvme_big_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),large txn (big.sql),median of 3 x 10s,aio fsync worker inflight=2,aio,worker,2,no,fdatasync,1,282,3.551
+nvme_big_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),large txn (big.sql),median of 3 x 10s,aio fsync worker inflight=2,aio,worker,2,no,fdatasync,8,619,12.928
+nvme_big_v5,v5,"local NVMe (WDC SN530, ext4)",0,write back (device),large txn (big.sql),median of 3 x 10s,aio fsync worker inflight=2,aio,worker,2,no,fdatasync,32,723,44.255

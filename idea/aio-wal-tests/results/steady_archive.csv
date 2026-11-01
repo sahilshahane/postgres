@@ -7,3 +7,6 @@ v1,io_uring,no,7102,3,42,446,0,ok
 v3,worker,no,,3,678,435,0,ok
 v3,io_uring,no,,3,100,412,0,ok
 v3,io_uring,yes,,3,129,365,0,ok
+v5 (fsync scheme),worker,no,,16,,412,0,ok
+v5 (fsync scheme),io_uring,no,,16,,446,0,ok
+v5 (fsync scheme),io_uring,yes,,,,438,0,ok
