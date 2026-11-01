@@ -1094,6 +1094,10 @@ smgr_aio_reopen(PgAioHandle *ioh)
 			od->write.fd = smgrfd(reln, sd->smgr.forkNum, sd->smgr.blockNum, &off);
 			Assert(off == od->write.offset);
 			break;
+		case PGAIO_OP_FSYNC:
+			/* smgr doesn't issue fsyncs via AIO */
+			elog(ERROR, "unexpected AIO fsync of a relation");
+			break;
 	}
 }
 

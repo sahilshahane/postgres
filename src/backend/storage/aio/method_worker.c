@@ -102,6 +102,14 @@ typedef struct PgAioWorkerControl
 	/* Protected by AioWorkerSubmissionQueueLock. */
 	PgAioWorkerSet idle_workerset;
 
+	/*
+	 * Set by a worker that noticed that the postmaster died.  Workers only
+	 * exit after that if the queue is empty, and nothing is queued anymore
+	 * once it is set, so no IO is left behind without a worker.  Protected by
+	 * AioWorkerSubmissionQueueLock.
+	 */
+	bool		postmaster_died;
+
 	/* Protected by AioWorkerControlLock. */
 	PgAioWorkerSet workerset;
 	int			nworkers;
@@ -264,6 +272,7 @@ pgaio_worker_shmem_init(void *arg)
 	io_worker_submission_queue->head = 0;
 	io_worker_submission_queue->tail = 0;
 	io_worker_control->grow = false;
+	io_worker_control->postmaster_died = false;
 	pgaio_workerset_initialize(&io_worker_control->workerset);
 	pgaio_workerset_initialize(&io_worker_control->idle_workerset);
 
@@ -494,7 +503,9 @@ pgaio_worker_submit(uint16 num_staged_ios, PgAioHandle **staged_ios)
 	 * Once the postmaster has died, workers exit as soon as they run out of
 	 * work, and no new ones get started.  The IO could then never be
 	 * executed, but the submitter may be waiting for it in a critical
-	 * section, e.g. for a WAL write.  Execute it synchronously instead.
+	 * section, e.g. for a WAL write.  Execute it synchronously instead.  The
+	 * check below, under the queue lock, is what makes this reliable; this
+	 * one just avoids queueing when we already know.
 	 */
 	if (unlikely(!PostmasterIsAlive()))
 	{
@@ -503,6 +514,15 @@ pgaio_worker_submit(uint16 num_staged_ios, PgAioHandle **staged_ios)
 	}
 	else if (LWLockConditionalAcquire(AioWorkerSubmissionQueueLock, LW_EXCLUSIVE))
 	{
+		if (unlikely(io_worker_control->postmaster_died))
+		{
+			/* workers may be gone already, see postmaster_died */
+			LWLockRelease(AioWorkerSubmissionQueueLock);
+			synchronous_ios = staged_ios;
+			nsync = num_staged_ios;
+			goto run_synchronously;
+		}
+
 		for (int i = 0; i < num_staged_ios; ++i)
 		{
 			Assert(!pgaio_worker_needs_synchronous_execution(staged_ios[i]));
@@ -534,6 +554,7 @@ pgaio_worker_submit(uint16 num_staged_ios, PgAioHandle **staged_ios)
 		nsync = num_staged_ios;
 	}
 
+run_synchronously:
 	/* Run whatever is left synchronously. */
 	if (nsync > 0)
 	{
@@ -1033,6 +1054,7 @@ IoWorkerMain(const void *startup_data, size_t startup_data_len)
 				 * again at the top of the loop.
 				 */
 				LWLockAcquire(AioWorkerSubmissionQueueLock, LW_EXCLUSIVE);
+				io_worker_control->postmaster_died = true;
 				queue_depth = pgaio_worker_submission_queue_depth();
 				LWLockRelease(AioWorkerSubmissionQueueLock);
 				if (queue_depth == 0)

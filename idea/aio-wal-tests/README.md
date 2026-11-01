@@ -16,7 +16,8 @@ point is to show the effect of a change.
 | `v2` | Exact byte-range writes with no same-page waits. **Unsafe** (could leave stale WAL after the end of WAL) and superseded. Kept only to show why pipelining small writes didn't help. |
 | `v3` | v2 plus the "zeroing write" rule: the first write reaching a page also zeroes the rest of it. The in-flight cap and zeroing waits happen before taking WALWriteLock. Default `wal_io_max_inflight` changed to 1. |
 | `v4-step1`, `v4-step2` | Intermediate steps towards v4: single "reaper" waiter, then 32 MB maximum write size. |
-| `v4` | v3 plus single reaper waiter, no waiting while holding WALWriteLock, 32 MB maximum write. **The final code.** |
+| `v4` | v3 plus single reaper waiter, no waiting while holding WALWriteLock, 32 MB maximum write. |
+| `v5` | v4 plus an fsync operation in the AIO subsystem. With `wal_sync_method = fdatasync` (Linux default) or `fsync`, WAL is written to the page cache and the fsync is done via AIO; with `open_datasync`/`open_sync`, the `O_DSYNC` scheme of v4 is used. Also fixes IO workers dropping queued I/O after postmaster death. **The final code.** In `throughput_v5.csv`, AIO rows have `wal_sync_method` set: `fdatasync` = fsync scheme, `open_datasync` = `O_DSYNC` scheme. In older files, AIO rows always used `O_DSYNC`. |
 
 ## Results (`results/`)
 
@@ -51,6 +52,13 @@ Runs:
 
 Suggested charts: TPS vs clients per `run`, one line per `config`; or, for the
 `*_inflight_sweep` runs, TPS vs `wal_io_max_inflight` per client count.
+
+### `throughput_v5.csv`: v5 runs
+
+Same columns as `throughput.csv`, written directly by `scripts/bench.sh`
+(medians of 3 on NVMe, single runs on the emulated disk). Runs:
+`dev4ms_writethrough_v5`, `dev4ms_big_v5`, `nvme_v5`, `nvme_big_v5`.
+Concatenate it with `throughput.csv` to plot everything together.
 
 ### `crash_tests.csv`: crash and power-loss correctness
 

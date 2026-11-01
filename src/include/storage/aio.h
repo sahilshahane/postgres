@@ -91,10 +91,10 @@ typedef enum PgAioOp
 
 	PGAIO_OP_READV,
 	PGAIO_OP_WRITEV,
+	PGAIO_OP_FSYNC,				/* fsync() or fdatasync(), see op_data.fsync */
 
 	/**
 	 * In the near term we'll need at least:
-	 * - fsync / fdatasync
 	 * - flush_range
 	 *
 	 * Eventually we'll additionally want at least:
@@ -104,7 +104,7 @@ typedef enum PgAioOp
 	 **/
 } PgAioOp;
 
-#define PGAIO_OP_COUNT	(PGAIO_OP_WRITEV + 1)
+#define PGAIO_OP_COUNT	(PGAIO_OP_FSYNC + 1)
 
 
 /*
@@ -147,6 +147,12 @@ typedef union
 		uint16		iov_length;
 		uint64		offset;
 	}			write;
+
+	struct
+	{
+		int			fd;
+		bool		datasync;	/* fdatasync() rather than fsync() */
+	}			fsync;
 } PgAioOpData;
 
 
@@ -303,6 +309,7 @@ extern void pgaio_io_start_readv(PgAioHandle *ioh,
 								 int fd, int iovcnt, uint64 offset);
 extern void pgaio_io_start_writev(PgAioHandle *ioh,
 								  int fd, int iovcnt, uint64 offset);
+extern void pgaio_io_start_fsync(PgAioHandle *ioh, int fd, bool datasync);
 
 /* functions in aio_target.c */
 extern void pgaio_io_set_target(PgAioHandle *ioh, PgAioTargetID targetid);

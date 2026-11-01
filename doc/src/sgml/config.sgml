@@ -3589,8 +3589,9 @@ include_dir 'conf.d'
         file or on the server command line.
        </para>
        <para>
-        This parameter is ignored if <xref linkend="guc-wal-io-method"/> is
-        <literal>aio</literal>.
+        If <xref linkend="guc-wal-io-method"/> is <literal>aio</literal>, this
+        parameter also selects how asynchronous WAL writes are made durable
+        (see there), and changes only take effect at server start.
        </para>
       </listitem>
      </varlistentry>
@@ -3610,17 +3611,25 @@ include_dir 'conf.d'
         prevents other processes from writing WAL at the same time.
        </para>
        <para>
-        With <literal>aio</literal>, WAL is written using the asynchronous I/O
-        subsystem selected by <xref linkend="guc-io-method"/>, to WAL files
-        opened with <symbol>O_DSYNC</symbol> (and with
-        <symbol>O_DIRECT</symbol> if <xref linkend="guc-debug-io-direct"/>
-        includes <literal>wal</literal>), so that a completed write is
-        durable.  Writes are started without waiting for them to complete,
-        several of them can be in progress at the same time (see
+        With <literal>aio</literal>, the asynchronous I/O subsystem selected
+        by <xref linkend="guc-io-method"/> is used, and processes that need
+        WAL to be flushed wait for I/O to complete instead of performing it
+        while holding the lock.  How WAL is made durable depends on
+        <xref linkend="guc-wal-sync-method"/>:
+        with <literal>fdatasync</literal> or <literal>fsync</literal>, WAL is
+        written to the operating system's cache as usual, and the
+        <function>fdatasync()</function> or <function>fsync()</function> is
+        performed asynchronously; with <literal>open_datasync</literal> or
+        <literal>open_sync</literal>, the writes themselves are performed
+        asynchronously, to WAL files opened with <symbol>O_DSYNC</symbol>,
+        so that a completed write is durable.  (With
+        <xref linkend="guc-debug-io-direct"/> including <literal>wal</literal>,
+        <symbol>O_DIRECT</symbol> is used in both cases.)  Several of these
+        operations can be in progress at the same time (see
         <xref linkend="guc-wal-io-max-inflight"/>), and they may complete in
         any order; WAL is only considered flushed up to the end of the
-        longest sequence of completed writes.  A transaction commit is still
-        only reported once its WAL has been flushed.
+        longest sequence of completed operations.  A transaction commit is
+        still only reported once its WAL has been flushed.
        </para>
        <para>
         This parameter can only be set at server start.
@@ -3636,9 +3645,9 @@ include_dir 'conf.d'
       </term>
       <listitem>
        <para>
-        The maximum number of WAL writes that can be in progress at the same
-        time when <xref linkend="guc-wal-io-method"/> is
-        <literal>aio</literal>.  Allowing more writes in progress can help on
+        The maximum number of asynchronous WAL writes or flushes that can be
+        in progress at the same time when <xref linkend="guc-wal-io-method"/>
+        is <literal>aio</literal>.  Allowing more writes in progress can help on
         storage with high latency that can process many requests in parallel,
         but on storage where each synchronous write forces the device's write
         cache to be flushed, fewer, larger writes are usually faster.  The

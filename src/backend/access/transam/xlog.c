@@ -484,6 +484,7 @@ typedef struct XLogAioWrite
 	Size		bufoff;			/* offset of first byte in XLogCtl->pages */
 	XLogAioWriteStatus status;
 	int			error;			/* errno, if status is FAILED */
+	bool		is_fsync;		/* fsync of the segment, not a write */
 	PgAioWaitRef wref;			/* to wait for the write to complete */
 } XLogAioWrite;
 
@@ -650,6 +651,13 @@ typedef struct XLogCtlData
 	/* see XLogAioWaitForWrite() */
 	pg_atomic_uint32 aioReaper;
 	ConditionVariable aioWaitCV;
+
+	/*
+	 * How AIO WAL writes are made durable, fixed at server start (see
+	 * "Asynchronous WAL writes"): true if WAL is written to the page cache
+	 * and then fsync'ed using AIO, false if it is written with O_DSYNC.
+	 */
+	bool		aioUseFsync;
 } XLogCtlData;
 
 /*
@@ -834,6 +842,8 @@ static void AdvanceXLInsertBuffer(XLogRecPtr upto, TimeLineID tli,
 static void XLogWrite(XLogwrtRqst WriteRqst, TimeLineID tli, bool flexible);
 static inline bool XLogAioEnabled(void);
 static bool XLogAioIssue(XLogRecPtr upto, TimeLineID tli, bool nowait);
+static void XLogAioStartFsync(int fd, XLogSegNo segno, TimeLineID tli,
+							  XLogRecPtr end);
 static bool XLogAioWaitFlush(XLogRecPtr upto);
 static void XLogAioReap(void);
 static bool XLogAioSegmentsPending(void);
@@ -2246,7 +2256,7 @@ AdvanceXLInsertBuffer(XLogRecPtr upto, TimeLineID tli, bool opportunistic)
 					 * With AIO the write has only been started, wait for it.
 					 * The buffer can only be reused once it's done.
 					 */
-					if (XLogAioEnabled())
+					if (XLogAioEnabled() && !XLogCtl->aioUseFsync)
 						XLogAioWaitFlush(OldPageRqstPtr);
 					pgWalUsage.wal_buffers_full++;
 					TRACE_POSTGRESQL_WAL_BUFFER_WRITE_DIRTY_DONE();
@@ -2478,6 +2488,7 @@ XLogWrite(XLogwrtRqst WriteRqst, TimeLineID tli, bool flexible)
 	bool		ispartialpage;
 	bool		last_iteration;
 	bool		finishing_seg;
+	bool		aiofsync;
 	XLogRecPtr	oldFlush;
 	int			curridx;
 	int			npages;
@@ -2488,15 +2499,20 @@ XLogWrite(XLogwrtRqst WriteRqst, TimeLineID tli, bool flexible)
 	Assert(CritSectionCount > 0);
 
 	/*
-	 * With wal_io_method = aio, just start the writes.  They are durable once
-	 * complete, so there's no separate flush, and the completion advances
-	 * the shared Write/Flush positions.  Callers wait as needed.
+	 * With wal_io_method = aio and O_DSYNC, just start the writes.  They are
+	 * durable once complete, so there's no separate flush, and the completion
+	 * advances the shared Write/Flush positions.  Callers wait as needed.
+	 *
+	 * When fsyncing instead (aioUseFsync), the writes below are done as
+	 * usual, into the page cache, but the fsyncs are started using AIO and
+	 * not waited for; their completion advances the Flush position.
 	 */
-	if (XLogAioEnabled())
+	if (XLogAioEnabled() && !XLogCtl->aioUseFsync)
 	{
 		(void) XLogAioIssue(WriteRqst.Write, tli, false);
 		return;
 	}
+	aiofsync = XLogAioEnabled();
 
 	/*
 	 * Update local LogwrtResult (caller probably did this already, but...)
@@ -2659,7 +2675,24 @@ XLogWrite(XLogwrtRqst WriteRqst, TimeLineID tli, bool flexible)
 			 * too many logfile segments have been used since the last
 			 * checkpoint.
 			 */
-			if (finishing_seg)
+			if (finishing_seg && aiofsync)
+			{
+				/*
+				 * Start the fsync of the finished segment.  Archive
+				 * notification etc. happen once it's durable, see
+				 * XLogAioProcessFinishedSegments().
+				 */
+				XLogAioStartFsync(openLogFile, openLogSegNo, tli,
+								  LogwrtResult.Write);
+
+				if (IsUnderPostmaster && XLogCheckpointNeeded(openLogSegNo))
+				{
+					(void) GetRedoRecPtr();
+					if (XLogCheckpointNeeded(openLogSegNo))
+						RequestCheckpoint(CHECKPOINT_CAUSE_XLOG);
+				}
+			}
+			else if (finishing_seg)
 			{
 				issue_xlog_fsync(openLogFile, openLogSegNo, tli);
 
@@ -2708,8 +2741,30 @@ XLogWrite(XLogwrtRqst WriteRqst, TimeLineID tli, bool flexible)
 	/*
 	 * If asked to flush, do so
 	 */
-	if (LogwrtResult.Flush < WriteRqst.Flush &&
-		LogwrtResult.Flush < LogwrtResult.Write)
+	if (aiofsync)
+	{
+		/* start an fsync, unless one covering this has been started */
+		if (WriteRqst.Flush > pg_atomic_read_u64(&XLogCtl->aioIssuedUpTo) &&
+			LogwrtResult.Write > pg_atomic_read_u64(&XLogCtl->aioIssuedUpTo))
+		{
+			if (openLogFile >= 0 &&
+				!XLByteInPrevSeg(LogwrtResult.Write, openLogSegNo,
+								 wal_segment_size))
+				XLogFileClose();
+			if (openLogFile < 0)
+			{
+				XLByteToPrevSeg(LogwrtResult.Write, openLogSegNo,
+								wal_segment_size);
+				openLogTLI = tli;
+				openLogFile = XLogFileOpen(openLogSegNo, tli);
+				ReserveExternalFD();
+			}
+			XLogAioStartFsync(openLogFile, openLogSegNo, tli,
+							  LogwrtResult.Write);
+		}
+	}
+	else if (LogwrtResult.Flush < WriteRqst.Flush &&
+			 LogwrtResult.Flush < LogwrtResult.Write)
 	{
 		/*
 		 * Could get here without iterating above loop, in which case we might
@@ -2759,9 +2814,20 @@ XLogWrite(XLogwrtRqst WriteRqst, TimeLineID tli, bool flexible)
 	 * We write Write first, bar, then Flush.  When reading, the opposite must
 	 * be done (with a matching barrier in between), so that we always see a
 	 * Flush value that trails behind the Write value seen.
+	 *
+	 * With AIO fsyncs, Flush is only advanced by their completion.  Write
+	 * has to be advanced before an fsync covering it can complete, see
+	 * XLogAioAdvanceLocked(); XLogAioStartFsync() is only called for WAL that
+	 * has been written, and LogwrtResult.Write only grows here.
 	 */
 	pg_atomic_write_u64(&XLogCtl->logWriteResult, LogwrtResult.Write);
 	pg_write_barrier();
+	if (aiofsync)
+	{
+		if (XLogAioSegmentsPending())
+			XLogAioProcessFinishedSegments(tli);
+		return;
+	}
 	pg_atomic_write_u64(&XLogCtl->logFlushResult, LogwrtResult.Flush);
 
 	/* Defer notification until the caller has released its WAL locks. */
@@ -2793,10 +2859,24 @@ XLogWrite(XLogwrtRqst WriteRqst, TimeLineID tli, bool flexible)
  * Asynchronous WAL writes
  * -----------------------
  *
- * With wal_io_method = aio, WAL is written through the AIO subsystem instead
- * of with pg_pwrite() + fsync under WALWriteLock.  WAL segments are opened
- * with O_DSYNC (see get_sync_bit()), so a completed write is durable and no
- * separate flush is needed.
+ * With wal_io_method = aio, waiting for WAL to become durable doesn't happen
+ * under WALWriteLock.  There are two ways to make WAL durable, chosen at
+ * server start from wal_sync_method (XLogCtl->aioUseFsync):
+ *
+ * - O_DSYNC (open_datasync, open_sync): WAL segments are opened with O_DSYNC
+ *   (see get_sync_bit()), and the writes themselves are done using AIO.  A
+ *   completed write is durable, no separate flush is needed.  This is what
+ *   most of the description below is about.
+ *
+ * - fsync (fdatasync, fsync): WAL is written synchronously by XLogWrite(),
+ *   into the kernel's page cache, which is cheap, and the fsync is done
+ *   using AIO (XLogAioStartFsync()).  The tracker then contains fsyncs
+ *   instead of writes, each making WAL up to its 'end' durable once it and
+ *   all earlier ones completed.  Write is advanced by the issuer, Flush by
+ *   the completions.  A finished segment gets its own fsync, like with
+ *   synchronous writes.
+ *
+ * In the O_DSYNC case:
  *
  * The issue side and the completion side are decoupled:
  *
@@ -2904,6 +2984,10 @@ XLogAioReportFailure(XLogAioWrite *w)
 
 	XLogFileName(xlogfname, w->tli, w->segno, wal_segment_size);
 	errno = w->error;
+	if (w->is_fsync)
+		ereport(PANIC,
+				(errcode_for_file_access(),
+				 errmsg("could not fsync file \"%s\": %m", xlogfname)));
 	ereport(PANIC,
 			(errcode_for_file_access(),
 			 errmsg("could not write to log file \"%s\" at offset %u, length %u: %m",
@@ -2936,9 +3020,17 @@ XLogAioAdvanceLocked(void)
 	{
 		Assert(newpos >= pg_atomic_read_u64(&XLogCtl->logFlushResult));
 
-		/* Write first, then Flush, see XLogWrite() */
-		pg_atomic_write_u64(&XLogCtl->logWriteResult, newpos);
-		pg_write_barrier();
+		/*
+		 * Write first, then Flush, see XLogWrite().  When fsyncing, WAL is
+		 * written synchronously, and the issuer has already advanced Write
+		 * past the end of the fsync.
+		 */
+		if (!XLogCtl->aioUseFsync)
+		{
+			pg_atomic_write_u64(&XLogCtl->logWriteResult, newpos);
+			pg_write_barrier();
+		}
+		Assert(newpos <= pg_atomic_read_u64(&XLogCtl->logWriteResult));
 		pg_atomic_write_u64(&XLogCtl->logFlushResult, newpos);
 	}
 }
@@ -3090,7 +3182,10 @@ xlog_aio_reopen(PgAioHandle *ioh)
 		aioReopenTLI = td->wal.tli;
 	}
 
-	od->write.fd = aioReopenFile;
+	if (pgaio_io_get_op(ioh) == PGAIO_OP_FSYNC)
+		od->fsync.fd = aioReopenFile;
+	else
+		od->write.fd = aioReopenFile;
 }
 
 static char *
@@ -3494,6 +3589,7 @@ XLogAioIssue(XLogRecPtr upto, TimeLineID tli, bool nowait)
 		w->nbytes = writeend - writestart;
 		w->bufoff = startidx * (Size) XLOG_BLCKSZ + (writestart - pagebegin);
 		w->error = 0;
+		w->is_fsync = false;
 
 		if (pgaio_can_start_io())
 		{
@@ -3635,6 +3731,105 @@ XLogAioIssue(XLogRecPtr upto, TimeLineID tli, bool nowait)
 }
 
 /*
+ * Start an fsync of WAL segment 'segno', which is open as 'fd', using AIO,
+ * after WAL up to 'end' has been written to it (synchronously, into the page
+ * cache).  Once the fsync and all earlier writes and fsyncs have completed,
+ * WAL up to 'end' is durable.  Used when aioUseFsync is set.
+ *
+ * Must be called with WALWriteLock held and in a critical section.
+ */
+static void
+XLogAioStartFsync(int fd, XLogSegNo segno, TimeLineID tli, XLogRecPtr end)
+{
+	uint64		seqno;
+	uint64		head;
+	XLogAioWrite *w;
+
+	Assert(CritSectionCount > 0);
+	Assert(LWLockHeldByMeInMode(WALWriteLock, LW_EXCLUSIVE));
+	Assert(XLogCtl->aioUseFsync);
+
+	if (end <= pg_atomic_read_u64(&XLogCtl->aioIssuedUpTo))
+		return;
+
+	/*
+	 * WAL up to 'end' has been written, but XLogWrite() publishes the new
+	 * Write position only at its end.  The fsync may complete right away and
+	 * advance Flush, which must never pass Write, so publish it now.
+	 */
+	if (pg_atomic_read_u64(&XLogCtl->logWriteResult) < end)
+	{
+		pg_atomic_write_u64(&XLogCtl->logWriteResult, end);
+		pg_write_barrier();
+	}
+
+	/* bound the number of fsyncs in flight */
+	while (XLogAioInflight(&head) >= (uint64) wal_io_max_inflight)
+		XLogAioWaitForWrite(head);
+
+	seqno = XLogCtl->aioNext;	/* only changed by us */
+	w = XLogAioSlot(seqno);
+	w->seqno = seqno;
+	w->end = end;
+	w->tli = tli;
+	w->segno = segno;
+	w->offset = 0;
+	w->nbytes = 0;				/* successful fsync returns 0 */
+	w->bufoff = 0;
+	w->error = 0;
+	w->is_fsync = true;
+
+	/*
+	 * fsync_writethrough isn't supported by AIO; it's only available on
+	 * platforms other than Linux anyway.
+	 */
+	if (pgaio_can_start_io() &&
+		wal_sync_method != WAL_SYNC_METHOD_FSYNC_WRITETHROUGH)
+	{
+		PgAioHandle *ioh;
+		PgAioTargetData *td;
+
+		ioh = pgaio_io_acquire(NULL, NULL);
+		pgaio_io_set_target(ioh, PGAIO_TID_WAL);
+		td = pgaio_io_get_target_data(ioh);
+		td->wal.segno = segno;
+		td->wal.tli = tli;
+		pgaio_io_register_callbacks(ioh, PGAIO_HCB_WAL_WRITEV, 0);
+		pgaio_io_set_handle_data_64(ioh, &seqno, 1);
+
+		SpinLockAcquire(&XLogCtl->aio_lck);
+		pgaio_io_get_wref(ioh, &w->wref);
+		w->status = XLOG_AIO_WRITE_INFLIGHT;
+		SpinLockRelease(&XLogCtl->aio_lck);
+
+		pgaio_io_start_fsync(ioh, fd,
+							 wal_sync_method == WAL_SYNC_METHOD_FDATASYNC);
+		pgaio_submit_staged();
+
+		/* publish only once started, see XLogAioIssue() */
+		SpinLockAcquire(&XLogCtl->aio_lck);
+		XLogCtl->aioNext = seqno + 1;
+		XLogAioAdvanceLocked();
+		SpinLockRelease(&XLogCtl->aio_lck);
+	}
+	else
+	{
+		/* PANICs on failure */
+		issue_xlog_fsync(fd, segno, tli);
+
+		SpinLockAcquire(&XLogCtl->aio_lck);
+		pgaio_wref_clear(&w->wref);
+		w->status = XLOG_AIO_WRITE_DONE;
+		XLogCtl->aioNext = seqno + 1;
+		XLogAioAdvanceLocked();
+		SpinLockRelease(&XLogCtl->aio_lck);
+	}
+
+	pg_atomic_write_u64(&XLogCtl->aioIssuedUpTo, end);
+	pgstat_count_io_op(IOOBJECT_WAL, IOCONTEXT_NORMAL, IOOP_FSYNC, 1, 0);
+}
+
+/*
  * XLogFlush() for wal_io_method = aio: make sure WAL up to 'record' has been
  * issued, then wait for it to become durable.  Called in a critical section.
  */
@@ -3699,7 +3894,16 @@ XLogFlushAio(XLogRecPtr record, TimeLineID insertTLI)
 			insertpos = WaitXLogInsertionsToFinish(insertpos);
 		}
 
-		if (!XLogAioIssue(insertpos, insertTLI, true))
+		if (XLogCtl->aioUseFsync)
+		{
+			XLogwrtRqst WriteRqst;
+
+			/* write synchronously, then start an fsync, see XLogWrite() */
+			WriteRqst.Write = insertpos;
+			WriteRqst.Flush = insertpos;
+			XLogWrite(WriteRqst, insertTLI, false);
+		}
+		else if (!XLogAioIssue(insertpos, insertTLI, true))
 		{
 			/* would have to wait; do that without the lock, then retry */
 			LWLockRelease(WALWriteLock);
@@ -6728,6 +6932,15 @@ XLOGShmemInit(void *arg)
 	XLogCtl->aioZeroingSeq = PG_UINT64_MAX;
 	pg_atomic_init_u32(&XLogCtl->aioReaper, 0);
 	ConditionVariableInit(&XLogCtl->aioWaitCV);
+
+	/*
+	 * Decide once, so that a reload of wal_sync_method or fsync can't mix
+	 * the two schemes while WAL IO is in flight.
+	 */
+	XLogCtl->aioUseFsync = wal_io_method == WAL_IO_METHOD_AIO && enableFsync &&
+		(wal_sync_method == WAL_SYNC_METHOD_FSYNC ||
+		 wal_sync_method == WAL_SYNC_METHOD_FDATASYNC ||
+		 wal_sync_method == WAL_SYNC_METHOD_FSYNC_WRITETHROUGH);
 }
 
 /*
@@ -10906,7 +11119,7 @@ get_sync_bit(int method)
 	 * "Asynchronous WAL writes".
 	 */
 	if (XLogAioEnabled() && !AmWalReceiverProcess())
-		return O_DSYNC | o_direct_flag;
+		return XLogCtl->aioUseFsync ? o_direct_flag : O_DSYNC | o_direct_flag;
 #endif
 
 	switch (method)
