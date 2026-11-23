@@ -387,6 +387,22 @@
   boot_val => '""',
 },
 
+{ name => 'buffer_eviction_policy', type => 'enum', context => 'PGC_POSTMASTER', group => 'RESOURCES_MEM',
+  short_desc => 'Selects the replacement policy used to evict pages from shared buffers.',
+  variable => 'buffer_eviction_policy',
+  boot_val => 'BUFFER_EVICTION_CLOCK',
+  options => 'buffer_eviction_policy_options',
+  assign_hook => 'assign_buffer_eviction_policy',
+},
+
+{ name => 'buffer_trace_directory', type => 'string', context => 'PGC_POSTMASTER', group => 'DEVELOPER_OPTIONS',
+  short_desc => 'Directory into which every backend writes a binary trace of shared buffer accesses.',
+  long_desc => 'An empty string disables tracing.',
+  flags => 'GUC_NOT_IN_SAMPLE',
+  variable => 'buffer_trace_directory',
+  boot_val => '""',
+},
+
 { name => 'bytea_output', type => 'enum', context => 'PGC_USERSET', group => 'CLIENT_CONN_STATEMENT',
   short_desc => 'Sets the output format for bytea.',
   variable => 'bytea_output',

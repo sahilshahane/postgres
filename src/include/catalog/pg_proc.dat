@@ -6046,6 +6046,18 @@
   proname => 'pg_stat_get_buf_alloc', provolatile => 's', proparallel => 'r',
   prorettype => 'int8', proargtypes => '', prosrc => 'pg_stat_get_buf_alloc' },
 
+{ oid => '9890', descr => 'statistics: shared buffer eviction policy counters',
+  proname => 'pg_buffer_eviction_stats', provolatile => 'v', proparallel => 'r',
+  prorettype => 'record', proargtypes => '',
+  proallargtypes => '{text,int8,int8,int8,int8,int8,int4}',
+  proargmodes => '{o,o,o,o,o,o,o}',
+  proargnames => '{policy,allocs,buffers_checked,small_to_main,ghost_inserts,ghost_hits,drrip_psel}',
+  prosrc => 'pg_buffer_eviction_stats' },
+{ oid => '9891', descr => 'statistics: reset shared buffer eviction policy counters',
+  proname => 'pg_buffer_eviction_stats_reset', provolatile => 'v',
+  proparallel => 'r', prorettype => 'void', proargtypes => '',
+  prosrc => 'pg_buffer_eviction_stats_reset' },
+
 { oid => '6214', descr => 'statistics: per backend type IO statistics',
   proname => 'pg_stat_get_io', prorows => '30', proretset => 't',
   provolatile => 'v', proparallel => 'r', prorettype => 'record',

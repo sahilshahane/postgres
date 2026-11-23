@@ -167,6 +167,20 @@ extern PGDLLIMPORT int bgwriter_lru_maxpages;
 extern PGDLLIMPORT double bgwriter_lru_multiplier;
 extern PGDLLIMPORT bool track_io_timing;
 
+/* replacement policy for shared buffers, see freelist.c */
+typedef enum BufferEvictionPolicy
+{
+	BUFFER_EVICTION_CLOCK,		/* PostgreSQL clock-sweep (default) */
+	BUFFER_EVICTION_SRRIP,		/* static re-reference interval prediction */
+	BUFFER_EVICTION_BRRIP,		/* bimodal RRIP */
+	BUFFER_EVICTION_DRRIP,		/* dynamic RRIP, set dueling SRRIP vs BRRIP */
+	BUFFER_EVICTION_SIEVE,		/* SIEVE (NSDI'24) */
+	BUFFER_EVICTION_S3FIFO,		/* S3-FIFO (SOSP'23) */
+} BufferEvictionPolicy;
+
+extern PGDLLIMPORT int buffer_eviction_policy;
+extern PGDLLIMPORT char *buffer_trace_directory;
+
 #define DEFAULT_EFFECTIVE_IO_CONCURRENCY 16
 #define DEFAULT_MAINTENANCE_IO_CONCURRENCY 16
 extern PGDLLIMPORT int effective_io_concurrency;

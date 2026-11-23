@@ -591,6 +591,23 @@ extern bool StrategyRejectBuffer(BufferAccessStrategy strategy,
 								 BufferDesc *buf, bool from_ring);
 
 extern int	StrategySyncStart(uint32 *complete_passes, uint32 *num_buf_alloc);
+
+/*
+ * Policy parameters derived from buffer_eviction_policy.  The hit path in
+ * PinBuffer() caps the usage count at BufferMaxUsageCount, and for the RRIP
+ * family jumps straight to the cap on a hit ("hit priority").
+ */
+extern PGDLLIMPORT int BufferMaxUsageCount;
+extern PGDLLIMPORT bool BufferHitToMax;
+
+extern uint64 StrategyInitialUsage(uint32 hashcode);
+extern void StrategyBufferInserted(BufferDesc *buf, const BufferTag *tag);
+extern void BufferTraceAccess(const BufferTag *tag, int flags);
+
+/* flags for BufferTraceAccess */
+#define BUFTRACE_HIT		0x01
+#define BUFTRACE_EXTEND		0x02
+#define BUFTRACE_STRATEGY	0x04
 extern void StrategyNotifyBgWriter(int bgwprocno);
 
 /* buf_table.c */

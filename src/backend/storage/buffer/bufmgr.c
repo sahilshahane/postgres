@@ -642,6 +642,10 @@ static void WaitIO(BufferDesc *buf);
 static void AbortBufferIO(Buffer buffer);
 static void shared_buffer_write_error_callback(void *arg);
 static void local_buffer_write_error_callback(void *arg);
+/* cheap test so that tracing costs nothing when disabled */
+#define BUFFER_TRACE_ENABLED() \
+	unlikely(buffer_trace_directory != NULL && buffer_trace_directory[0] != '\0')
+
 static inline BufferDesc *BufferAlloc(SMgrRelation smgr,
 									  char relpersistence,
 									  ForkNumber forkNum,
@@ -2241,6 +2245,10 @@ BufferAlloc(SMgrRelation smgr, char relpersistence, ForkNumber forkNum,
 		/* Can release the mapping lock as soon as we've pinned it */
 		LWLockRelease(newPartitionLock);
 
+		if (BUFFER_TRACE_ENABLED())
+			BufferTraceAccess(&newTag,
+							  BUFTRACE_HIT | (strategy ? BUFTRACE_STRATEGY : 0));
+
 		*foundPtr = true;
 
 		if (!valid)
@@ -2261,6 +2269,9 @@ BufferAlloc(SMgrRelation smgr, char relpersistence, ForkNumber forkNum,
 	 * buffer.  Remember to unlock the mapping lock while doing the work.
 	 */
 	LWLockRelease(newPartitionLock);
+
+	if (BUFFER_TRACE_ENABLED())
+		BufferTraceAccess(&newTag, strategy ? BUFTRACE_STRATEGY : 0);
 
 	/*
 	 * Acquire a victim buffer. Somebody else might try to do the same, we
@@ -2335,7 +2346,7 @@ BufferAlloc(SMgrRelation smgr, char relpersistence, ForkNumber forkNum,
 	 * checkpoints, except for their "init" forks, which need to be treated
 	 * just like permanent relations.
 	 */
-	set_bits |= BM_TAG_VALID | BUF_USAGECOUNT_ONE;
+	set_bits |= BM_TAG_VALID | StrategyInitialUsage(newHash);
 	if (relpersistence == RELPERSISTENCE_PERMANENT || forkNum == INIT_FORKNUM)
 		set_bits |= BM_PERMANENT;
 
@@ -2343,6 +2354,9 @@ BufferAlloc(SMgrRelation smgr, char relpersistence, ForkNumber forkNum,
 					set_bits, 0, 0);
 
 	LWLockRelease(newPartitionLock);
+
+	/* let queue-based policies place the buffer according to its new tag */
+	StrategyBufferInserted(victim_buf_hdr, &newTag);
 
 	/*
 	 * Buffer contents are currently invalid.
@@ -3004,7 +3018,7 @@ ExtendBufferedRelShared(BufferManagerRelation bmr,
 
 			victim_buf_hdr->tag = tag;
 
-			set_bits |= BM_TAG_VALID | BUF_USAGECOUNT_ONE;
+			set_bits |= BM_TAG_VALID | StrategyInitialUsage(hash);
 			if (bmr.relpersistence == RELPERSISTENCE_PERMANENT || fork == INIT_FORKNUM)
 				set_bits |= BM_PERMANENT;
 
@@ -3013,6 +3027,11 @@ ExtendBufferedRelShared(BufferManagerRelation bmr,
 							0);
 
 			LWLockRelease(partition_lock);
+
+			StrategyBufferInserted(victim_buf_hdr, &tag);
+			if (BUFFER_TRACE_ENABLED())
+				BufferTraceAccess(&tag, BUFTRACE_EXTEND |
+								  (strategy ? BUFTRACE_STRATEGY : 0));
 
 			/* XXX: could combine the locked operations in it with the above */
 			StartSharedBufferIO(victim_buf_hdr, true, true, NULL);
@@ -3336,9 +3355,20 @@ PinBuffer(BufferDesc *buf, BufferAccessStrategy strategy,
 
 			if (strategy == NULL)
 			{
-				/* Default case: increase usagecount unless already max. */
-				if (BUF_STATE_GET_USAGECOUNT(buf_state) < BM_MAX_USAGE_COUNT)
-					buf_state += BUF_USAGECOUNT_ONE;
+				/*
+				 * Default case: increase usagecount unless already at the
+				 * policy's maximum.  RRIP policies promote straight to the
+				 * maximum on a hit (hit priority).
+				 */
+				uint32		usage = BUF_STATE_GET_USAGECOUNT(buf_state);
+
+				if (usage < (uint32) BufferMaxUsageCount)
+				{
+					if (BufferHitToMax)
+						buf_state += (BufferMaxUsageCount - usage) * BUF_USAGECOUNT_ONE;
+					else
+						buf_state += BUF_USAGECOUNT_ONE;
+				}
 			}
 			else
 			{
