@@ -1,0 +1,1196 @@
+diff --git a/.gitignore b/.gitignore
+index 4e911395fe..c2cbe92f47 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -43,3 +43,6 @@ lib*.pc
+ /Release/
+ /tmp_install/
+ /portlock/
++graphify-out
++idea
++.claude
+diff --git a/src/backend/storage/buffer/bufmgr.c b/src/backend/storage/buffer/bufmgr.c
+index c17fc3590f..7e13c16dc6 100644
+--- a/src/backend/storage/buffer/bufmgr.c
++++ b/src/backend/storage/buffer/bufmgr.c
+@@ -642,6 +642,10 @@ static void WaitIO(BufferDesc *buf);
+ static void AbortBufferIO(Buffer buffer);
+ static void shared_buffer_write_error_callback(void *arg);
+ static void local_buffer_write_error_callback(void *arg);
++/* cheap test so that tracing costs nothing when disabled */
++#define BUFFER_TRACE_ENABLED() \
++	unlikely(buffer_trace_directory != NULL && buffer_trace_directory[0] != '\0')
++
+ static inline BufferDesc *BufferAlloc(SMgrRelation smgr,
+ 									  char relpersistence,
+ 									  ForkNumber forkNum,
+@@ -2241,6 +2245,10 @@ BufferAlloc(SMgrRelation smgr, char relpersistence, ForkNumber forkNum,
+ 		/* Can release the mapping lock as soon as we've pinned it */
+ 		LWLockRelease(newPartitionLock);
+ 
++		if (BUFFER_TRACE_ENABLED())
++			BufferTraceAccess(&newTag,
++							  BUFTRACE_HIT | (strategy ? BUFTRACE_STRATEGY : 0));
++
+ 		*foundPtr = true;
+ 
+ 		if (!valid)
+@@ -2262,6 +2270,9 @@ BufferAlloc(SMgrRelation smgr, char relpersistence, ForkNumber forkNum,
+ 	 */
+ 	LWLockRelease(newPartitionLock);
+ 
++	if (BUFFER_TRACE_ENABLED())
++		BufferTraceAccess(&newTag, strategy ? BUFTRACE_STRATEGY : 0);
++
+ 	/*
+ 	 * Acquire a victim buffer. Somebody else might try to do the same, we
+ 	 * don't hold any conflicting locks. If so we'll have to undo our work
+@@ -2335,7 +2346,7 @@ BufferAlloc(SMgrRelation smgr, char relpersistence, ForkNumber forkNum,
+ 	 * checkpoints, except for their "init" forks, which need to be treated
+ 	 * just like permanent relations.
+ 	 */
+-	set_bits |= BM_TAG_VALID | BUF_USAGECOUNT_ONE;
++	set_bits |= BM_TAG_VALID | StrategyInitialUsage(newHash);
+ 	if (relpersistence == RELPERSISTENCE_PERMANENT || forkNum == INIT_FORKNUM)
+ 		set_bits |= BM_PERMANENT;
+ 
+@@ -2344,6 +2355,9 @@ BufferAlloc(SMgrRelation smgr, char relpersistence, ForkNumber forkNum,
+ 
+ 	LWLockRelease(newPartitionLock);
+ 
++	/* let queue-based policies place the buffer according to its new tag */
++	StrategyBufferInserted(victim_buf_hdr, &newTag);
++
+ 	/*
+ 	 * Buffer contents are currently invalid.
+ 	 */
+@@ -3004,7 +3018,7 @@ ExtendBufferedRelShared(BufferManagerRelation bmr,
+ 
+ 			victim_buf_hdr->tag = tag;
+ 
+-			set_bits |= BM_TAG_VALID | BUF_USAGECOUNT_ONE;
++			set_bits |= BM_TAG_VALID | StrategyInitialUsage(hash);
+ 			if (bmr.relpersistence == RELPERSISTENCE_PERMANENT || fork == INIT_FORKNUM)
+ 				set_bits |= BM_PERMANENT;
+ 
+@@ -3014,6 +3028,11 @@ ExtendBufferedRelShared(BufferManagerRelation bmr,
+ 
+ 			LWLockRelease(partition_lock);
+ 
++			StrategyBufferInserted(victim_buf_hdr, &tag);
++			if (BUFFER_TRACE_ENABLED())
++				BufferTraceAccess(&tag, BUFTRACE_EXTEND |
++								  (strategy ? BUFTRACE_STRATEGY : 0));
++
+ 			/* XXX: could combine the locked operations in it with the above */
+ 			StartSharedBufferIO(victim_buf_hdr, true, true, NULL);
+ 		}
+@@ -3336,9 +3355,20 @@ PinBuffer(BufferDesc *buf, BufferAccessStrategy strategy,
+ 
+ 			if (strategy == NULL)
+ 			{
+-				/* Default case: increase usagecount unless already max. */
+-				if (BUF_STATE_GET_USAGECOUNT(buf_state) < BM_MAX_USAGE_COUNT)
+-					buf_state += BUF_USAGECOUNT_ONE;
++				/*
++				 * Default case: increase usagecount unless already at the
++				 * policy's maximum.  RRIP policies promote straight to the
++				 * maximum on a hit (hit priority).
++				 */
++				uint32		usage = BUF_STATE_GET_USAGECOUNT(buf_state);
++
++				if (usage < (uint32) BufferMaxUsageCount)
++				{
++					if (BufferHitToMax)
++						buf_state += (BufferMaxUsageCount - usage) * BUF_USAGECOUNT_ONE;
++					else
++						buf_state += BUF_USAGECOUNT_ONE;
++				}
+ 			}
+ 			else
+ 			{
+diff --git a/src/backend/storage/buffer/freelist.c b/src/backend/storage/buffer/freelist.c
+index 9971287aff..8aff2ca0a8 100644
+--- a/src/backend/storage/buffer/freelist.c
++++ b/src/backend/storage/buffer/freelist.c
+@@ -22,10 +22,60 @@
+ #include "storage/proc.h"
+ #include "storage/shmem.h"
+ #include "storage/subsystems.h"
++#include "common/pg_prng.h"
++#include "access/htup_details.h"
++#include "funcapi.h"
++#include "miscadmin.h"
++#include "storage/ipc.h"
++#include "storage/lwlock.h"
++#include "utils/builtins.h"
++#include "utils/guc.h"
++#include "utils/guc_hooks.h"
++#include "utils/hsearch.h"
+ 
+ #define INT_ACCESS_ONCE(var)	((int)(*((volatile int *)&(var))))
+ 
+ 
++/*
++ * Doubly linked FIFO of buffer ids used by the queue-based policies.  "head"
++ * is the most recently inserted buffer, "tail" the oldest.
++ */
++typedef struct PolicyList
++{
++	int			head;
++	int			tail;
++	int			count;
++} PolicyList;
++
++typedef struct PolicyNode
++{
++	int			older;			/* towards tail, -1 at the tail */
++	int			newer;			/* towards head, -1 at the head */
++	int			queue;			/* index into StrategyControl->lists */
++} PolicyNode;
++
++#define S3_SMALL	0
++#define S3_MAIN		1
++
++/*
++ * S3-FIFO moves a buffer from the small to the main queue when it was
++ * re-referenced at least this many times while in the small queue.
++ */
++#define S3FIFO_MOVE_THRESHOLD	1
++
++/* DRRIP: 1/32 of the pages lead for SRRIP, 1/32 for BRRIP */
++#define DRRIP_GROUPS		32
++#define DRRIP_PSEL_MAX		1023
++
++/* BRRIP inserts with a "long" prediction once every this many misses */
++#define BRRIP_EPSILON		32
++
++typedef struct GhostEntry
++{
++	BufferTag	tag;			/* hash key */
++	uint64		pos;			/* ring position of the latest insertion */
++} GhostEntry;
++
+ /*
+  * The shared freelist control information.
+  */
+@@ -53,10 +103,67 @@ typedef struct
+ 	 * StrategyNotifyBgWriter.
+ 	 */
+ 	int			bgwprocno;
++
++	/*
++	 * State for the alternative replacement policies.  Everything below that
++	 * is not atomic is protected by BufferEvictionPolicyLock.
++	 */
++	PolicyList	lists[2];		/* SIEVE uses lists[0]; S3-FIFO uses both */
++	int			sieve_hand;		/* SIEVE hand, -1 means "start at tail" */
++	int			s3_small_target;	/* S3-FIFO: target size of the small queue */
++	int			ghost_capacity; /* S3-FIFO: entries in the ghost FIFO */
++	uint64		ghost_next;		/* S3-FIFO: insert position in ghost ring */
++	pg_atomic_uint32 drrip_psel;	/* DRRIP policy selector, 0..1023 */
++
++	/* statistics, see pg_buffer_eviction_stats() */
++	pg_atomic_uint64 stat_allocs;	/* victims chosen by the policy */
++	pg_atomic_uint64 stat_checks;	/* buffers examined to find them */
++	pg_atomic_uint64 stat_small_to_main;	/* S3-FIFO S -> M promotions */
++	pg_atomic_uint64 stat_ghost_inserts;
++	pg_atomic_uint64 stat_ghost_hits;
++
++	/* global sequence number for buffer access tracing */
++	pg_atomic_uint64 trace_seq;
+ } BufferStrategyControl;
+ 
+ /* Pointers to shared state */
+ static BufferStrategyControl *StrategyControl = NULL;
++static PolicyNode *PolicyNodes = NULL;	/* NBuffers entries, SIEVE/S3-FIFO */
++static BufferTag *GhostRing = NULL; /* S3-FIFO ghost FIFO */
++static HTAB *GhostHash = NULL;	/* S3-FIFO ghost membership */
++
++/* GUC variables */
++int			buffer_eviction_policy = BUFFER_EVICTION_CLOCK;
++char	   *buffer_trace_directory = NULL;
++
++/* derived from buffer_eviction_policy by assign_buffer_eviction_policy() */
++int			BufferMaxUsageCount = BM_MAX_USAGE_COUNT;
++bool		BufferHitToMax = false;
++
++const struct config_enum_entry buffer_eviction_policy_options[] = {
++	{"clock", BUFFER_EVICTION_CLOCK, false},
++	{"srrip", BUFFER_EVICTION_SRRIP, false},
++	{"brrip", BUFFER_EVICTION_BRRIP, false},
++	{"drrip", BUFFER_EVICTION_DRRIP, false},
++	{"sieve", BUFFER_EVICTION_SIEVE, false},
++	{"s3fifo", BUFFER_EVICTION_S3FIFO, false},
++	{NULL, 0, false}
++};
++
++#define POLICY_USES_QUEUES(p) \
++	((p) == BUFFER_EVICTION_SIEVE || (p) == BUFFER_EVICTION_S3FIFO)
++
++/* Result of examining one prospective victim, see CheckVictim() */
++typedef enum VictimCheck
++{
++	VICTIM_BUSY,				/* pinned, cannot be used */
++	VICTIM_KEEP,				/* recently used, keep it (usage maybe aged) */
++	VICTIM_TAKEN,				/* pinned by us, caller owns it */
++} VictimCheck;
++
++static BufferDesc *ClockSweepGetVictim(uint64 *buf_state);
++static BufferDesc *SieveGetVictim(uint64 *buf_state);
++static BufferDesc *S3FifoGetVictim(uint64 *buf_state);
+ 
+ static void StrategyCtlShmemRequest(void *arg);
+ static void StrategyCtlShmemInit(void *arg);
+@@ -185,7 +292,6 @@ StrategyGetBuffer(BufferAccessStrategy strategy, uint64 *buf_state, bool *from_r
+ {
+ 	BufferDesc *buf;
+ 	int			bgwprocno;
+-	int			trycounter;
+ 
+ 	*from_ring = false;
+ 
+@@ -236,85 +342,493 @@ StrategyGetBuffer(BufferAccessStrategy strategy, uint64 *buf_state, bool *from_r
+ 	 */
+ 	pg_atomic_fetch_add_u32(&StrategyControl->numBufferAllocs, 1);
+ 
+-	/* Use the "clock sweep" algorithm to find a free buffer */
+-	trycounter = NBuffers;
++	switch (buffer_eviction_policy)
++	{
++		case BUFFER_EVICTION_SIEVE:
++			buf = SieveGetVictim(buf_state);
++			break;
++		case BUFFER_EVICTION_S3FIFO:
++			buf = S3FifoGetVictim(buf_state);
++			break;
++		default:
++			/* clock-sweep and the RRIP family share the clock machinery */
++			buf = ClockSweepGetVictim(buf_state);
++			break;
++	}
++
++	pg_atomic_fetch_add_u64(&StrategyControl->stat_allocs, 1);
++
++	/* Found a usable buffer */
++	if (strategy != NULL)
++		AddBufferToRing(strategy, buf);
++
++	TrackNewBufferPin(BufferDescriptorGetBuffer(buf));
++
++	return buf;
++}
++
++/*
++ * CheckVictim -- examine one buffer the policy proposes to evict.
++ *
++ * A buffer with usage count >= keep_threshold is kept; if "age" is true its
++ * usage count is decremented by one first (clock-style aging).  A pinned
++ * buffer is reported busy.  Otherwise the buffer is pinned by us with a CAS
++ * and VICTIM_TAKEN is returned with the new state in *buf_state.
++ *
++ * This is the same lock-free protocol the original clock-sweep used, so the
++ * hit path (PinBuffer) never has to take any policy lock.
++ */
++static VictimCheck
++CheckVictim(BufferDesc *buf, uint32 keep_threshold, bool age,
++			uint64 *buf_state)
++{
++	uint64		old_buf_state = pg_atomic_read_u64(&buf->state);
++
++	for (;;)
++	{
++		uint64		local_buf_state = old_buf_state;
++
++		if (BUF_STATE_GET_REFCOUNT(local_buf_state) != 0)
++			return VICTIM_BUSY;
++
++		/* See equivalent code in PinBuffer() */
++		if (unlikely(local_buf_state & BM_LOCKED))
++		{
++			old_buf_state = WaitBufHdrUnlocked(buf);
++			continue;
++		}
++
++		if ((local_buf_state & BM_TAG_VALID) &&
++			BUF_STATE_GET_USAGECOUNT(local_buf_state) >= keep_threshold)
++		{
++			if (!age)
++				return VICTIM_KEEP;
++
++			local_buf_state -= BUF_USAGECOUNT_ONE;
++			if (pg_atomic_compare_exchange_u64(&buf->state, &old_buf_state,
++											   local_buf_state))
++				return VICTIM_KEEP;
++			continue;
++		}
++
++		/* pin the buffer if the CAS succeeds */
++		local_buf_state += BUF_REFCOUNT_ONE;
++		if (pg_atomic_compare_exchange_u64(&buf->state, &old_buf_state,
++										   local_buf_state))
++		{
++			*buf_state = local_buf_state;
++			return VICTIM_TAKEN;
++		}
++	}
++}
++
++/*
++ * Error out if we have examined every buffer without being able to make any
++ * progress, i.e. all buffers are pinned.  Same rule as the original code.
++ */
++static inline void
++CountBusyBuffer(int *trycounter)
++{
++	if (--(*trycounter) == 0)
++		ereport(ERROR,
++				errcode(ERRCODE_INSUFFICIENT_RESOURCES),
++				errmsg("could not find an unpinned shared buffer"));
++}
++
++/*
++ * ClockSweepGetVictim -- PostgreSQL's clock-sweep, also used by SRRIP, BRRIP
++ * and DRRIP.  In RRIP terms the usage count is (max RRPV - RRPV): a hit
++ * predicts a "near-immediate" re-reference, the sweep ages buffers, and a
++ * buffer whose count reached zero is predicted "distant" and evicted.  The
++ * RRIP variants differ from clock only in the hit and insertion rules (see
++ * PinBuffer() and StrategyInitialUsage()).
++ */
++static BufferDesc *
++ClockSweepGetVictim(uint64 *buf_state)
++{
++	int			trycounter = NBuffers;
++	uint64		checks = 0;
++
++	for (;;)
++	{
++		BufferDesc *buf = GetBufferDescriptor(ClockSweepTick());
++
++		checks++;
++		switch (CheckVictim(buf, 1, true, buf_state))
++		{
++			case VICTIM_BUSY:
++				CountBusyBuffer(&trycounter);
++				break;
++			case VICTIM_KEEP:
++				trycounter = NBuffers;
++				break;
++			case VICTIM_TAKEN:
++				pg_atomic_fetch_add_u64(&StrategyControl->stat_checks, checks);
++				return buf;
++		}
++	}
++}
++
++/* ---------------- queue primitives (BufferEvictionPolicyLock held) ---------------- */
++
++static inline void
++PolicyListRemove(int buf_id)
++{
++	PolicyNode *n = &PolicyNodes[buf_id];
++	PolicyList *l = &StrategyControl->lists[n->queue];
++
++	if (n->older >= 0)
++		PolicyNodes[n->older].newer = n->newer;
++	else
++		l->tail = n->newer;
++	if (n->newer >= 0)
++		PolicyNodes[n->newer].older = n->older;
++	else
++		l->head = n->older;
++	n->older = n->newer = -1;
++	l->count--;
++}
++
++static inline void
++PolicyListPushHead(int queue, int buf_id)
++{
++	PolicyNode *n = &PolicyNodes[buf_id];
++	PolicyList *l = &StrategyControl->lists[queue];
++
++	n->queue = queue;
++	n->newer = -1;
++	n->older = l->head;
++	if (l->head >= 0)
++		PolicyNodes[l->head].newer = buf_id;
++	else
++		l->tail = buf_id;
++	l->head = buf_id;
++	l->count++;
++}
++
++/* move buf_id to the head of "queue" (possibly the queue it is already in) */
++static inline void
++PolicyListMoveToHead(int queue, int buf_id)
++{
++	PolicyListRemove(buf_id);
++	PolicyListPushHead(queue, buf_id);
++}
++
++#ifdef USE_ASSERT_CHECKING
++/*
++ * Verify the queue invariants: every buffer is in exactly one queue, links
++ * are symmetric and the counts match.  O(NBuffers), so only called once in a
++ * while from assert-enabled builds.
++ */
++static void
++PolicyCheckInvariants(void)
++{
++	int			total = 0;
++
++	for (int q = 0; q < 2; q++)
++	{
++		PolicyList *l = &StrategyControl->lists[q];
++		int			n = 0;
++		int			prev = -1;
++
++		for (int b = l->tail; b >= 0; b = PolicyNodes[b].newer)
++		{
++			Assert(b < NBuffers);
++			Assert(PolicyNodes[b].queue == q);
++			Assert(PolicyNodes[b].older == prev);
++			prev = b;
++			n++;
++			Assert(n <= NBuffers);
++		}
++		Assert(prev == l->head);
++		Assert(n == l->count);
++		total += n;
++	}
++	Assert(total == NBuffers);
++}
++
++#define MAYBE_CHECK_INVARIANTS() \
++	do { \
++		if ((pg_atomic_read_u64(&StrategyControl->stat_allocs) & 1023) == 0) \
++			PolicyCheckInvariants(); \
++	} while (0)
++#else
++#define MAYBE_CHECK_INVARIANTS() ((void) 0)
++#endif
++
++/*
++ * SieveGetVictim -- SIEVE (Zhang et al., NSDI 2024).
++ *
++ * One FIFO of all buffers, new pages enter at the head.  The hand walks from
++ * the tail towards the head; a visited buffer (usage count 1) has its bit
++ * cleared and stays in place, an unvisited one is evicted.  Unlike CLOCK the
++ * survivors are never moved, and the victim's slot is reinserted at the head
++ * as the new page.  Hits only set the visited bit (BufferMaxUsageCount = 1).
++ */
++static BufferDesc *
++SieveGetVictim(uint64 *buf_state)
++{
++	int			trycounter = NBuffers;
++	uint64		checks = 0;
++
++	LWLockAcquire(BufferEvictionPolicyLock, LW_EXCLUSIVE);
++	MAYBE_CHECK_INVARIANTS();
++
+ 	for (;;)
+ 	{
+-		uint64		old_buf_state;
+-		uint64		local_buf_state;
++		int			b = StrategyControl->sieve_hand;
++		BufferDesc *buf;
++		VictimCheck r;
++
++		if (b < 0)
++			b = StrategyControl->lists[0].tail;
++		buf = GetBufferDescriptor(b);
++		checks++;
++
++		r = CheckVictim(buf, 1, true, buf_state);
++
++		/* in every case the hand advances one step towards the head */
++		StrategyControl->sieve_hand = PolicyNodes[b].newer;
++
++		if (r == VICTIM_TAKEN)
++		{
++			/* the slot becomes the newest object */
++			PolicyListMoveToHead(0, b);
++			LWLockRelease(BufferEvictionPolicyLock);
++			pg_atomic_fetch_add_u64(&StrategyControl->stat_checks, checks);
++			return buf;
++		}
++		if (r == VICTIM_BUSY)
++			CountBusyBuffer(&trycounter);
++		else
++			trycounter = NBuffers;
++	}
++}
++
++/* ---------------- S3-FIFO ghost queue ---------------- */
++
++static void
++GhostInsert(const BufferTag *tag)
++{
++	uint64		pos = StrategyControl->ghost_next++;
++	int			slot = (int) (pos % StrategyControl->ghost_capacity);
++	GhostEntry *e;
++	bool		found;
++
++	/* the ring is full: forget the oldest entry, unless it was re-inserted */
++	if (pos >= (uint64) StrategyControl->ghost_capacity)
++	{
++		e = hash_search(GhostHash, &GhostRing[slot], HASH_FIND, NULL);
++		if (e != NULL && e->pos == pos - StrategyControl->ghost_capacity)
++			hash_search(GhostHash, &GhostRing[slot], HASH_REMOVE, NULL);
++	}
++
++	GhostRing[slot] = *tag;
++	e = hash_search(GhostHash, tag, HASH_ENTER_NULL, &found);
++	if (e != NULL)
++		e->pos = pos;
++	pg_atomic_fetch_add_u64(&StrategyControl->stat_ghost_inserts, 1);
++}
+ 
+-		buf = GetBufferDescriptor(ClockSweepTick());
++static bool
++GhostRemove(const BufferTag *tag)
++{
++	return hash_search(GhostHash, tag, HASH_REMOVE, NULL) != NULL;
++}
++
++/*
++ * S3FifoGetVictim -- S3-FIFO (Yang et al., SOSP 2023).
++ *
++ * Small FIFO S (10% of buffers) and main FIFO M (the rest); a ghost FIFO G
++ * remembers tags recently evicted from S.  New pages go to S, or to M if
++ * their tag is in G.  Usage count is the 2-bit frequency (max 3).
++ *
++ * evict: if |S| > target, look at the tail of S: re-referenced buffers are
++ * promoted to M, others are evicted and their tag enters G.  Otherwise look
++ * at the tail of M: if freq > 0, decrement and reinsert at the head of M,
++ * else evict.  Pinned buffers are rotated to the head of their queue.
++ *
++ * The chosen slot is provisionally moved to the head of its queue so that a
++ * victim that GetVictimBuffer() ends up not using is not offered again
++ * immediately; StrategyBufferInserted() then puts it in the right queue.
++ */
++static BufferDesc *
++S3FifoGetVictim(uint64 *buf_state)
++{
++	int			trycounter = NBuffers;
++	uint64		checks = 0;
++	int			busy[2] = {0, 0};	/* pinned buffers rotated, per queue */
++	PolicyList *small = &StrategyControl->lists[S3_SMALL];
++	PolicyList *main = &StrategyControl->lists[S3_MAIN];
++
++	LWLockAcquire(BufferEvictionPolicyLock, LW_EXCLUSIVE);
++	MAYBE_CHECK_INVARIANTS();
++
++	for (;;)
++	{
++		bool		from_small = small->count > StrategyControl->s3_small_target ||
++			main->count == 0;
++		int			q;
++		int			b;
++		BufferDesc *buf;
++		VictimCheck r;
+ 
+ 		/*
+-		 * Check whether the buffer can be used and pin it if so. Do this
+-		 * using a CAS loop, to avoid having to lock the buffer header.
++		 * If every buffer of the preferred queue was found pinned during this
++		 * search, take the victim from the other queue instead.  Without this
++		 * a fully pinned small queue (e.g. a GiST build pinning many pages
++		 * with a tiny shared_buffers) would make us rotate S until we
++		 * wrongly concluded that all of shared buffers is pinned.
+ 		 */
+-		old_buf_state = pg_atomic_read_u64(&buf->state);
+-		for (;;)
++		if (from_small && busy[S3_SMALL] >= small->count && main->count > 0)
++			from_small = false;
++		else if (!from_small && busy[S3_MAIN] >= main->count && small->count > 0)
++			from_small = true;
++
++		q = from_small ? S3_SMALL : S3_MAIN;
++		b = StrategyControl->lists[q].tail;
++		buf = GetBufferDescriptor(b);
++
++		checks++;
++		if (from_small)
++			r = CheckVictim(buf, S3FIFO_MOVE_THRESHOLD, false, buf_state);
++		else
++			r = CheckVictim(buf, 1, true, buf_state);
++
++		switch (r)
+ 		{
+-			local_buf_state = old_buf_state;
+-
+-			/*
+-			 * If the buffer is pinned or has a nonzero usage_count, we cannot
+-			 * use it; decrement the usage_count (unless pinned) and keep
+-			 * scanning.
+-			 */
++			case VICTIM_BUSY:
++				PolicyListMoveToHead(q, b);
++				busy[q]++;
++				CountBusyBuffer(&trycounter);
++				break;
+ 
+-			if (BUF_STATE_GET_REFCOUNT(local_buf_state) != 0)
+-			{
+-				if (--trycounter == 0)
+-				{
+-					/*
+-					 * We've scanned all the buffers without making any state
+-					 * changes, so all the buffers are pinned (or were when we
+-					 * looked at them). We could hope that someone will free
+-					 * one eventually, but it's probably better to fail than
+-					 * to risk getting stuck in an infinite loop.
+-					 */
+-					ereport(ERROR,
+-							errcode(ERRCODE_INSUFFICIENT_RESOURCES),
+-							errmsg("could not find an unpinned shared buffer"));
+-				}
++			case VICTIM_KEEP:
++				/* small: promote to main; main: reinsert (freq was aged) */
++				PolicyListMoveToHead(S3_MAIN, b);
++				busy[q] = 0;
++				if (from_small)
++					pg_atomic_fetch_add_u64(&StrategyControl->stat_small_to_main, 1);
++				trycounter = NBuffers;
+ 				break;
+-			}
+ 
+-			/* See equivalent code in PinBuffer() */
+-			if (unlikely(local_buf_state & BM_LOCKED))
+-			{
+-				old_buf_state = WaitBufHdrUnlocked(buf);
+-				continue;
+-			}
++			case VICTIM_TAKEN:
++				/* we hold a pin, so the tag is stable */
++				if (from_small && (*buf_state & BM_TAG_VALID))
++					GhostInsert(&buf->tag);
++				PolicyListMoveToHead(q, b);
++				LWLockRelease(BufferEvictionPolicyLock);
++				pg_atomic_fetch_add_u64(&StrategyControl->stat_checks, checks);
++				return buf;
++		}
++	}
++}
++
++/*
++ * StrategyBufferInserted -- a victim buffer has just been given a new tag.
++ *
++ * For S3-FIFO, decide between the small and the main queue by consulting the
++ * ghost queue.  SIEVE already put the slot at the head of its only queue, and
++ * the clock policies have nothing to do.
++ */
++void
++StrategyBufferInserted(BufferDesc *buf, const BufferTag *tag)
++{
++	int			want;
++
++	if (buffer_eviction_policy != BUFFER_EVICTION_S3FIFO)
++		return;
++
++	LWLockAcquire(BufferEvictionPolicyLock, LW_EXCLUSIVE);
++	if (GhostRemove(tag))
++	{
++		want = S3_MAIN;
++		pg_atomic_fetch_add_u64(&StrategyControl->stat_ghost_hits, 1);
++	}
++	else
++		want = S3_SMALL;
++
++	if (PolicyNodes[buf->buf_id].queue != want)
++		PolicyListMoveToHead(want, buf->buf_id);
++	LWLockRelease(BufferEvictionPolicyLock);
++}
+ 
+-			if (BUF_STATE_GET_USAGECOUNT(local_buf_state) != 0)
++/* saturating update of the DRRIP policy selector, 0..DRRIP_PSEL_MAX */
++static inline void
++PselAdd(int delta)
++{
++	pg_atomic_uint32 *psel = &StrategyControl->drrip_psel;
++	uint32		old = pg_atomic_read_u32(psel);
++
++	for (;;)
++	{
++		uint32		new;
++
++		if (delta > 0 && old >= DRRIP_PSEL_MAX)
++			return;
++		if (delta < 0 && old == 0)
++			return;
++		new = old + delta;
++		if (pg_atomic_compare_exchange_u32(psel, &old, new))
++			return;
++	}
++}
++
++/* BRRIP insertion: "distant" (0) usually, "long" (1) with probability 1/32 */
++static inline uint64
++BrripInsertion(void)
++{
++	if (pg_prng_uint32(&pg_global_prng_state) % BRRIP_EPSILON == 0)
++		return BUF_USAGECOUNT_ONE;
++	return 0;
++}
++
++/*
++ * StrategyInitialUsage -- usage count bits for a newly loaded page.
++ *
++ * "hashcode" is the buffer-mapping hash of the page's tag; DRRIP uses it to
++ * assign pages to leader groups (the analogue of leader cache sets in the
++ * set-dueling scheme of Qureshi et al. / Jaleel et al.).  A miss on an SRRIP
++ * leader page increments PSEL, a miss on a BRRIP leader decrements it, and
++ * follower pages use BRRIP while PSEL is in its upper half.
++ *
++ * Called with the buffer header lock held, so it must not block.
++ */
++uint64
++StrategyInitialUsage(uint32 hashcode)
++{
++	switch (buffer_eviction_policy)
++	{
++		case BUFFER_EVICTION_CLOCK:
++		case BUFFER_EVICTION_SRRIP:
++			return BUF_USAGECOUNT_ONE;
++
++		case BUFFER_EVICTION_BRRIP:
++			return BrripInsertion();
++
++		case BUFFER_EVICTION_DRRIP:
+ 			{
+-				local_buf_state -= BUF_USAGECOUNT_ONE;
++				/* use bits not consumed by the partition/bucket selection */
++				uint32		group = (hashcode >> 16) % DRRIP_GROUPS;
+ 
+-				if (pg_atomic_compare_exchange_u64(&buf->state, &old_buf_state,
+-												   local_buf_state))
++				if (group == 0)
+ 				{
+-					trycounter = NBuffers;
+-					break;
++					PselAdd(1);
++					return BUF_USAGECOUNT_ONE;
+ 				}
+-			}
+-			else
+-			{
+-				/* pin the buffer if the CAS succeeds */
+-				local_buf_state += BUF_REFCOUNT_ONE;
+-
+-				if (pg_atomic_compare_exchange_u64(&buf->state, &old_buf_state,
+-												   local_buf_state))
++				if (group == 1)
+ 				{
+-					/* Found a usable buffer */
+-					if (strategy != NULL)
+-						AddBufferToRing(strategy, buf);
+-					*buf_state = local_buf_state;
+-
+-					TrackNewBufferPin(BufferDescriptorGetBuffer(buf));
+-
+-					return buf;
++					PselAdd(-1);
++					return BrripInsertion();
+ 				}
++				if (pg_atomic_read_u32(&StrategyControl->drrip_psel) > DRRIP_PSEL_MAX / 2)
++					return BrripInsertion();
++				return BUF_USAGECOUNT_ONE;
+ 			}
+-		}
++
++		default:
++			/* SIEVE and S3-FIFO: not yet visited / freq 0 */
++			return 0;
+ 	}
+ }
+ 
+@@ -384,6 +898,19 @@ StrategyNotifyBgWriter(int bgwprocno)
+  * StrategyCtlShmemRequest -- request shared memory for the buffer
+  *		cache replacement strategy.
+  */
++/* S3-FIFO: small queue is 10% of the buffers, the ghost holds as many tags as M */
++static inline int
++S3FifoSmallTarget(void)
++{
++	return Max(1, NBuffers / 10);
++}
++
++static inline int
++S3FifoGhostCapacity(void)
++{
++	return Max(1, NBuffers - S3FifoSmallTarget());
++}
++
+ static void
+ StrategyCtlShmemRequest(void *arg)
+ {
+@@ -391,6 +918,30 @@ StrategyCtlShmemRequest(void *arg)
+ 					   .size = sizeof(BufferStrategyControl),
+ 					   .ptr = (void **) &StrategyControl
+ 		);
++
++	/* the queue-based policies need per-buffer links */
++	if (POLICY_USES_QUEUES(buffer_eviction_policy))
++		ShmemRequestStruct(.name = "Buffer Eviction Policy Nodes",
++						   .size = mul_size(NBuffers, sizeof(PolicyNode)),
++						   .ptr = (void **) &PolicyNodes
++			);
++
++	if (buffer_eviction_policy == BUFFER_EVICTION_S3FIFO)
++	{
++		int			ghost = S3FifoGhostCapacity();
++
++		ShmemRequestStruct(.name = "Buffer Eviction Ghost Ring",
++						   .size = mul_size(ghost, sizeof(BufferTag)),
++						   .ptr = (void **) &GhostRing
++			);
++		ShmemRequestHash(.name = "Buffer Eviction Ghost Table",
++						 .nelems = ghost + 16,
++						 .ptr = &GhostHash,
++						 .hash_info.keysize = sizeof(BufferTag),
++						 .hash_info.entrysize = sizeof(GhostEntry),
++						 .hash_flags = HASH_ELEM | HASH_BLOBS | HASH_FIXED_SIZE,
++			);
++	}
+ }
+ 
+ /*
+@@ -410,6 +961,186 @@ StrategyCtlShmemInit(void *arg)
+ 
+ 	/* No pending notification */
+ 	StrategyControl->bgwprocno = -1;
++
++	/* alternative policies */
++	StrategyControl->sieve_hand = -1;
++	StrategyControl->s3_small_target = S3FifoSmallTarget();
++	StrategyControl->ghost_capacity = S3FifoGhostCapacity();
++	StrategyControl->ghost_next = 0;
++	pg_atomic_init_u32(&StrategyControl->drrip_psel, DRRIP_PSEL_MAX / 2);
++	pg_atomic_init_u64(&StrategyControl->stat_allocs, 0);
++	pg_atomic_init_u64(&StrategyControl->stat_checks, 0);
++	pg_atomic_init_u64(&StrategyControl->stat_small_to_main, 0);
++	pg_atomic_init_u64(&StrategyControl->stat_ghost_inserts, 0);
++	pg_atomic_init_u64(&StrategyControl->stat_ghost_hits, 0);
++	pg_atomic_init_u64(&StrategyControl->trace_seq, 0);
++
++	for (int q = 0; q < 2; q++)
++	{
++		StrategyControl->lists[q].head = -1;
++		StrategyControl->lists[q].tail = -1;
++		StrategyControl->lists[q].count = 0;
++	}
++
++	/*
++	 * All buffers start out empty.  SIEVE keeps them in its single queue;
++	 * S3-FIFO starts with them in the main queue so that the small queue
++	 * fills up with real pages first.  Buffer 0 ends up at the tail.
++	 */
++	if (POLICY_USES_QUEUES(buffer_eviction_policy))
++	{
++		int			q = buffer_eviction_policy == BUFFER_EVICTION_S3FIFO ? S3_MAIN : 0;
++
++		for (int i = 0; i < NBuffers; i++)
++			PolicyListPushHead(q, i);
++	}
++
++	/* make the active policy visible in the server log of every run */
++	for (const struct config_enum_entry *e = buffer_eviction_policy_options; e->name; e++)
++		if (e->val == buffer_eviction_policy)
++			elog(LOG, "buffer eviction policy: %s, shared_buffers: %d pages, max usage count: %d",
++				 e->name, NBuffers, BufferMaxUsageCount);
++}
++
++/*
++ * GUC assign hook: derive the hit-path parameters.  Runs in every process
++ * that loads the GUC, so PinBuffer() can read plain variables.
++ */
++void
++assign_buffer_eviction_policy(int newval, void *extra)
++{
++	switch (newval)
++	{
++		case BUFFER_EVICTION_SRRIP:
++		case BUFFER_EVICTION_BRRIP:
++		case BUFFER_EVICTION_DRRIP:
++			/* 2-bit RRPV as in Jaleel et al., hit priority */
++			BufferMaxUsageCount = 3;
++			BufferHitToMax = true;
++			break;
++		case BUFFER_EVICTION_SIEVE:
++			/* a single visited bit */
++			BufferMaxUsageCount = 1;
++			BufferHitToMax = false;
++			break;
++		case BUFFER_EVICTION_S3FIFO:
++			/* 2-bit frequency counter */
++			BufferMaxUsageCount = 3;
++			BufferHitToMax = false;
++			break;
++		default:
++			BufferMaxUsageCount = BM_MAX_USAGE_COUNT;
++			BufferHitToMax = false;
++			break;
++	}
++}
++
++/*
++ * pg_buffer_eviction_stats -- counters of the replacement policy since the
++ * last reset.  buffers_checked / allocs is the average number of buffers the
++ * policy examined to find one victim.
++ */
++Datum
++pg_buffer_eviction_stats(PG_FUNCTION_ARGS)
++{
++	TupleDesc	tupdesc;
++	Datum		values[7];
++	bool		nulls[7] = {0};
++	const char *name = "unknown";
++
++	if (get_call_result_type(fcinfo, NULL, &tupdesc) != TYPEFUNC_COMPOSITE)
++		elog(ERROR, "return type must be a row type");
++
++	for (const struct config_enum_entry *e = buffer_eviction_policy_options; e->name; e++)
++		if (e->val == buffer_eviction_policy)
++			name = e->name;
++
++	values[0] = CStringGetTextDatum(name);
++	values[1] = Int64GetDatum((int64) pg_atomic_read_u64(&StrategyControl->stat_allocs));
++	values[2] = Int64GetDatum((int64) pg_atomic_read_u64(&StrategyControl->stat_checks));
++	values[3] = Int64GetDatum((int64) pg_atomic_read_u64(&StrategyControl->stat_small_to_main));
++	values[4] = Int64GetDatum((int64) pg_atomic_read_u64(&StrategyControl->stat_ghost_inserts));
++	values[5] = Int64GetDatum((int64) pg_atomic_read_u64(&StrategyControl->stat_ghost_hits));
++	values[6] = Int32GetDatum((int32) pg_atomic_read_u32(&StrategyControl->drrip_psel));
++
++	PG_RETURN_DATUM(HeapTupleGetDatum(heap_form_tuple(tupdesc, values, nulls)));
++}
++
++Datum
++pg_buffer_eviction_stats_reset(PG_FUNCTION_ARGS)
++{
++	pg_atomic_write_u64(&StrategyControl->stat_allocs, 0);
++	pg_atomic_write_u64(&StrategyControl->stat_checks, 0);
++	pg_atomic_write_u64(&StrategyControl->stat_small_to_main, 0);
++	pg_atomic_write_u64(&StrategyControl->stat_ghost_inserts, 0);
++	pg_atomic_write_u64(&StrategyControl->stat_ghost_hits, 0);
++	PG_RETURN_VOID();
++}
++
++/* ---------------- buffer access tracing ---------------- */
++
++/*
++ * One record per shared-buffer lookup.  "seq" comes from a global counter so
++ * the per-backend files can be merged into one total order offline.
++ */
++typedef struct BufferTraceRecord
++{
++	uint64		seq;
++	uint32		db;
++	uint32		rel;
++	uint32		block;
++	uint8		fork;
++	uint8		flags;			/* BUFTRACE_* */
++	uint16		pad;
++} BufferTraceRecord;
++
++StaticAssertDecl(sizeof(BufferTraceRecord) == 24, "unexpected trace record size");
++
++static FILE *trace_file = NULL;
++static bool trace_failed = false;
++
++static void
++BufferTraceClose(int code, Datum arg)
++{
++	if (trace_file != NULL)
++	{
++		fclose(trace_file);
++		trace_file = NULL;
++	}
++}
++
++void
++BufferTraceAccess(const BufferTag *tag, int flags)
++{
++	BufferTraceRecord rec;
++
++	if (trace_file == NULL)
++	{
++		char		path[MAXPGPATH];
++
++		if (trace_failed)
++			return;
++		snprintf(path, sizeof(path), "%s/trace.%d.%lld.bin",
++				 buffer_trace_directory, MyProcPid, (long long) MyStartTime);
++		trace_file = fopen(path, "wb");
++		if (trace_file == NULL)
++		{
++			trace_failed = true;
++			elog(WARNING, "could not open buffer trace file \"%s\": %m", path);
++			return;
++		}
++		setvbuf(trace_file, NULL, _IOFBF, 1024 * 1024);
++		on_proc_exit(BufferTraceClose, 0);
++	}
++
++	rec.seq = pg_atomic_fetch_add_u64(&StrategyControl->trace_seq, 1);
++	rec.db = tag->dbOid;
++	rec.rel = tag->relNumber;
++	rec.block = tag->blockNum;
++	rec.fork = (uint8) tag->forkNum;
++	rec.flags = (uint8) flags;
++	rec.pad = 0;
++	fwrite(&rec, sizeof(rec), 1, trace_file);
+ }
+ 
+ 
+diff --git a/src/backend/utils/activity/wait_event_names.txt b/src/backend/utils/activity/wait_event_names.txt
+index 3d366fd111..8de2edd87e 100644
+--- a/src/backend/utils/activity/wait_event_names.txt
++++ b/src/backend/utils/activity/wait_event_names.txt
+@@ -372,6 +372,7 @@ LogicalDecodingControl	"Waiting to read or update logical decoding status inform
+ DataChecksumsWorker	"Waiting for data checksums worker."
+ AioWorkerControl	"Waiting to update AIO worker information."
+ DataChecksumTransition	"Waiting for a data checksum state transition to be written to WAL."
++BufferEvictionPolicy	"Waiting to update the shared buffer eviction policy queues."
+ 
+ #
+ # END OF PREDEFINED LWLOCKS (DO NOT CHANGE THIS LINE)
+diff --git a/src/backend/utils/misc/guc_parameters.dat b/src/backend/utils/misc/guc_parameters.dat
+index 380679a76c..4029d01069 100644
+--- a/src/backend/utils/misc/guc_parameters.dat
++++ b/src/backend/utils/misc/guc_parameters.dat
+@@ -387,6 +387,22 @@
+   boot_val => '""',
+ },
+ 
++{ name => 'buffer_eviction_policy', type => 'enum', context => 'PGC_POSTMASTER', group => 'RESOURCES_MEM',
++  short_desc => 'Selects the replacement policy used to evict pages from shared buffers.',
++  variable => 'buffer_eviction_policy',
++  boot_val => 'BUFFER_EVICTION_CLOCK',
++  options => 'buffer_eviction_policy_options',
++  assign_hook => 'assign_buffer_eviction_policy',
++},
++
++{ name => 'buffer_trace_directory', type => 'string', context => 'PGC_POSTMASTER', group => 'DEVELOPER_OPTIONS',
++  short_desc => 'Directory into which every backend writes a binary trace of shared buffer accesses.',
++  long_desc => 'An empty string disables tracing.',
++  flags => 'GUC_NOT_IN_SAMPLE',
++  variable => 'buffer_trace_directory',
++  boot_val => '""',
++},
++
+ { name => 'bytea_output', type => 'enum', context => 'PGC_USERSET', group => 'CLIENT_CONN_STATEMENT',
+   short_desc => 'Sets the output format for bytea.',
+   variable => 'bytea_output',
+diff --git a/src/include/catalog/pg_proc.dat b/src/include/catalog/pg_proc.dat
+index 1f21a8eb6d..08fadb6f8c 100644
+--- a/src/include/catalog/pg_proc.dat
++++ b/src/include/catalog/pg_proc.dat
+@@ -6046,6 +6046,18 @@
+   proname => 'pg_stat_get_buf_alloc', provolatile => 's', proparallel => 'r',
+   prorettype => 'int8', proargtypes => '', prosrc => 'pg_stat_get_buf_alloc' },
+ 
++{ oid => '9890', descr => 'statistics: shared buffer eviction policy counters',
++  proname => 'pg_buffer_eviction_stats', provolatile => 'v', proparallel => 'r',
++  prorettype => 'record', proargtypes => '',
++  proallargtypes => '{text,int8,int8,int8,int8,int8,int4}',
++  proargmodes => '{o,o,o,o,o,o,o}',
++  proargnames => '{policy,allocs,buffers_checked,small_to_main,ghost_inserts,ghost_hits,drrip_psel}',
++  prosrc => 'pg_buffer_eviction_stats' },
++{ oid => '9891', descr => 'statistics: reset shared buffer eviction policy counters',
++  proname => 'pg_buffer_eviction_stats_reset', provolatile => 'v',
++  proparallel => 'r', prorettype => 'void', proargtypes => '',
++  prosrc => 'pg_buffer_eviction_stats_reset' },
++
+ { oid => '6214', descr => 'statistics: per backend type IO statistics',
+   proname => 'pg_stat_get_io', prorows => '30', proretset => 't',
+   provolatile => 'v', proparallel => 'r', prorettype => 'record',
+diff --git a/src/include/storage/buf_internals.h b/src/include/storage/buf_internals.h
+index 726ab75dfe..cc6e2bff1b 100644
+--- a/src/include/storage/buf_internals.h
++++ b/src/include/storage/buf_internals.h
+@@ -591,6 +591,23 @@ extern bool StrategyRejectBuffer(BufferAccessStrategy strategy,
+ 								 BufferDesc *buf, bool from_ring);
+ 
+ extern int	StrategySyncStart(uint32 *complete_passes, uint32 *num_buf_alloc);
++
++/*
++ * Policy parameters derived from buffer_eviction_policy.  The hit path in
++ * PinBuffer() caps the usage count at BufferMaxUsageCount, and for the RRIP
++ * family jumps straight to the cap on a hit ("hit priority").
++ */
++extern PGDLLIMPORT int BufferMaxUsageCount;
++extern PGDLLIMPORT bool BufferHitToMax;
++
++extern uint64 StrategyInitialUsage(uint32 hashcode);
++extern void StrategyBufferInserted(BufferDesc *buf, const BufferTag *tag);
++extern void BufferTraceAccess(const BufferTag *tag, int flags);
++
++/* flags for BufferTraceAccess */
++#define BUFTRACE_HIT		0x01
++#define BUFTRACE_EXTEND		0x02
++#define BUFTRACE_STRATEGY	0x04
+ extern void StrategyNotifyBgWriter(int bgwprocno);
+ 
+ /* buf_table.c */
+diff --git a/src/include/storage/bufmgr.h b/src/include/storage/bufmgr.h
+index 6837b35fc6..d91cf3eac7 100644
+--- a/src/include/storage/bufmgr.h
++++ b/src/include/storage/bufmgr.h
+@@ -167,6 +167,20 @@ extern PGDLLIMPORT int bgwriter_lru_maxpages;
+ extern PGDLLIMPORT double bgwriter_lru_multiplier;
+ extern PGDLLIMPORT bool track_io_timing;
+ 
++/* replacement policy for shared buffers, see freelist.c */
++typedef enum BufferEvictionPolicy
++{
++	BUFFER_EVICTION_CLOCK,		/* PostgreSQL clock-sweep (default) */
++	BUFFER_EVICTION_SRRIP,		/* static re-reference interval prediction */
++	BUFFER_EVICTION_BRRIP,		/* bimodal RRIP */
++	BUFFER_EVICTION_DRRIP,		/* dynamic RRIP, set dueling SRRIP vs BRRIP */
++	BUFFER_EVICTION_SIEVE,		/* SIEVE (NSDI'24) */
++	BUFFER_EVICTION_S3FIFO,		/* S3-FIFO (SOSP'23) */
++} BufferEvictionPolicy;
++
++extern PGDLLIMPORT int buffer_eviction_policy;
++extern PGDLLIMPORT char *buffer_trace_directory;
++
+ #define DEFAULT_EFFECTIVE_IO_CONCURRENCY 16
+ #define DEFAULT_MAINTENANCE_IO_CONCURRENCY 16
+ extern PGDLLIMPORT int effective_io_concurrency;
+diff --git a/src/include/storage/lwlocklist.h b/src/include/storage/lwlocklist.h
+index 8d858be992..b53e31cdd7 100644
+--- a/src/include/storage/lwlocklist.h
++++ b/src/include/storage/lwlocklist.h
+@@ -90,6 +90,7 @@ PG_LWLOCK(55, LogicalDecodingControl)
+ PG_LWLOCK(56, DataChecksumsWorker)
+ PG_LWLOCK(57, AioWorkerControl)
+ PG_LWLOCK(58, DataChecksumTransition)
++PG_LWLOCK(59, BufferEvictionPolicy)
+ 
+ /*
+  * There also exist several built-in LWLock tranches.  As with the predefined
+diff --git a/src/include/utils/guc.h b/src/include/utils/guc.h
+index 164efba6b5..6d5c3d04d4 100644
+--- a/src/include/utils/guc.h
++++ b/src/include/utils/guc.h
+@@ -346,6 +346,7 @@ extern PGDLLIMPORT bool optimize_bounded_sort;
+ extern PGDLLIMPORT const struct config_enum_entry archive_mode_options[];
+ extern PGDLLIMPORT const struct config_enum_entry dynamic_shared_memory_options[];
+ extern PGDLLIMPORT const struct config_enum_entry io_method_options[];
++extern PGDLLIMPORT const struct config_enum_entry buffer_eviction_policy_options[];
+ extern PGDLLIMPORT const struct config_enum_entry recovery_target_action_options[];
+ extern PGDLLIMPORT const struct config_enum_entry server_message_level_options[];
+ extern PGDLLIMPORT const struct config_enum_entry wal_level_options[];
+diff --git a/src/include/utils/guc_hooks.h b/src/include/utils/guc_hooks.h
+index 06453a18c0..5d4ec0e152 100644
+--- a/src/include/utils/guc_hooks.h
++++ b/src/include/utils/guc_hooks.h
+@@ -63,6 +63,7 @@ extern bool check_default_with_oids(bool *newval, void **extra,
+ extern const char *show_effective_wal_level(void);
+ extern bool check_huge_page_size(int *newval, void **extra, GucSource source);
+ extern void assign_io_method(int newval, void *extra);
++extern void assign_buffer_eviction_policy(int newval, void *extra);
+ extern bool check_io_max_concurrency(int *newval, void **extra, GucSource source);
+ extern const char *show_in_hot_standby(void);
+ extern bool check_locale_messages(char **newval, void **extra, GucSource source);

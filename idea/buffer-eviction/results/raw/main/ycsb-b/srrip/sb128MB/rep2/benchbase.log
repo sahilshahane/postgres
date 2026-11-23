@@ -1,0 +1,61 @@
+[INFO ] 2026-11-23 05:03:37,928 [main]  com.oltpbenchmark.DBWorkload main - ======================================================================
+
+Benchmark:                       YCSB {com.oltpbenchmark.benchmarks.ycsb.YCSBBenchmark}
+Configuration:                   /home/neel/postgres_sahil/bench/results/main/ycsb-b/srrip/sb128MB/rep2/benchbase.xml
+Type:                            POSTGRES
+Driver:                          org.postgresql.Driver
+URL:                             jdbc:postgresql://localhost:5440/benchbase?sslmode=disable&ApplicationName=ycsb&reWriteBatchedInserts=true
+Isolation:                       TRANSACTION_READ_COMMITTED
+Batch Size:                      128
+DDL Path:                        null
+Loader Threads:                  8
+Session Setup File:              null
+Scale Factor:                    2000.0
+Terminals:                       16
+New Connection Per Txn:          false
+Reconnect on Connection Failure: true
+
+[INFO ] 2026-11-23 05:03:37,929 [main]  com.oltpbenchmark.DBWorkload main - ======================================================================
+[INFO ] 2026-11-23 05:03:38,057 [main]  com.oltpbenchmark.DBWorkload runWorkload - Creating 16 virtual terminals...
+[INFO ] 2026-11-23 05:03:38,108 [main]  com.oltpbenchmark.DBWorkload runWorkload - Launching the YCSB Benchmark with 1 Phase...
+[INFO ] 2026-11-23 05:03:38,116 [main]  com.oltpbenchmark.ThreadBench runRateLimitedMultiPhase - [0;1mPHASE START[0;0m :: [Workload=YCSB] [Serial=false] [Time=120] [WarmupTime=30] [Rate=unlimited] [Arrival=REGULAR] [Ratios=[95.0, 0.0, 0.0, 5.0, 0.0, 0.0]] [ActiveWorkers=16]
+[INFO ] 2026-11-23 05:04:08,117 [main]  com.oltpbenchmark.ThreadBench runRateLimitedMultiPhase - [0;1mMEASURE[0;0m :: Warmup complete, starting measurements.
+[INFO ] 2026-11-23 05:06:08,117 [main]  com.oltpbenchmark.ThreadBench runRateLimitedMultiPhase - [0;1mTERMINATE[0;0m :: Waiting for all terminals to finish ..
+[INFO ] 2026-11-23 05:06:08,121 [Thread-16]  com.oltpbenchmark.ThreadBench run - Starting WatchDogThread
+[INFO ] 2026-11-23 05:06:08,460 [main]  com.oltpbenchmark.DBWorkload runWorkload - ======================================================================
+[INFO ] 2026-11-23 05:06:08,461 [main]  com.oltpbenchmark.DBWorkload runWorkload - Rate limited reqs/s: Results(state=EXIT, nanoSeconds=120000037026, measuredRequests=2283102) = 19025.844129575795 requests/sec (throughput), 25268.61720336816 requests/sec (goodput)
+[INFO ] 2026-11-23 05:06:08,513 [main]  com.oltpbenchmark.DBWorkload writeOutputs - Output Raw data into file: ycsb_2026-11-23_05-06-08.raw.csv
+[INFO ] 2026-11-23 05:06:12,850 [main]  com.oltpbenchmark.DBWorkload writeOutputs - Output samples into file: ycsb_2026-11-23_05-06-08.samples.csv
+[INFO ] 2026-11-23 05:06:13,003 [main]  com.oltpbenchmark.DBWorkload writeOutputs - Output summary data into file: ycsb_2026-11-23_05-06-08.summary.json
+[INFO ] 2026-11-23 05:06:13,010 [main]  com.oltpbenchmark.DBWorkload writeOutputs - Output DBMS parameters into file: ycsb_2026-11-23_05-06-08.params.json
+[INFO ] 2026-11-23 05:06:13,016 [main]  com.oltpbenchmark.DBWorkload writeOutputs - Output DBMS metrics into file: ycsb_2026-11-23_05-06-08.metrics.json
+[INFO ] 2026-11-23 05:06:13,019 [main]  com.oltpbenchmark.DBWorkload writeOutputs - Output benchmark config into file: ycsb_2026-11-23_05-06-08.config.xml
+[INFO ] 2026-11-23 05:06:13,049 [main]  com.oltpbenchmark.DBWorkload writeOutputs - Output results into file: ycsb_2026-11-23_05-06-08.results.csv with window size 5
+[INFO ] 2026-11-23 05:06:13,373 [main]  com.oltpbenchmark.DBWorkload writeHistograms - ======================================================================
+[INFO ] 2026-11-23 05:06:13,373 [main]  com.oltpbenchmark.DBWorkload writeHistograms - Workload Histograms:
+
+[0;1mCompleted Transactions:[0;0m
+com.oltpbenchmark.benchmarks.ycsb.procedures.ReadRecord/01                       [2880023] ********************************************************************************
+com.oltpbenchmark.benchmarks.ycsb.procedures.InsertRecord/02                     [      0] 
+com.oltpbenchmark.benchmarks.ycsb.procedures.ScanRecord/03                       [      0] 
+com.oltpbenchmark.benchmarks.ycsb.procedures.UpdateRecord/04                     [ 152212] ****
+com.oltpbenchmark.benchmarks.ycsb.procedures.DeleteRecord/05                     [      0] 
+com.oltpbenchmark.benchmarks.ycsb.procedures.ReadModifyWriteRecord/06            [      0] 
+
+[0;1mAborted Transactions:[0;0m
+<EMPTY>
+
+[0;1mRejected Transactions (Server Retry):[0;0m
+<EMPTY>
+
+[0;1mRejected Transactions (Retry Different):[0;0m
+<EMPTY>
+
+[0;1mUnexpected SQL Errors:[0;0m
+<EMPTY>
+
+[0;1mUnknown Status Transactions:[0;0m
+<EMPTY>
+
+
+[INFO ] 2026-11-23 05:06:13,373 [main]  com.oltpbenchmark.DBWorkload writeHistograms - ======================================================================

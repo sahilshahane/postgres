@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<parameters>
+    <type>POSTGRES</type>
+    <driver>org.postgresql.Driver</driver>
+    <url>jdbc:postgresql://localhost:5440/benchbase?sslmode=disable&amp;ApplicationName=ycsb&amp;reWriteBatchedInserts=true</url>
+    <username>admin</username>
+    <password>password</password>
+    <reconnectOnConnectionFailure>true</reconnectOnConnectionFailure>
+    <isolation>TRANSACTION_READ_COMMITTED</isolation>
+    <batchsize>128</batchsize>
+    <scalefactor>2000</scalefactor>
+    <loaderThreads>8</loaderThreads>
+    <!-- YCSB default zipfian constant; scrambled = hot keys spread over pages (Cooper et al.) -->
+    <skewFactor>0.99</skewFactor>
+    <scrambled>true</scrambled>
+    <terminals>16</terminals>
+    <works>
+        <work>
+            <warmup>20</warmup>
+            <time>60</time>
+            <rate>unlimited</rate>
+            <!-- Read, Insert, Scan, Update, Delete, ReadModifyWrite -->
+            <weights>0,5,95,0,0,0</weights>
+        </work>
+    </works>
+    <transactiontypes>
+        <transactiontype><name>ReadRecord</name></transactiontype>
+        <transactiontype><name>InsertRecord</name></transactiontype>
+        <transactiontype><name>ScanRecord</name></transactiontype>
+        <transactiontype><name>UpdateRecord</name></transactiontype>
+        <transactiontype><name>DeleteRecord</name></transactiontype>
+        <transactiontype><name>ReadModifyWriteRecord</name></transactiontype>
+    </transactiontypes>
+</parameters>

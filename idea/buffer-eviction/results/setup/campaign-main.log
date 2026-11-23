@@ -1,0 +1,277 @@
+[01:30:17] tpcc srrip sb=128MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpcc/srrip/sb128MB/rep1 (20537140,1041658,84069,396,1573064.596)
+[01:32:55] tpcc sieve sb=128MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpcc/sieve/sb128MB/rep1 (24190931,1105794,98024,452,1553845.359)
+[01:35:37] tpcc drrip sb=128MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpcc/drrip/sb128MB/rep1 (20676072,1006116,82713,372,1616313.159)
+[01:38:18] tpcc clock sb=128MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpcc/clock/sb128MB/rep1 (16449577,785302,66711,302,1381372.99)
+[01:41:22] tpcc brrip sb=128MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpcc/brrip/sb128MB/rep1 (7682391,345162,30088,159,1202408.939)
+[01:44:17] tpcc s3fifo sb=128MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpcc/s3fifo/sb128MB/rep1 (22280595,1018298,89557,431,1543408.198)
+[01:47:03] tpcc srrip sb=256MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpcc/srrip/sb256MB/rep1 (46403366,1049450,188159,852,1340782.054)
+[01:49:45] tpcc sieve sb=256MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpcc/sieve/sb256MB/rep1 (46749608,992801,189128,891,1311256.63)
+[01:52:31] tpcc drrip sb=256MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpcc/drrip/sb256MB/rep1 (43082720,964327,174368,769,1330544.708)
+[01:55:13] tpcc s3fifo sb=256MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpcc/s3fifo/sb256MB/rep1 (41286247,871898,167575,800,1320623.19)
+[01:58:00] tpcc clock sb=256MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpcc/clock/sb256MB/rep1 (41506120,891067,168524,765,1315579.427)
+[02:00:45] tpcc brrip sb=256MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpcc/brrip/sb256MB/rep1 (46449591,1007754,188194,886,1314323.243)
+[02:03:23] tpcc srrip sb=512MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpcc/srrip/sb512MB/rep1 (76795568,717165,310202,1410,891589.431)
+[02:06:17] tpcc sieve sb=512MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpcc/sieve/sb512MB/rep1 (80014920,725336,323163,1515,862784.177)
+[02:08:55] tpcc drrip sb=512MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpcc/drrip/sb512MB/rep1 (68246902,635701,275513,1230,922409.906)
+[02:11:44] tpcc s3fifo sb=512MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpcc/s3fifo/sb512MB/rep1 (83241568,793835,335709,1592,869055.958)
+[02:14:32] tpcc brrip sb=512MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpcc/brrip/sb512MB/rep1 (80630979,748185,325561,1464,867203.886)
+[02:17:19] tpcc clock sb=512MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpcc/clock/sb512MB/rep1 (68258553,651534,275073,1187,923234.438)
+[02:20:00] tpcc srrip sb=1GB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpcc/srrip/sb1GB/rep1 (128581974,241318,515922,2324,480942.384)
+[02:22:50] tpcc sieve sb=1GB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpcc/sieve/sb1GB/rep1 (125187038,215378,500558,2279,550040.376)
+[02:25:45] tpcc drrip sb=1GB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpcc/drrip/sb1GB/rep1 (115301224,203880,442284,1902,542524.275)
+[02:28:33] tpcc clock sb=1GB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpcc/clock/sb1GB/rep1 (115047335,226985,459923,2139,587458.273)
+[02:31:29] tpcc brrip sb=1GB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpcc/brrip/sb1GB/rep1 (125058833,229211,499673,2387,553088.466)
+[02:34:21] tpcc s3fifo sb=1GB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpcc/s3fifo/sb1GB/rep1 (107435363,229268,429680,2016,572463.109)
+[02:37:13] tpcc brrip sb=128MB rep=2
+done /home/neel/postgres_sahil/bench/results/main/tpcc/brrip/sb128MB/rep2 (17901881,860336,72848,344,1654930.941)
+[02:40:10] tpcc sieve sb=128MB rep=2
+done /home/neel/postgres_sahil/bench/results/main/tpcc/sieve/sb128MB/rep2 (24474665,1130589,99865,416,1534123.564)
+[02:42:46] tpcc drrip sb=128MB rep=2
+done /home/neel/postgres_sahil/bench/results/main/tpcc/drrip/sb128MB/rep2 (23201159,1166332,94795,467,1595824.274)
+[02:45:32] tpcc srrip sb=128MB rep=2
+done /home/neel/postgres_sahil/bench/results/main/tpcc/srrip/sb128MB/rep2 (23503140,1188415,95176,462,1607514.488)
+[02:48:13] tpcc clock sb=128MB rep=2
+done /home/neel/postgres_sahil/bench/results/main/tpcc/clock/sb128MB/rep2 (22678676,1122066,92794,391,1580393.95)
+[02:50:54] tpcc s3fifo sb=128MB rep=2
+done /home/neel/postgres_sahil/bench/results/main/tpcc/s3fifo/sb128MB/rep2 (25028266,1179354,101630,461,1563369.504)
+[02:53:38] tpcc brrip sb=256MB rep=2
+done /home/neel/postgres_sahil/bench/results/main/tpcc/brrip/sb256MB/rep2 (45500590,986415,184796,852,1322121.132)
+[02:56:29] tpcc sieve sb=256MB rep=2
+done /home/neel/postgres_sahil/bench/results/main/tpcc/sieve/sb256MB/rep2 (40084489,853344,162343,727,1309567.566)
+[02:59:18] tpcc drrip sb=256MB rep=2
+done /home/neel/postgres_sahil/bench/results/main/tpcc/drrip/sb256MB/rep2 (45141606,1017086,183604,837,1339156.462)
+[03:02:16] tpcc s3fifo sb=256MB rep=2
+done /home/neel/postgres_sahil/bench/results/main/tpcc/s3fifo/sb256MB/rep2 (42460987,890849,172075,798,1271546.855)
+[03:04:55] tpcc srrip sb=256MB rep=2
+done /home/neel/postgres_sahil/bench/results/main/tpcc/srrip/sb256MB/rep2 (33413626,747770,134850,599,1310616.658)
+[03:07:35] tpcc clock sb=256MB rep=2
+done /home/neel/postgres_sahil/bench/results/main/tpcc/clock/sb256MB/rep2 (44496761,966251,180669,817,1332423.788)
+[03:10:22] tpcc brrip sb=512MB rep=2
+done /home/neel/postgres_sahil/bench/results/main/tpcc/brrip/sb512MB/rep2 (59718824,550539,240530,1137,978794.12)
+[03:13:09] tpcc sieve sb=512MB rep=2
+done /home/neel/postgres_sahil/bench/results/main/tpcc/sieve/sb512MB/rep2 (71586962,646364,287649,1301,909903.162)
+[03:15:59] tpcc drrip sb=512MB rep=2
+done /home/neel/postgres_sahil/bench/results/main/tpcc/drrip/sb512MB/rep2 (67752568,628833,273324,1197,888214.015)
+[03:18:38] tpcc s3fifo sb=512MB rep=2
+done /home/neel/postgres_sahil/bench/results/main/tpcc/s3fifo/sb512MB/rep2 (71741532,685417,290006,1338,927587.575)
+[03:21:33] tpcc clock sb=512MB rep=2
+done /home/neel/postgres_sahil/bench/results/main/tpcc/clock/sb512MB/rep2 (67953752,651297,275000,1184,964687.998)
+[03:24:13] tpcc srrip sb=512MB rep=2
+done /home/neel/postgres_sahil/bench/results/main/tpcc/srrip/sb512MB/rep2 (74161421,694709,298882,1349,932423.728)
+[03:27:03] tpcc brrip sb=1GB rep=2
+done /home/neel/postgres_sahil/bench/results/main/tpcc/brrip/sb1GB/rep2 (123098484,226280,493552,2222,507587.443)
+[03:29:52] tpcc sieve sb=1GB rep=2
+done /home/neel/postgres_sahil/bench/results/main/tpcc/sieve/sb1GB/rep2 (114734846,196626,459655,2092,578807.892)
+[03:32:42] tpcc drrip sb=1GB rep=2
+done /home/neel/postgres_sahil/bench/results/main/tpcc/drrip/sb1GB/rep2 (121669092,207809,454855,2054,607189.812)
+[03:35:39] tpcc srrip sb=1GB rep=2
+done /home/neel/postgres_sahil/bench/results/main/tpcc/srrip/sb1GB/rep2 (111149429,205065,443960,1993,592397.751)
+[03:38:34] tpcc clock sb=1GB rep=2
+done /home/neel/postgres_sahil/bench/results/main/tpcc/clock/sb1GB/rep2 (109740025,215770,438919,2048,608833.008)
+[03:41:29] tpcc s3fifo sb=1GB rep=2
+done /home/neel/postgres_sahil/bench/results/main/tpcc/s3fifo/sb1GB/rep2 (113316743,238987,453911,2074,592356.537)
+[03:44:27] ycsb-b srrip sb=128MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/srrip/sb128MB/rep1 (10209338,2429805,2854803,0,1537772.022)
+[03:47:26] ycsb-b sieve sb=128MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/sieve/sb128MB/rep1 (14155993,2409384,3762062,0,1314718.707)
+[03:50:38] ycsb-b drrip sb=128MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/drrip/sb128MB/rep1 (10962309,2601623,3062629,0,1534609.919)
+[03:53:23] ycsb-b clock sb=128MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/clock/sb128MB/rep1 (9809668,2475765,2777523,0,1570967.166)
+[03:56:27] ycsb-b brrip sb=128MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/brrip/sb128MB/rep1 (11670886,2467854,3195130,0,1549405.163)
+[03:59:16] ycsb-b s3fifo sb=128MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/s3fifo/sb128MB/rep1 (13637148,2374717,3628919,0,1353272.523)
+[04:02:07] ycsb-b srrip sb=256MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/srrip/sb256MB/rep1 (13114901,2158198,3451946,0,1504569.121)
+[04:04:52] ycsb-b sieve sb=256MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/sieve/sb256MB/rep1 (14828431,2201315,3863404,0,1392084.495)
+[04:07:58] ycsb-b drrip sb=256MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/drrip/sb256MB/rep1 (13279923,2188534,3498980,0,1490434.853)
+[04:10:47] ycsb-b s3fifo sb=256MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/s3fifo/sb256MB/rep1 (14116425,2109667,3671661,0,1523883.413)
+[04:13:35] ycsb-b clock sb=256MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/clock/sb256MB/rep1 (12374823,2033528,3255270,0,1541581.448)
+[04:16:22] ycsb-b brrip sb=256MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/brrip/sb256MB/rep1 (13821891,2182028,3618119,0,1513508.894)
+[04:19:16] ycsb-b srrip sb=512MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/srrip/sb512MB/rep1 (15450318,2016984,3956669,0,1435833.593)
+[04:22:17] ycsb-b sieve sb=512MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/sieve/sb512MB/rep1 (16623678,2053081,4240784,0,1335399.319)
+[04:25:20] ycsb-b drrip sb=512MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/drrip/sb512MB/rep1 (13849120,1798113,3536363,0,1503784.062)
+[04:28:08] ycsb-b s3fifo sb=512MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/s3fifo/sb512MB/rep1 (16923011,2084861,4303638,0,1428392.626)
+[04:31:17] ycsb-b brrip sb=512MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/brrip/sb512MB/rep1 (16376128,2094254,4181860,0,1431847.675)
+[04:34:24] ycsb-b clock sb=512MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/clock/sb512MB/rep1 (15485465,2028429,3963844,0,1441753.959)
+[04:37:18] ycsb-b srrip sb=1GB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/srrip/sb1GB/rep1 (18087878,1568710,4452437,0,1348387.38)
+[04:40:07] ycsb-b sieve sb=1GB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/sieve/sb1GB/rep1 (18946450,1589805,4653031,0,1315536.167)
+[04:42:58] ycsb-b drrip sb=1GB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/drrip/sb1GB/rep1 (21603674,1860408,5306318,0,1227311.273)
+[04:46:03] ycsb-b clock sb=1GB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/clock/sb1GB/rep1 (18146762,1577919,4469040,0,1343068.661)
+[04:48:53] ycsb-b brrip sb=1GB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/brrip/sb1GB/rep1 (19060758,1618507,4681358,0,1345361.943)
+[04:51:44] ycsb-b s3fifo sb=1GB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/s3fifo/sb1GB/rep1 (21272120,1794294,5214461,0,1295565.468)
+[04:54:50] ycsb-b brrip sb=128MB rep=2
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/brrip/sb128MB/rep2 (9802153,2065083,2678261,0,1585881.889)
+[04:57:38] ycsb-b sieve sb=128MB rep=2
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/sieve/sb128MB/rep2 (13518482,2304564,3583775,0,1348158.023)
+[05:00:41] ycsb-b drrip sb=128MB rep=2
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/drrip/sb128MB/rep2 (9334472,2212871,2604025,0,1622292.744)
+[05:03:31] ycsb-b srrip sb=128MB rep=2
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/srrip/sb128MB/rep2 (8317654,1971634,2321209,0,1604225.434)
+[05:06:15] ycsb-b clock sb=128MB rep=2
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/clock/sb128MB/rep2 (10324020,2580987,2909840,0,1562522.839)
+[05:09:02] ycsb-b s3fifo sb=128MB rep=2
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/s3fifo/sb128MB/rep2 (13453323,2336764,3574747,0,1428944.243)
+[05:11:51] ycsb-b brrip sb=256MB rep=2
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/brrip/sb256MB/rep2 (13545786,2146860,3551723,0,1498421.378)
+[05:15:10] ycsb-b sieve sb=256MB rep=2
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/sieve/sb256MB/rep2 (14237150,2110624,3706905,0,1368276.874)
+[05:18:24] ycsb-b drrip sb=256MB rep=2
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/drrip/sb256MB/rep2 (11458077,1891379,3019292,0,1559764.435)
+[05:21:20] ycsb-b s3fifo sb=256MB rep=2
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/s3fifo/sb256MB/rep2 (15986880,2387796,4151867,0,1447607.013)
+[05:24:26] ycsb-b srrip sb=256MB rep=2
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/srrip/sb256MB/rep2 (11184639,1838474,2944150,0,1539005.801)
+[05:27:09] ycsb-b clock sb=256MB rep=2
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/clock/sb256MB/rep2 (14133356,2322039,3716064,0,1482740.088)
+[05:30:05] ycsb-b brrip sb=512MB rep=2
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/brrip/sb512MB/rep2 (13929637,1774572,3552718,0,1464295.921)
+[05:33:01] ycsb-b sieve sb=512MB rep=2
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/sieve/sb512MB/rep2 (15891341,1959085,4040912,0,1316130.515)
+[05:36:11] ycsb-b drrip sb=512MB rep=2
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/drrip/sb512MB/rep2 (13473536,1748376,3444516,0,1463198.164)
+[05:38:55] ycsb-b s3fifo sb=512MB rep=2
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/s3fifo/sb512MB/rep2 (17777398,2190073,4513424,0,1366433.212)
+[05:41:58] ycsb-b clock sb=512MB rep=2
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/clock/sb512MB/rep2 (13928358,1822843,3564837,0,1452790.273)
+[05:44:57] ycsb-b srrip sb=512MB rep=2
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/srrip/sb512MB/rep2 (14233521,1860012,3643828,0,1485894.96)
+[05:48:13] ycsb-b brrip sb=1GB rep=2
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/brrip/sb1GB/rep2 (18148567,1542423,4458178,0,1326578.621)
+[05:51:01] ycsb-b sieve sb=1GB rep=2
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/sieve/sb1GB/rep2 (19133656,1602417,4689467,0,1264323.739)
+[05:54:02] ycsb-b drrip sb=1GB rep=2
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/drrip/sb1GB/rep2 (18105272,1545176,4439215,0,1314369.131)
+[05:56:52] ycsb-b srrip sb=1GB rep=2
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/srrip/sb1GB/rep2 (22807086,1967356,5600637,0,1234527.378)
+[06:00:22] ycsb-b clock sb=1GB rep=2
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/clock/sb1GB/rep2 (17544715,1526026,4322115,0,1326906.9)
+[06:03:08] ycsb-b s3fifo sb=1GB rep=2
+done /home/neel/postgres_sahil/bench/results/main/ycsb-b/s3fifo/sb1GB/rep2 (21755051,1882917,5344533,0,1255676.901)
+[06:06:08] tpch srrip sb=128MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpch/srrip/sb128MB/rep1 (5834093,5412107,89,0,297058.112)
+[06:17:25] tpch sieve sb=128MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpch/sieve/sb128MB/rep1 (5693133,5553067,89,0,300104.587)
+[06:28:46] tpch drrip sb=128MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpch/drrip/sb128MB/rep1 (5835290,5410910,89,0,292252.019)
+[06:39:56] tpch clock sb=128MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpch/clock/sb128MB/rep1 (5796113,5450087,89,0,299651.973)
+[06:51:06] tpch brrip sb=128MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpch/brrip/sb128MB/rep1 (5877944,5368256,89,0,289504.382)
+[07:02:18] tpch s3fifo sb=128MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpch/s3fifo/sb128MB/rep1 (5933430,5312770,89,0,280097.909)
+[07:12:49] tpch srrip sb=256MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpch/srrip/sb256MB/rep1 (6565701,4680499,89,0,244564.968)
+[07:22:26] tpch sieve sb=256MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpch/sieve/sb256MB/rep1 (6273085,4973115,89,0,257192.256)
+[07:32:29] tpch drrip sb=256MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpch/drrip/sb256MB/rep1 (6564626,4681574,89,0,241755.871)
+[07:41:41] tpch s3fifo sb=256MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpch/s3fifo/sb256MB/rep1 (6527127,4719073,89,0,240949.773)
+[07:50:58] tpch clock sb=256MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpch/clock/sb256MB/rep1 (6551472,4694728,89,0,242592.195)
+[08:00:26] tpch brrip sb=256MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpch/brrip/sb256MB/rep1 (6611490,4634710,89,0,237766.899)
+[08:09:30] tpch srrip sb=512MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpch/srrip/sb512MB/rep1 (7642685,3603515,89,0,175038.153)
+[08:16:33] tpch sieve sb=512MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpch/sieve/sb512MB/rep1 (7237640,4008560,89,0,207511.116)
+[08:24:46] tpch drrip sb=512MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpch/drrip/sb512MB/rep1 (7644116,3602084,89,0,174218.537)
+[08:31:58] tpch s3fifo sb=512MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpch/s3fifo/sb512MB/rep1 (7883115,3363085,89,0,168500.83)
+[08:38:55] tpch brrip sb=512MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpch/brrip/sb512MB/rep1 (7679232,3566968,89,0,173503.854)
+[08:45:52] tpch clock sb=512MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpch/clock/sb512MB/rep1 (7701928,3544272,89,0,175792.609)
+[08:52:56] tpch srrip sb=1GB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpch/srrip/sb1GB/rep1 (9980657,1265543,89,0,60323.251)
+[08:56:19] tpch sieve sb=1GB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpch/sieve/sb1GB/rep1 (9580379,1665821,89,0,89626.857)
+[09:00:34] tpch drrip sb=1GB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpch/drrip/sb1GB/rep1 (9982664,1263536,89,0,60881.513)
+[09:03:49] tpch clock sb=1GB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpch/clock/sb1GB/rep1 (9850375,1395825,89,0,62008.405)
+[09:07:15] tpch brrip sb=1GB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpch/brrip/sb1GB/rep1 (10038062,1208138,89,0,53288.391)
+[09:10:13] tpch s3fifo sb=1GB rep=1
+done /home/neel/postgres_sahil/bench/results/main/tpch/s3fifo/sb1GB/rep1 (10009308,1236892,89,0,55790.31)
+[09:13:17] ycsb-e srrip sb=128MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-e/srrip/sb128MB/rep1 (1774032,7153944,90450,0,1794907.376)
+[09:16:08] ycsb-e sieve sb=128MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-e/sieve/sb128MB/rep1 (2556588,7149321,98762,0,1800814.689)
+[09:18:53] ycsb-e drrip sb=128MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-e/drrip/sb128MB/rep1 (1757560,7108254,90322,0,1797906.573)
+[09:22:06] ycsb-e clock sb=128MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-e/clock/sb128MB/rep1 (1698345,7039675,88438,0,1791455.032)
+[09:24:45] ycsb-e brrip sb=128MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-e/brrip/sb128MB/rep1 (1887828,7206033,92433,0,1834040.47)
+[09:27:24] ycsb-e s3fifo sb=128MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-e/s3fifo/sb128MB/rep1 (2535332,7281853,99402,0,1838725.607)
+[09:30:09] ycsb-e srrip sb=256MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-e/srrip/sb256MB/rep1 (2793047,7037611,100015,0,1769642.625)
+[09:32:49] ycsb-e sieve sb=256MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-e/sieve/sb256MB/rep1 (3646323,6956883,107555,0,1762783.783)
+[09:35:34] ycsb-e drrip sb=256MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-e/drrip/sb256MB/rep1 (3045761,7619533,108429,0,1902675.043)
+[09:38:26] ycsb-e s3fifo sb=256MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-e/s3fifo/sb256MB/rep1 (3667887,7234530,110499,0,1781550.468)
+[09:41:13] ycsb-e clock sb=256MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-e/clock/sb256MB/rep1 (2748878,7089090,99686,0,1765672.204)
+[09:44:11] ycsb-e brrip sb=256MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-e/brrip/sb256MB/rep1 (3055122,7233626,104442,0,1786305.253)
+[09:46:57] ycsb-e srrip sb=512MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-e/srrip/sb512MB/rep1 (5040239,7072655,122807,0,1736721.246)
+[09:49:56] ycsb-e sieve sb=512MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-e/sieve/sb512MB/rep1 (5788486,6379612,123483,0,1730250.765)
+[09:52:37] ycsb-e drrip sb=512MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-e/drrip/sb512MB/rep1 (5023721,7061275,122596,0,1720734.857)
+[09:55:29] ycsb-e s3fifo sb=512MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-e/s3fifo/sb512MB/rep1 (6068860,7056684,132834,0,1681548.484)
+[09:58:27] ycsb-e brrip sb=512MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-e/brrip/sb512MB/rep1 (5617932,7366503,131982,0,1781341.614)
+[10:01:12] ycsb-e clock sb=512MB rep=1
+done /home/neel/postgres_sahil/bench/results/main/ycsb-e/clock/sb512MB/rep1 (4927442,7032225,121728,0,1722263.581)
+[10:04:10] ycsb-e srrip sb=1GB rep=1

@@ -1,0 +1,319 @@
+2026-11-23 03:35:43.418 IST [934525] LOG:  buffer eviction policy: srrip, shared_buffers: 131072 pages, max usage count: 3
+2026-11-23 03:35:43.420 IST [934525] LOG:  starting PostgreSQL 20devel on x86_64-linux, compiled by gcc-13.3.0, 64-bit
+2026-11-23 03:35:43.420 IST [934525] LOG:  listening on IPv4 address "127.0.0.1", port 5440
+2026-11-23 03:35:43.837 IST [934525] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5440"
+2026-11-23 03:35:44.708 IST [934530] LOG:  database system was shut down at 2026-11-23 01:14:11 IST
+2026-11-23 03:35:46.696 IST [934525] LOG:  database system is ready to accept connections
+2026-11-23 03:36:35.018 IST [934589] LOG:  process 934589 still waiting for ExclusiveLock on extension of relation 16552 of database 16385 after 1000.068 ms
+2026-11-23 03:36:35.018 IST [934589] DETAIL:  Process holding the lock: 934576. Wait queue: 934586, 934589, 934581.
+2026-11-23 03:36:35.018 IST [934589] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:36:35.018 IST [934589] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18),($19,$20,$21,$22,$23,$24,$25,$26,$27),($28,$29,$30,$31,$32,$33,$34,$35,$36),($37,$38,$39,$40,$41,$42,$43,$44,$45),($46,$47,$48,$49,$50,$51,$52,$53,$54),($55,$56,$57,$58,$59,$60,$61,$62,$63),($64,$65,$66,$67,$68,$69,$70,$71,$72)
+	
+2026-11-23 03:36:35.018 IST [934586] LOG:  process 934586 still waiting for ExclusiveLock on extension of relation 16552 of database 16385 after 1000.072 ms
+2026-11-23 03:36:35.018 IST [934586] DETAIL:  Process holding the lock: 934576. Wait queue: 934586, 934589, 934581.
+2026-11-23 03:36:35.018 IST [934586] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:36:35.018 IST [934586] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18),($19,$20,$21,$22,$23,$24,$25,$26,$27),($28,$29,$30,$31,$32,$33,$34,$35,$36),($37,$38,$39,$40,$41,$42,$43,$44,$45),($46,$47,$48,$49,$50,$51,$52,$53,$54),($55,$56,$57,$58,$59,$60,$61,$62,$63),($64,$65,$66,$67,$68,$69,$70,$71,$72)
+	
+2026-11-23 03:36:35.026 IST [934581] LOG:  process 934581 still waiting for ExclusiveLock on extension of relation 16552 of database 16385 after 1000.073 ms
+2026-11-23 03:36:35.026 IST [934581] DETAIL:  Process holding the lock: 934576. Wait queue: 934586, 934589, 934581.
+2026-11-23 03:36:35.026 IST [934581] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:36:35.026 IST [934581] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18),($19,$20,$21,$22,$23,$24,$25,$26,$27),($28,$29,$30,$31,$32,$33,$34,$35,$36),($37,$38,$39,$40,$41,$42,$43,$44,$45),($46,$47,$48,$49,$50,$51,$52,$53,$54),($55,$56,$57,$58,$59,$60,$61,$62,$63),($64,$65,$66,$67,$68,$69,$70,$71,$72)
+	
+2026-11-23 03:36:35.034 IST [934586] LOG:  process 934586 acquired ExclusiveLock on extension of relation 16552 of database 16385 after 1015.773 ms
+2026-11-23 03:36:35.034 IST [934586] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:36:35.034 IST [934586] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18),($19,$20,$21,$22,$23,$24,$25,$26,$27),($28,$29,$30,$31,$32,$33,$34,$35,$36),($37,$38,$39,$40,$41,$42,$43,$44,$45),($46,$47,$48,$49,$50,$51,$52,$53,$54),($55,$56,$57,$58,$59,$60,$61,$62,$63),($64,$65,$66,$67,$68,$69,$70,$71,$72)
+	
+2026-11-23 03:36:35.063 IST [934589] LOG:  process 934589 acquired ExclusiveLock on extension of relation 16552 of database 16385 after 1044.354 ms
+2026-11-23 03:36:35.063 IST [934589] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:36:35.063 IST [934589] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18),($19,$20,$21,$22,$23,$24,$25,$26,$27),($28,$29,$30,$31,$32,$33,$34,$35,$36),($37,$38,$39,$40,$41,$42,$43,$44,$45),($46,$47,$48,$49,$50,$51,$52,$53,$54),($55,$56,$57,$58,$59,$60,$61,$62,$63),($64,$65,$66,$67,$68,$69,$70,$71,$72)
+	
+2026-11-23 03:36:35.064 IST [934581] LOG:  process 934581 acquired ExclusiveLock on extension of relation 16552 of database 16385 after 1037.929 ms
+2026-11-23 03:36:35.064 IST [934581] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:36:35.064 IST [934581] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18),($19,$20,$21,$22,$23,$24,$25,$26,$27),($28,$29,$30,$31,$32,$33,$34,$35,$36),($37,$38,$39,$40,$41,$42,$43,$44,$45),($46,$47,$48,$49,$50,$51,$52,$53,$54),($55,$56,$57,$58,$59,$60,$61,$62,$63),($64,$65,$66,$67,$68,$69,$70,$71,$72)
+	
+2026-11-23 03:36:44.921 IST [934586] LOG:  process 934586 still waiting for ExclusiveLock on extension of relation 16552 of database 16385 after 1000.117 ms
+2026-11-23 03:36:44.921 IST [934586] DETAIL:  Process holding the lock: 934576. Wait queue: 934584, 934574, 934586.
+2026-11-23 03:36:44.921 IST [934586] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:36:44.921 IST [934586] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18),($19,$20,$21,$22,$23,$24,$25,$26,$27),($28,$29,$30,$31,$32,$33,$34,$35,$36)
+	
+2026-11-23 03:36:44.921 IST [934574] LOG:  process 934574 still waiting for ExclusiveLock on extension of relation 16552 of database 16385 after 1000.127 ms
+2026-11-23 03:36:44.921 IST [934574] DETAIL:  Process holding the lock: 934576. Wait queue: 934584, 934574, 934586.
+2026-11-23 03:36:44.921 IST [934574] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:36:44.921 IST [934574] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18),($19,$20,$21,$22,$23,$24,$25,$26,$27),($28,$29,$30,$31,$32,$33,$34,$35,$36)
+	
+2026-11-23 03:36:44.921 IST [934584] LOG:  process 934584 still waiting for ExclusiveLock on extension of relation 16552 of database 16385 after 1000.272 ms
+2026-11-23 03:36:44.921 IST [934584] DETAIL:  Process holding the lock: 934576. Wait queue: 934584, 934574, 934586.
+2026-11-23 03:36:44.921 IST [934584] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:36:44.921 IST [934584] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18),($19,$20,$21,$22,$23,$24,$25,$26,$27),($28,$29,$30,$31,$32,$33,$34,$35,$36),($37,$38,$39,$40,$41,$42,$43,$44,$45),($46,$47,$48,$49,$50,$51,$52,$53,$54),($55,$56,$57,$58,$59,$60,$61,$62,$63),($64,$65,$66,$67,$68,$69,$70,$71,$72)
+	
+2026-11-23 03:36:45.039 IST [934584] LOG:  process 934584 acquired ExclusiveLock on extension of relation 16552 of database 16385 after 1117.743 ms
+2026-11-23 03:36:45.039 IST [934584] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:36:45.039 IST [934584] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18),($19,$20,$21,$22,$23,$24,$25,$26,$27),($28,$29,$30,$31,$32,$33,$34,$35,$36),($37,$38,$39,$40,$41,$42,$43,$44,$45),($46,$47,$48,$49,$50,$51,$52,$53,$54),($55,$56,$57,$58,$59,$60,$61,$62,$63),($64,$65,$66,$67,$68,$69,$70,$71,$72)
+	
+2026-11-23 03:36:45.040 IST [934574] LOG:  process 934574 acquired ExclusiveLock on extension of relation 16552 of database 16385 after 1119.216 ms
+2026-11-23 03:36:45.040 IST [934574] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:36:45.040 IST [934574] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18),($19,$20,$21,$22,$23,$24,$25,$26,$27),($28,$29,$30,$31,$32,$33,$34,$35,$36)
+	
+2026-11-23 03:36:45.057 IST [934586] LOG:  process 934586 acquired ExclusiveLock on extension of relation 16552 of database 16385 after 1135.465 ms
+2026-11-23 03:36:45.057 IST [934586] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:36:45.057 IST [934586] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18),($19,$20,$21,$22,$23,$24,$25,$26,$27),($28,$29,$30,$31,$32,$33,$34,$35,$36)
+	
+2026-11-23 03:36:57.829 IST [934584] LOG:  process 934584 still waiting for ExclusiveLock on extension of relation 16552 of database 16385 after 1000.287 ms
+2026-11-23 03:36:57.829 IST [934584] DETAIL:  Process holding the lock: 934589. Wait queue: 934584, 934587, 934577, 934586.
+2026-11-23 03:36:57.829 IST [934584] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:36:57.829 IST [934584] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18),($19,$20,$21,$22,$23,$24,$25,$26,$27),($28,$29,$30,$31,$32,$33,$34,$35,$36),($37,$38,$39,$40,$41,$42,$43,$44,$45),($46,$47,$48,$49,$50,$51,$52,$53,$54),($55,$56,$57,$58,$59,$60,$61,$62,$63),($64,$65,$66,$67,$68,$69,$70,$71,$72)
+	
+2026-11-23 03:36:57.829 IST [934587] LOG:  process 934587 still waiting for ExclusiveLock on extension of relation 16552 of database 16385 after 1000.278 ms
+2026-11-23 03:36:57.829 IST [934587] DETAIL:  Process holding the lock: 934589. Wait queue: 934584, 934587, 934577, 934586.
+2026-11-23 03:36:57.829 IST [934587] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:36:57.829 IST [934587] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18),($19,$20,$21,$22,$23,$24,$25,$26,$27),($28,$29,$30,$31,$32,$33,$34,$35,$36),($37,$38,$39,$40,$41,$42,$43,$44,$45),($46,$47,$48,$49,$50,$51,$52,$53,$54),($55,$56,$57,$58,$59,$60,$61,$62,$63),($64,$65,$66,$67,$68,$69,$70,$71,$72)
+	
+2026-11-23 03:36:58.057 IST [934584] LOG:  process 934584 acquired ExclusiveLock on extension of relation 16552 of database 16385 after 1228.235 ms
+2026-11-23 03:36:58.057 IST [934584] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:36:58.057 IST [934584] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18),($19,$20,$21,$22,$23,$24,$25,$26,$27),($28,$29,$30,$31,$32,$33,$34,$35,$36),($37,$38,$39,$40,$41,$42,$43,$44,$45),($46,$47,$48,$49,$50,$51,$52,$53,$54),($55,$56,$57,$58,$59,$60,$61,$62,$63),($64,$65,$66,$67,$68,$69,$70,$71,$72)
+	
+2026-11-23 03:36:58.077 IST [934587] LOG:  process 934587 acquired ExclusiveLock on extension of relation 16552 of database 16385 after 1247.796 ms
+2026-11-23 03:36:58.077 IST [934587] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:36:58.077 IST [934587] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18),($19,$20,$21,$22,$23,$24,$25,$26,$27),($28,$29,$30,$31,$32,$33,$34,$35,$36),($37,$38,$39,$40,$41,$42,$43,$44,$45),($46,$47,$48,$49,$50,$51,$52,$53,$54),($55,$56,$57,$58,$59,$60,$61,$62,$63),($64,$65,$66,$67,$68,$69,$70,$71,$72)
+	
+2026-11-23 03:37:04.443 IST [934584] LOG:  process 934584 still waiting for ExclusiveLock on extension of relation 16552 of database 16385 after 1000.295 ms
+2026-11-23 03:37:04.443 IST [934584] DETAIL:  Process holding the lock: 934583. Wait queue: 934584, 934580, 934585, 934589, 934587, 934574, 934579, 934588.
+2026-11-23 03:37:04.443 IST [934584] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:37:04.443 IST [934584] STATEMENT:      UPDATE order_line
+	       SET OL_DELIVERY_D = $1
+	     WHERE OL_O_ID = $2
+	       AND OL_D_ID = $3
+	       AND OL_W_ID = $4
+	
+2026-11-23 03:37:04.450 IST [934580] LOG:  process 934580 still waiting for ExclusiveLock on extension of relation 16552 of database 16385 after 1000.365 ms
+2026-11-23 03:37:04.450 IST [934580] DETAIL:  Process holding the lock: 934583. Wait queue: 934584, 934580, 934585, 934589, 934587, 934574, 934579, 934588.
+2026-11-23 03:37:04.450 IST [934580] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:37:04.450 IST [934580] STATEMENT:      UPDATE order_line
+	       SET OL_DELIVERY_D = $1
+	     WHERE OL_O_ID = $2
+	       AND OL_D_ID = $3
+	       AND OL_W_ID = $4
+	
+2026-11-23 03:37:04.576 IST [934584] LOG:  process 934584 acquired ExclusiveLock on extension of relation 16552 of database 16385 after 1133.920 ms
+2026-11-23 03:37:04.576 IST [934584] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:37:04.576 IST [934584] STATEMENT:      UPDATE order_line
+	       SET OL_DELIVERY_D = $1
+	     WHERE OL_O_ID = $2
+	       AND OL_D_ID = $3
+	       AND OL_W_ID = $4
+	
+2026-11-23 03:37:04.596 IST [934580] LOG:  process 934580 acquired ExclusiveLock on extension of relation 16552 of database 16385 after 1146.535 ms
+2026-11-23 03:37:04.596 IST [934580] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:37:04.596 IST [934580] STATEMENT:      UPDATE order_line
+	       SET OL_DELIVERY_D = $1
+	     WHERE OL_O_ID = $2
+	       AND OL_D_ID = $3
+	       AND OL_W_ID = $4
+	
+2026-11-23 03:37:40.967 IST [934586] LOG:  process 934586 still waiting for ExclusiveLock on extension of relation 16552 of database 16385 after 1000.084 ms
+2026-11-23 03:37:40.967 IST [934586] DETAIL:  Process holding the lock: 934574. Wait queue: 934582, 934583, 934576, 934578, 934575, 934586, 934588, 934577.
+2026-11-23 03:37:40.967 IST [934586] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:37:40.967 IST [934586] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18),($19,$20,$21,$22,$23,$24,$25,$26,$27),($28,$29,$30,$31,$32,$33,$34,$35,$36),($37,$38,$39,$40,$41,$42,$43,$44,$45),($46,$47,$48,$49,$50,$51,$52,$53,$54),($55,$56,$57,$58,$59,$60,$61,$62,$63),($64,$65,$66,$67,$68,$69,$70,$71,$72)
+	
+2026-11-23 03:37:40.967 IST [934588] LOG:  process 934588 still waiting for ExclusiveLock on extension of relation 16552 of database 16385 after 1000.092 ms
+2026-11-23 03:37:40.967 IST [934588] DETAIL:  Process holding the lock: 934574. Wait queue: 934582, 934583, 934576, 934578, 934575, 934586, 934588, 934577.
+2026-11-23 03:37:40.967 IST [934588] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:37:40.967 IST [934588] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18),($19,$20,$21,$22,$23,$24,$25,$26,$27),($28,$29,$30,$31,$32,$33,$34,$35,$36),($37,$38,$39,$40,$41,$42,$43,$44,$45),($46,$47,$48,$49,$50,$51,$52,$53,$54),($55,$56,$57,$58,$59,$60,$61,$62,$63),($64,$65,$66,$67,$68,$69,$70,$71,$72)
+	
+2026-11-23 03:37:40.967 IST [934582] LOG:  process 934582 still waiting for ExclusiveLock on extension of relation 16552 of database 16385 after 1000.106 ms
+2026-11-23 03:37:40.967 IST [934582] DETAIL:  Process holding the lock: 934574. Wait queue: 934582, 934583, 934576, 934578, 934575, 934586, 934588, 934577.
+2026-11-23 03:37:40.967 IST [934582] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:37:40.967 IST [934582] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18)
+	
+2026-11-23 03:37:40.967 IST [934583] LOG:  process 934583 still waiting for ExclusiveLock on extension of relation 16552 of database 16385 after 1000.109 ms
+2026-11-23 03:37:40.967 IST [934583] DETAIL:  Process holding the lock: 934574. Wait queue: 934582, 934583, 934576, 934578, 934575, 934586, 934588, 934577.
+2026-11-23 03:37:40.967 IST [934583] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:37:40.967 IST [934583] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18),($19,$20,$21,$22,$23,$24,$25,$26,$27),($28,$29,$30,$31,$32,$33,$34,$35,$36)
+	
+2026-11-23 03:37:40.967 IST [934575] LOG:  process 934575 still waiting for ExclusiveLock on extension of relation 16552 of database 16385 after 1000.127 ms
+2026-11-23 03:37:40.967 IST [934575] DETAIL:  Process holding the lock: 934574. Wait queue: 934582, 934583, 934576, 934578, 934575, 934586, 934588, 934577.
+2026-11-23 03:37:40.967 IST [934575] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:37:40.967 IST [934575] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18),($19,$20,$21,$22,$23,$24,$25,$26,$27),($28,$29,$30,$31,$32,$33,$34,$35,$36),($37,$38,$39,$40,$41,$42,$43,$44,$45),($46,$47,$48,$49,$50,$51,$52,$53,$54),($55,$56,$57,$58,$59,$60,$61,$62,$63),($64,$65,$66,$67,$68,$69,$70,$71,$72)
+	
+2026-11-23 03:37:40.967 IST [934578] LOG:  process 934578 still waiting for ExclusiveLock on extension of relation 16552 of database 16385 after 1000.139 ms
+2026-11-23 03:37:40.967 IST [934578] DETAIL:  Process holding the lock: 934574. Wait queue: 934582, 934583, 934576, 934578, 934575, 934586, 934588, 934577.
+2026-11-23 03:37:40.967 IST [934578] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:37:40.967 IST [934578] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18),($19,$20,$21,$22,$23,$24,$25,$26,$27),($28,$29,$30,$31,$32,$33,$34,$35,$36),($37,$38,$39,$40,$41,$42,$43,$44,$45),($46,$47,$48,$49,$50,$51,$52,$53,$54),($55,$56,$57,$58,$59,$60,$61,$62,$63),($64,$65,$66,$67,$68,$69,$70,$71,$72)
+	
+2026-11-23 03:37:40.967 IST [934576] LOG:  process 934576 still waiting for ExclusiveLock on extension of relation 16552 of database 16385 after 1000.163 ms
+2026-11-23 03:37:40.967 IST [934576] DETAIL:  Process holding the lock: 934574. Wait queue: 934582, 934583, 934576, 934578, 934575, 934586, 934588, 934577.
+2026-11-23 03:37:40.967 IST [934576] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:37:40.967 IST [934576] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18),($19,$20,$21,$22,$23,$24,$25,$26,$27),($28,$29,$30,$31,$32,$33,$34,$35,$36)
+	
+2026-11-23 03:37:41.005 IST [934582] LOG:  process 934582 acquired ExclusiveLock on extension of relation 16552 of database 16385 after 1037.761 ms
+2026-11-23 03:37:41.005 IST [934582] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:37:41.005 IST [934582] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18)
+	
+2026-11-23 03:37:41.036 IST [934583] LOG:  process 934583 acquired ExclusiveLock on extension of relation 16552 of database 16385 after 1069.195 ms
+2026-11-23 03:37:41.036 IST [934583] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:37:41.036 IST [934583] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18),($19,$20,$21,$22,$23,$24,$25,$26,$27),($28,$29,$30,$31,$32,$33,$34,$35,$36)
+	
+2026-11-23 03:37:41.052 IST [934576] LOG:  process 934576 acquired ExclusiveLock on extension of relation 16552 of database 16385 after 1085.189 ms
+2026-11-23 03:37:41.052 IST [934576] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:37:41.052 IST [934576] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18),($19,$20,$21,$22,$23,$24,$25,$26,$27),($28,$29,$30,$31,$32,$33,$34,$35,$36)
+	
+2026-11-23 03:37:41.060 IST [934578] LOG:  process 934578 acquired ExclusiveLock on extension of relation 16552 of database 16385 after 1092.666 ms
+2026-11-23 03:37:41.060 IST [934578] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:37:41.060 IST [934578] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18),($19,$20,$21,$22,$23,$24,$25,$26,$27),($28,$29,$30,$31,$32,$33,$34,$35,$36),($37,$38,$39,$40,$41,$42,$43,$44,$45),($46,$47,$48,$49,$50,$51,$52,$53,$54),($55,$56,$57,$58,$59,$60,$61,$62,$63),($64,$65,$66,$67,$68,$69,$70,$71,$72)
+	
+2026-11-23 03:37:41.068 IST [934575] LOG:  process 934575 acquired ExclusiveLock on extension of relation 16552 of database 16385 after 1101.214 ms
+2026-11-23 03:37:41.068 IST [934575] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:37:41.068 IST [934575] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18),($19,$20,$21,$22,$23,$24,$25,$26,$27),($28,$29,$30,$31,$32,$33,$34,$35,$36),($37,$38,$39,$40,$41,$42,$43,$44,$45),($46,$47,$48,$49,$50,$51,$52,$53,$54),($55,$56,$57,$58,$59,$60,$61,$62,$63),($64,$65,$66,$67,$68,$69,$70,$71,$72)
+	
+2026-11-23 03:37:41.069 IST [934586] LOG:  process 934586 acquired ExclusiveLock on extension of relation 16552 of database 16385 after 1101.635 ms
+2026-11-23 03:37:41.069 IST [934586] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:37:41.069 IST [934586] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18),($19,$20,$21,$22,$23,$24,$25,$26,$27),($28,$29,$30,$31,$32,$33,$34,$35,$36),($37,$38,$39,$40,$41,$42,$43,$44,$45),($46,$47,$48,$49,$50,$51,$52,$53,$54),($55,$56,$57,$58,$59,$60,$61,$62,$63),($64,$65,$66,$67,$68,$69,$70,$71,$72)
+	
+2026-11-23 03:37:41.076 IST [934588] LOG:  process 934588 acquired ExclusiveLock on extension of relation 16552 of database 16385 after 1108.659 ms
+2026-11-23 03:37:41.076 IST [934588] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:37:41.076 IST [934588] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18),($19,$20,$21,$22,$23,$24,$25,$26,$27),($28,$29,$30,$31,$32,$33,$34,$35,$36),($37,$38,$39,$40,$41,$42,$43,$44,$45),($46,$47,$48,$49,$50,$51,$52,$53,$54),($55,$56,$57,$58,$59,$60,$61,$62,$63),($64,$65,$66,$67,$68,$69,$70,$71,$72)
+	
+2026-11-23 03:37:44.936 IST [934576] LOG:  process 934576 still waiting for ExclusiveLock on extension of relation 16552 of database 16385 after 1000.195 ms
+2026-11-23 03:37:44.936 IST [934576] DETAIL:  Process holding the lock: 934586. Wait queue: 934588, 934578, 934576, 934589.
+2026-11-23 03:37:44.936 IST [934576] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:37:44.936 IST [934576] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18),($19,$20,$21,$22,$23,$24,$25,$26,$27),($28,$29,$30,$31,$32,$33,$34,$35,$36)
+	
+2026-11-23 03:37:44.936 IST [934578] LOG:  process 934578 still waiting for ExclusiveLock on extension of relation 16552 of database 16385 after 1000.190 ms
+2026-11-23 03:37:44.936 IST [934578] DETAIL:  Process holding the lock: 934586. Wait queue: 934588, 934578, 934576, 934589.
+2026-11-23 03:37:44.936 IST [934578] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:37:44.936 IST [934578] STATEMENT:      UPDATE order_line
+	       SET OL_DELIVERY_D = $1
+	     WHERE OL_O_ID = $2
+	       AND OL_D_ID = $3
+	       AND OL_W_ID = $4
+	
+2026-11-23 03:37:44.936 IST [934588] LOG:  process 934588 still waiting for ExclusiveLock on extension of relation 16552 of database 16385 after 1000.219 ms
+2026-11-23 03:37:44.936 IST [934588] DETAIL:  Process holding the lock: 934586. Wait queue: 934588, 934578, 934576, 934589.
+2026-11-23 03:37:44.936 IST [934588] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:37:44.936 IST [934588] STATEMENT:      UPDATE order_line
+	       SET OL_DELIVERY_D = $1
+	     WHERE OL_O_ID = $2
+	       AND OL_D_ID = $3
+	       AND OL_W_ID = $4
+	
+2026-11-23 03:37:44.956 IST [934589] LOG:  process 934589 still waiting for ExclusiveLock on extension of relation 16552 of database 16385 after 1000.309 ms
+2026-11-23 03:37:44.956 IST [934589] DETAIL:  Process holding the lock: 934586. Wait queue: 934588, 934578, 934576, 934589.
+2026-11-23 03:37:44.956 IST [934589] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:37:44.956 IST [934589] STATEMENT:      UPDATE order_line
+	       SET OL_DELIVERY_D = $1
+	     WHERE OL_O_ID = $2
+	       AND OL_D_ID = $3
+	       AND OL_W_ID = $4
+	
+2026-11-23 03:37:45.060 IST [934588] LOG:  process 934588 acquired ExclusiveLock on extension of relation 16552 of database 16385 after 1124.406 ms
+2026-11-23 03:37:45.060 IST [934588] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:37:45.060 IST [934588] STATEMENT:      UPDATE order_line
+	       SET OL_DELIVERY_D = $1
+	     WHERE OL_O_ID = $2
+	       AND OL_D_ID = $3
+	       AND OL_W_ID = $4
+	
+2026-11-23 03:37:45.091 IST [934578] LOG:  process 934578 acquired ExclusiveLock on extension of relation 16552 of database 16385 after 1155.689 ms
+2026-11-23 03:37:45.091 IST [934578] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:37:45.091 IST [934578] STATEMENT:      UPDATE order_line
+	       SET OL_DELIVERY_D = $1
+	     WHERE OL_O_ID = $2
+	       AND OL_D_ID = $3
+	       AND OL_W_ID = $4
+	
+2026-11-23 03:37:45.107 IST [934576] LOG:  process 934576 acquired ExclusiveLock on extension of relation 16552 of database 16385 after 1171.568 ms
+2026-11-23 03:37:45.107 IST [934576] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:37:45.107 IST [934576] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18),($19,$20,$21,$22,$23,$24,$25,$26,$27),($28,$29,$30,$31,$32,$33,$34,$35,$36)
+	
+2026-11-23 03:37:45.107 IST [934589] LOG:  process 934589 acquired ExclusiveLock on extension of relation 16552 of database 16385 after 1151.911 ms
+2026-11-23 03:37:45.107 IST [934589] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:37:45.107 IST [934589] STATEMENT:      UPDATE order_line
+	       SET OL_DELIVERY_D = $1
+	     WHERE OL_O_ID = $2
+	       AND OL_D_ID = $3
+	       AND OL_W_ID = $4
+	
+2026-11-23 03:38:02.909 IST [934589] LOG:  process 934589 still waiting for ExclusiveLock on extension of relation 16564 of database 16385 after 1000.065 ms
+2026-11-23 03:38:02.909 IST [934589] DETAIL:  Process holding the lock: 934584. Wait queue: 934589.
+2026-11-23 03:38:02.909 IST [934589] CONTEXT:  waiting for ExclusiveLock on extension of relation 16564 of database 16385
+2026-11-23 03:38:02.909 IST [934589] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18),($19,$20,$21,$22,$23,$24,$25,$26,$27),($28,$29,$30,$31,$32,$33,$34,$35,$36),($37,$38,$39,$40,$41,$42,$43,$44,$45),($46,$47,$48,$49,$50,$51,$52,$53,$54),($55,$56,$57,$58,$59,$60,$61,$62,$63),($64,$65,$66,$67,$68,$69,$70,$71,$72)
+	
+2026-11-23 03:38:03.641 IST [934589] LOG:  process 934589 acquired ExclusiveLock on extension of relation 16564 of database 16385 after 1731.812 ms
+2026-11-23 03:38:03.641 IST [934589] CONTEXT:  waiting for ExclusiveLock on extension of relation 16564 of database 16385
+2026-11-23 03:38:03.641 IST [934589] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18),($19,$20,$21,$22,$23,$24,$25,$26,$27),($28,$29,$30,$31,$32,$33,$34,$35,$36),($37,$38,$39,$40,$41,$42,$43,$44,$45),($46,$47,$48,$49,$50,$51,$52,$53,$54),($55,$56,$57,$58,$59,$60,$61,$62,$63),($64,$65,$66,$67,$68,$69,$70,$71,$72)
+	
+2026-11-23 03:38:24.994 IST [934525] LOG:  received fast shutdown request
+2026-11-23 03:38:24.995 IST [934525] LOG:  aborting any active transactions
+2026-11-23 03:38:24.996 IST [934525] LOG:  background worker "logical replication launcher" (PID 934561) exited with exit code 1
+2026-11-23 03:38:24.998 IST [934528] LOG:  shutting down
+2026-11-23 03:38:24.999 IST [934528] LOG:  checkpoint starting: shutdown fast
+2026-11-23 03:38:34.165 IST [934528] LOG:  checkpoint complete: shutdown fast: wrote 122392 buffers (93.4%), wrote 241 SLRU buffers; 0 WAL file(s) added, 0 removed, 170 recycled; write=8.973 s, sync=0.005 s, total=9.168 s; sync files=41, longest=0.002 s, average=0.001 s; distance=2785897 kB, estimate=2785897 kB; lsn=2/4C09A7E8, redo lsn=2/4C09A7E8
+2026-11-23 03:38:34.370 IST [934525] LOG:  database system is shut down

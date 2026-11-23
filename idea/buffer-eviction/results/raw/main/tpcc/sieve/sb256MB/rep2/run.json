@@ -1,0 +1,4 @@
+{"bench":"tpcc","workload":"tpcc","policy":"sieve","shared_buffers":"256MB","rep":2,
+ "terminals":16,"warmup_s":30,"time_s":120,"scalefactor":"20",
+ "elapsed_s":154.187910266,"copy_s":2,"host":"utkarsh-MS-7C96","started":"2026-11-23T02:56:29+05:30",
+ "loadavg_end":"15.03 15.22 15.56"}

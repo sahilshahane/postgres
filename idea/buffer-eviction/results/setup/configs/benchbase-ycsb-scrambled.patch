@@ -1,0 +1,58 @@
+diff --git a/src/main/java/com/oltpbenchmark/benchmarks/ycsb/YCSBBenchmark.java b/src/main/java/com/oltpbenchmark/benchmarks/ycsb/YCSBBenchmark.java
+index b0a861e..48d499b 100644
+--- a/src/main/java/com/oltpbenchmark/benchmarks/ycsb/YCSBBenchmark.java
++++ b/src/main/java/com/oltpbenchmark/benchmarks/ycsb/YCSBBenchmark.java
+@@ -43,6 +43,9 @@ public final class YCSBBenchmark extends BenchmarkModule {
+   /** The constant used in the zipfian distribution (to modify the skew) */
+   protected final double skewFactor;
+ 
++  /** Use YCSB's scrambled zipfian (hot keys spread over the key space), as in Cooper et al. */
++  protected final boolean scrambled;
++
+   public YCSBBenchmark(WorkloadConfiguration workConf) {
+     super(workConf);
+ 
+@@ -64,6 +67,8 @@ public final class YCSBBenchmark extends BenchmarkModule {
+       }
+     }
+     this.skewFactor = skewFactor;
++    this.scrambled =
++        workConf.getXmlConfig() != null && workConf.getXmlConfig().getBoolean("scrambled", false);
+   }
+ 
+   @Override
+diff --git a/src/main/java/com/oltpbenchmark/benchmarks/ycsb/YCSBWorker.java b/src/main/java/com/oltpbenchmark/benchmarks/ycsb/YCSBWorker.java
+index 614ddb8..bee4ed0 100644
+--- a/src/main/java/com/oltpbenchmark/benchmarks/ycsb/YCSBWorker.java
++++ b/src/main/java/com/oltpbenchmark/benchmarks/ycsb/YCSBWorker.java
+@@ -23,6 +23,8 @@ import com.oltpbenchmark.api.TransactionType;
+ import com.oltpbenchmark.api.Worker;
+ import com.oltpbenchmark.benchmarks.ycsb.procedures.*;
+ import com.oltpbenchmark.distributions.CounterGenerator;
++import com.oltpbenchmark.distributions.IntegerGenerator;
++import com.oltpbenchmark.distributions.ScrambledZipfianGenerator;
+ import com.oltpbenchmark.distributions.UniformGenerator;
+ import com.oltpbenchmark.distributions.ZipfianGenerator;
+ import com.oltpbenchmark.types.TransactionStatus;
+@@ -38,7 +40,7 @@ import java.util.ArrayList;
+  */
+ class YCSBWorker extends Worker<YCSBBenchmark> {
+ 
+-  private final ZipfianGenerator readRecord;
++  private final IntegerGenerator readRecord;
+   private static CounterGenerator insertRecord;
+   private final UniformGenerator randScan;
+ 
+@@ -57,8 +59,10 @@ class YCSBWorker extends Worker<YCSBBenchmark> {
+     super(benchmarkModule, id);
+     this.data = new char[benchmarkModule.fieldSize];
+     this.readRecord =
+-        new ZipfianGenerator(
+-            rng(), init_record_count, benchmarkModule.skewFactor); // pool for read keys
++        benchmarkModule.scrambled
++            ? new ScrambledZipfianGenerator(0, init_record_count - 1, benchmarkModule.skewFactor)
++            : new ZipfianGenerator(
++                rng(), init_record_count, benchmarkModule.skewFactor); // pool for read keys
+     this.randScan = new UniformGenerator(1, YCSBConstants.MAX_SCAN);
+ 
+     synchronized (YCSBWorker.class) {

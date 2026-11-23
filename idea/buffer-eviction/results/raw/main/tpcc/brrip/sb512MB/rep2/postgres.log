@@ -1,0 +1,26 @@
+2026-11-23 03:10:26.108 IST [928945] LOG:  buffer eviction policy: brrip, shared_buffers: 65536 pages, max usage count: 3
+2026-11-23 03:10:26.110 IST [928945] LOG:  starting PostgreSQL 20devel on x86_64-linux, compiled by gcc-13.3.0, 64-bit
+2026-11-23 03:10:26.110 IST [928945] LOG:  listening on IPv4 address "127.0.0.1", port 5440
+2026-11-23 03:10:27.145 IST [928945] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5440"
+2026-11-23 03:10:28.002 IST [928952] LOG:  database system was shut down at 2026-11-23 01:14:11 IST
+2026-11-23 03:10:29.706 IST [928945] LOG:  database system is ready to accept connections
+2026-11-23 03:11:45.198 IST [929002] LOG:  process 929002 still waiting for ExclusiveLock on extension of relation 16552 of database 16385 after 1000.299 ms
+2026-11-23 03:11:45.198 IST [929002] DETAIL:  Process holding the lock: 929005. Wait queue: 929002.
+2026-11-23 03:11:45.198 IST [929002] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:11:45.198 IST [929002] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18),($19,$20,$21,$22,$23,$24,$25,$26,$27),($28,$29,$30,$31,$32,$33,$34,$35,$36)
+	
+2026-11-23 03:11:45.316 IST [929002] LOG:  process 929002 acquired ExclusiveLock on extension of relation 16552 of database 16385 after 1118.758 ms
+2026-11-23 03:11:45.316 IST [929002] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:11:45.316 IST [929002] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18),($19,$20,$21,$22,$23,$24,$25,$26,$27),($28,$29,$30,$31,$32,$33,$34,$35,$36)
+	
+2026-11-23 03:13:07.254 IST [928945] LOG:  received fast shutdown request
+2026-11-23 03:13:07.255 IST [928945] LOG:  aborting any active transactions
+2026-11-23 03:13:07.256 IST [928945] LOG:  background worker "logical replication launcher" (PID 928983) exited with exit code 1
+2026-11-23 03:13:07.257 IST [928950] LOG:  shutting down
+2026-11-23 03:13:07.258 IST [928950] LOG:  checkpoint starting: shutdown fast
+2026-11-23 03:13:09.120 IST [928950] LOG:  checkpoint complete: shutdown fast: wrote 60560 buffers (92.4%), wrote 139 SLRU buffers; 0 WAL file(s) added, 0 removed, 124 recycled; write=1.723 s, sync=0.012 s, total=1.863 s; sync files=41, longest=0.008 s, average=0.001 s; distance=2032271 kB, estimate=2032271 kB; lsn=2/1E0A3E88, redo lsn=2/1E0A3E88
+2026-11-23 03:13:09.232 IST [928945] LOG:  database system is shut down

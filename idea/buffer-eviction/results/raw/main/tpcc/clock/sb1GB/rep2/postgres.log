@@ -1,0 +1,26 @@
+2026-11-23 03:38:39.447 IST [935142] LOG:  buffer eviction policy: clock, shared_buffers: 131072 pages, max usage count: 5
+2026-11-23 03:38:39.449 IST [935142] LOG:  starting PostgreSQL 20devel on x86_64-linux, compiled by gcc-13.3.0, 64-bit
+2026-11-23 03:38:39.450 IST [935142] LOG:  listening on IPv4 address "127.0.0.1", port 5440
+2026-11-23 03:38:40.599 IST [935142] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5440"
+2026-11-23 03:38:41.360 IST [935147] LOG:  database system was shut down at 2026-11-23 01:14:11 IST
+2026-11-23 03:38:43.142 IST [935142] LOG:  database system is ready to accept connections
+2026-11-23 03:41:08.492 IST [935199] LOG:  process 935199 still waiting for ExclusiveLock on extension of relation 16564 of database 16385 after 1000.223 ms
+2026-11-23 03:41:08.492 IST [935199] DETAIL:  Process holding the lock: 935203. Wait queue: 935199.
+2026-11-23 03:41:08.492 IST [935199] CONTEXT:  waiting for ExclusiveLock on extension of relation 16564 of database 16385
+2026-11-23 03:41:08.492 IST [935199] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18),($19,$20,$21,$22,$23,$24,$25,$26,$27),($28,$29,$30,$31,$32,$33,$34,$35,$36),($37,$38,$39,$40,$41,$42,$43,$44,$45),($46,$47,$48,$49,$50,$51,$52,$53,$54),($55,$56,$57,$58,$59,$60,$61,$62,$63),($64,$65,$66,$67,$68,$69,$70,$71,$72)
+	
+2026-11-23 03:41:08.513 IST [935199] LOG:  process 935199 acquired ExclusiveLock on extension of relation 16564 of database 16385 after 1021.056 ms
+2026-11-23 03:41:08.513 IST [935199] CONTEXT:  waiting for ExclusiveLock on extension of relation 16564 of database 16385
+2026-11-23 03:41:08.513 IST [935199] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18),($19,$20,$21,$22,$23,$24,$25,$26,$27),($28,$29,$30,$31,$32,$33,$34,$35,$36),($37,$38,$39,$40,$41,$42,$43,$44,$45),($46,$47,$48,$49,$50,$51,$52,$53,$54),($55,$56,$57,$58,$59,$60,$61,$62,$63),($64,$65,$66,$67,$68,$69,$70,$71,$72)
+	
+2026-11-23 03:41:21.641 IST [935142] LOG:  received fast shutdown request
+2026-11-23 03:41:21.643 IST [935142] LOG:  aborting any active transactions
+2026-11-23 03:41:21.644 IST [935142] LOG:  background worker "logical replication launcher" (PID 935183) exited with exit code 1
+2026-11-23 03:41:21.646 IST [935145] LOG:  shutting down
+2026-11-23 03:41:21.673 IST [935145] LOG:  checkpoint starting: shutdown fast
+2026-11-23 03:41:28.961 IST [935145] LOG:  checkpoint complete: shutdown fast: wrote 122161 buffers (93.2%), wrote 238 SLRU buffers; 0 WAL file(s) added, 0 removed, 169 recycled; write=7.076 s, sync=0.004 s, total=7.316 s; sync files=41, longest=0.002 s, average=0.001 s; distance=2781292 kB, estimate=2781292 kB; lsn=2/4BC1B408, redo lsn=2/4BC1B408
+2026-11-23 03:41:29.168 IST [935142] LOG:  database system is shut down

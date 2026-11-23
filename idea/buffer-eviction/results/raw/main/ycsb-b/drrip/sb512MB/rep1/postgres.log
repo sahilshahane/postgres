@@ -1,0 +1,20 @@
+2026-11-23 04:25:22.412 IST [945248] LOG:  buffer eviction policy: drrip, shared_buffers: 65536 pages, max usage count: 3
+2026-11-23 04:25:22.414 IST [945248] LOG:  starting PostgreSQL 20devel on x86_64-linux, compiled by gcc-13.3.0, 64-bit
+2026-11-23 04:25:22.415 IST [945248] LOG:  listening on IPv4 address "127.0.0.1", port 5440
+2026-11-23 04:25:22.427 IST [945248] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5440"
+2026-11-23 04:25:22.452 IST [945253] LOG:  database system was shut down at 2026-11-23 01:14:11 IST
+2026-11-23 04:25:22.490 IST [945248] LOG:  database system is ready to accept connections
+2026-11-23 04:25:55.784 IST [945299] LOG:  process 945299 still waiting for ExclusiveLock on extension of relation 16386 of database 16385 after 1000.427 ms
+2026-11-23 04:25:55.784 IST [945299] DETAIL:  Process holding the lock: 945305. Wait queue: 945299.
+2026-11-23 04:25:55.784 IST [945299] CONTEXT:  waiting for ExclusiveLock on extension of relation 16386 of database 16385
+2026-11-23 04:25:55.784 IST [945299] STATEMENT:  UPDATE usertable SET FIELD1=$1,FIELD2=$2,FIELD3=$3,FIELD4=$4,FIELD5=$5,FIELD6=$6,FIELD7=$7,FIELD8=$8,FIELD9=$9,FIELD10=$10 WHERE YCSB_KEY=$11
+2026-11-23 04:25:55.797 IST [945299] LOG:  process 945299 acquired ExclusiveLock on extension of relation 16386 of database 16385 after 1013.307 ms
+2026-11-23 04:25:55.797 IST [945299] CONTEXT:  waiting for ExclusiveLock on extension of relation 16386 of database 16385
+2026-11-23 04:25:55.797 IST [945299] STATEMENT:  UPDATE usertable SET FIELD1=$1,FIELD2=$2,FIELD3=$3,FIELD4=$4,FIELD5=$5,FIELD6=$6,FIELD7=$7,FIELD8=$8,FIELD9=$9,FIELD10=$10 WHERE YCSB_KEY=$11
+2026-11-23 04:28:06.423 IST [945248] LOG:  received fast shutdown request
+2026-11-23 04:28:06.455 IST [945248] LOG:  aborting any active transactions
+2026-11-23 04:28:06.457 IST [945248] LOG:  background worker "logical replication launcher" (PID 945255) exited with exit code 1
+2026-11-23 04:28:06.458 IST [945251] LOG:  shutting down
+2026-11-23 04:28:06.459 IST [945251] LOG:  checkpoint starting: shutdown fast
+2026-11-23 04:28:08.535 IST [945251] LOG:  checkpoint complete: shutdown fast: wrote 18638 buffers (28.4%), wrote 122 SLRU buffers; 0 WAL file(s) added, 0 removed, 68 recycled; write=1.955 s, sync=0.019 s, total=2.077 s; sync files=11, longest=0.017 s, average=0.002 s; distance=1129768 kB, estimate=1129768 kB; lsn=1/5EF4A4B8, redo lsn=1/5EF4A4B8
+2026-11-23 04:28:08.644 IST [945248] LOG:  database system is shut down

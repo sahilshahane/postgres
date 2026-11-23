@@ -1,0 +1,10 @@
+CPU(s):                                  16
+Model name:                              AMD Ryzen 7 5700G with Radeon Graphics
+CPU(s) scaling MHz:                      65%
+               total        used        free      shared  buff/cache   available
+Mem:            15Gi       3.8Gi       1.6Gi        65Mi         9Gi        11Gi
+nvme0n1 INTEL SSDPEKNW512G8       476.9G
+6.17.0-19-generic
+postgres (PostgreSQL) 20devel
+openjdk version "21.0.13.1" 2026-11-17
+33c00473807ebd49304d114a6d769d2d2b2bbb34

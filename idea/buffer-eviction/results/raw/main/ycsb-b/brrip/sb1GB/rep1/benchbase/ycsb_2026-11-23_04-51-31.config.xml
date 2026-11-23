@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<configuration>
+  <reconnectOnConnectionFailure>true</reconnectOnConnectionFailure>
+  <isolation>TRANSACTION_READ_COMMITTED</isolation>
+  <batchsize>128</batchsize>
+  <scalefactor>2000</scalefactor>
+  <loaderThreads>8</loaderThreads>
+  <skewFactor>0.99</skewFactor>
+  <scrambled>true</scrambled>
+  <terminals>16</terminals>
+  <works>
+    <work>
+      <warmup>30</warmup>
+      <time>120</time>
+      <rate>unlimited</rate>
+      <weights>95,0,0,5,0,0</weights>
+    </work>
+  </works>
+  <transactiontypes>
+    <transactiontype>
+      <name>ReadRecord</name>
+    </transactiontype>
+    <transactiontype>
+      <name>InsertRecord</name>
+    </transactiontype>
+    <transactiontype>
+      <name>ScanRecord</name>
+    </transactiontype>
+    <transactiontype>
+      <name>UpdateRecord</name>
+    </transactiontype>
+    <transactiontype>
+      <name>DeleteRecord</name>
+    </transactiontype>
+    <transactiontype>
+      <name>ReadModifyWriteRecord</name>
+    </transactiontype>
+  </transactiontypes>
+</configuration>

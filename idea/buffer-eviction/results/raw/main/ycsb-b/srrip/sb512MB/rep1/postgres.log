@@ -1,0 +1,13 @@
+2026-11-23 04:19:34.335 IST [943959] LOG:  buffer eviction policy: srrip, shared_buffers: 65536 pages, max usage count: 3
+2026-11-23 04:19:34.337 IST [943959] LOG:  starting PostgreSQL 20devel on x86_64-linux, compiled by gcc-13.3.0, 64-bit
+2026-11-23 04:19:34.337 IST [943959] LOG:  listening on IPv4 address "127.0.0.1", port 5440
+2026-11-23 04:19:34.358 IST [943959] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5440"
+2026-11-23 04:19:34.386 IST [943964] LOG:  database system was shut down at 2026-11-23 01:14:11 IST
+2026-11-23 04:19:34.400 IST [943959] LOG:  database system is ready to accept connections
+2026-11-23 04:22:16.712 IST [943959] LOG:  received fast shutdown request
+2026-11-23 04:22:16.713 IST [943959] LOG:  aborting any active transactions
+2026-11-23 04:22:16.714 IST [943959] LOG:  background worker "logical replication launcher" (PID 943966) exited with exit code 1
+2026-11-23 04:22:16.715 IST [943962] LOG:  shutting down
+2026-11-23 04:22:16.716 IST [943962] LOG:  checkpoint starting: shutdown fast
+2026-11-23 04:22:17.371 IST [943962] LOG:  checkpoint complete: shutdown fast: wrote 18530 buffers (28.3%), wrote 137 SLRU buffers; 0 WAL file(s) added, 0 removed, 75 recycled; write=0.561 s, sync=0.017 s, total=0.656 s; sync files=11, longest=0.015 s, average=0.002 s; distance=1240283 kB, estimate=1240283 kB; lsn=1/65B36F28, redo lsn=1/65B36F28
+2026-11-23 04:22:17.477 IST [943959] LOG:  database system is shut down

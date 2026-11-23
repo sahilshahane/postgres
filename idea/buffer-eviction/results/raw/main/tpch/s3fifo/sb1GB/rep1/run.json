@@ -1,0 +1,4 @@
+{"bench":"tpch","workload":"tpch","policy":"s3fifo","shared_buffers":"1GB","rep":1,
+ "terminals":16,"warmup_s":30,"time_s":120,"scalefactor":"1",
+ "elapsed_s":86.689694061,"copy_s":1,"host":"utkarsh-MS-7C96","started":"2026-11-23T09:10:13+05:30",
+ "loadavg_end":"1.43 1.57 1.55"}

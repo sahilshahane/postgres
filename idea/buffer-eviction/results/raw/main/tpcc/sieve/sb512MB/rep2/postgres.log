@@ -1,0 +1,26 @@
+2026-11-23 03:13:12.567 IST [929563] LOG:  buffer eviction policy: sieve, shared_buffers: 65536 pages, max usage count: 1
+2026-11-23 03:13:12.569 IST [929563] LOG:  starting PostgreSQL 20devel on x86_64-linux, compiled by gcc-13.3.0, 64-bit
+2026-11-23 03:13:12.569 IST [929563] LOG:  listening on IPv4 address "127.0.0.1", port 5440
+2026-11-23 03:13:13.986 IST [929563] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5440"
+2026-11-23 03:13:14.820 IST [929568] LOG:  database system was shut down at 2026-11-23 01:14:11 IST
+2026-11-23 03:13:17.038 IST [929563] LOG:  database system is ready to accept connections
+2026-11-23 03:14:09.796 IST [929610] LOG:  process 929610 still waiting for ExclusiveLock on extension of relation 16552 of database 16385 after 1000.259 ms
+2026-11-23 03:14:09.796 IST [929610] DETAIL:  Process holding the lock: 929625. Wait queue: 929610.
+2026-11-23 03:14:09.796 IST [929610] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:14:09.796 IST [929610] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18)
+	
+2026-11-23 03:14:09.811 IST [929610] LOG:  process 929610 acquired ExclusiveLock on extension of relation 16552 of database 16385 after 1016.011 ms
+2026-11-23 03:14:09.811 IST [929610] CONTEXT:  waiting for ExclusiveLock on extension of relation 16552 of database 16385
+2026-11-23 03:14:09.811 IST [929610] STATEMENT:      INSERT INTO order_line
+	     (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO)
+	     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9),($10,$11,$12,$13,$14,$15,$16,$17,$18)
+	
+2026-11-23 03:15:53.617 IST [929563] LOG:  received fast shutdown request
+2026-11-23 03:15:53.634 IST [929563] LOG:  aborting any active transactions
+2026-11-23 03:15:53.635 IST [929563] LOG:  background worker "logical replication launcher" (PID 929600) exited with exit code 1
+2026-11-23 03:15:53.636 IST [929566] LOG:  shutting down
+2026-11-23 03:15:53.637 IST [929566] LOG:  checkpoint starting: shutdown fast
+2026-11-23 03:15:59.436 IST [929566] LOG:  checkpoint complete: shutdown fast: wrote 59936 buffers (91.5%), wrote 140 SLRU buffers; 0 WAL file(s) added, 0 removed, 134 recycled; write=5.656 s, sync=0.010 s, total=5.801 s; sync files=41, longest=0.007 s, average=0.001 s; distance=2208895 kB, estimate=2208895 kB; lsn=2/28D1FEE8, redo lsn=2/28D1FEE8
+2026-11-23 03:15:59.548 IST [929563] LOG:  database system is shut down

@@ -1,0 +1,4 @@
+{"bench":"ycsb","workload":"ycsb-e","policy":"clock","shared_buffers":"512MB","rep":1,
+ "terminals":16,"warmup_s":30,"time_s":120,"scalefactor":"2000",
+ "elapsed_s":151.145732311,"copy_s":24,"host":"utkarsh-MS-7C96","started":"2026-11-23T10:01:12+05:30",
+ "loadavg_end":"16.25 15.35 14.72"}
