@@ -80,3 +80,26 @@ Absolute: stock fdatasync 870 / 2,105 / 4,161 / 8,207 / 15,963 / 21,100 TPS.
    variable wake-ups, hand-off of the next IO to a woken waiter. This is the
    concrete optimization target. Next step: a wait-event / perf profile at
    32 clients, stock vs AIO. (Attempted; the VM had been stopped.)
+
+## Phase 1b: where backends wait at 32 clients (`01b-profile-32c/`)
+
+The VM had been stopped at 21:10 IST by the program's Budgets spend-limit
+action (`AWSServiceRoleForBudgetsSpendLimitMember`), which then also denied
+starting or launching instances. The user removed the limit and the VM was
+restarted. No data was lost (phase 1 was already copied).
+
+pg_stat_activity sampled every 20 ms during 15 s of pgbench -N, 32 clients,
+fresh servers (absolute TPS is lower than in phase 1 because of the sampler):
+
+| wait | stock fdatasync (9,697 TPS) | aio fdatasync if=16 thr=256kB (9,081 TPS, -6%) |
+|---|---:|---:|
+| waiting for the group-commit flush | 77.1% `LWLock:WALWrite` | 81.8% `IO:WalSync` |
+| performing the flush | 3.0% `IO:WalSync` | (included above) |
+| on CPU | 7.8% | 8.3% |
+| waiting for the client | 10.5% | 8.4% |
+
+Both spend ~80% of the time waiting for the flush; AIO waits on the IO
+itself rather than on the lock, as designed. CPU time is the same, so the
+AIO overhead is **added latency per flush cycle**, not CPU work. Suspect:
+the hand-off after an fsync completes (wake the waiters, one of them takes
+WALWriteLock, writes the new WAL, starts the next fsync).

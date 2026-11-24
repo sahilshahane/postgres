@@ -1,0 +1,18 @@
+== stock: 9696.887114 tps; wait events of 32 backends (share of samples)
+   77.1%  LWLock:WALWrite
+   10.5%  Client:ClientRead
+    7.8%  CPU:running
+    3.0%  IO:WalSync
+    0.8%  IO:DataFileRead
+    0.6%  LWLock:WALInsert
+    0.0%  IO:WalWrite
+    0.0%  Buffer:BufferExclusive
+== aio: 9081.245384 tps; wait events of 32 backends (share of samples)
+   81.8%  IO:WalSync
+    8.4%  Client:ClientRead
+    8.3%  CPU:running
+    0.9%  IO:DataFileRead
+    0.4%  LWLock:WALWrite
+    0.1%  LWLock:WALInsert
+    0.1%  IO:WalWrite
+    0.0%  IO:DataFileExtend
