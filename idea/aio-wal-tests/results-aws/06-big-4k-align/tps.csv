@@ -1,0 +1,21 @@
+workload,config,clients,rounds,tps_median,tps_min,tps_max,latency_median_ms
+big,aio4 fds thr=0,1,6,317,290,339,3.162
+big,aio4 fds thr=0,4,6,525,467,599,7.617
+big,aio4 fds thr=0,16,6,848,709,944,18.877
+big,aio4 fds thr=0,32,6,1011,655,1038,31.641
+big,stock4 odsync+DIO,1,6,333,316,344,3.006
+big,stock4 odsync+DIO,4,6,628,584,714,6.369
+big,stock4 odsync+DIO,16,6,802,545,817,19.965
+big,stock4 odsync+DIO,32,6,1079,748,1132,29.672
+big,aio4 odsDIO thr=4kB,1,6,327,315,341,3.061
+big,aio4 odsDIO thr=4kB,4,6,660,601,687,6.066
+big,aio4 odsDIO thr=4kB,16,6,814,551,860,19.666
+big,aio4 odsDIO thr=4kB,32,6,1064,722,1105,30.064
+big,aio4 odsDIO thr=4kB align,1,6,322,312,343,3.104
+big,aio4 odsDIO thr=4kB align,4,6,673,586,705,5.955
+big,aio4 odsDIO thr=4kB align,16,6,807,571,879,19.826
+big,aio4 odsDIO thr=4kB align,32,6,1059,700,1079,30.215
+big,stock4 fdatasync,1,6,320,310,338,3.123
+big,stock4 fdatasync,4,6,562,493,653,7.122
+big,stock4 fdatasync,16,6,800,522,873,19.994
+big,stock4 fdatasync,32,6,1033,705,1114,30.979

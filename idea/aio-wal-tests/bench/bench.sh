@@ -16,6 +16,7 @@
 #   WORKDIR     per-config data directories, same filesystem as GOLDEN (/mnt/xfs/b3)
 #   WORKLOAD    pgbench (pgbench -N, ~0.5 kB WAL per commit) |
 #               big (big.sql, 500-row insert, ~150 kB WAL per commit)
+#               bigpc (bigpc.sql: the same, into one table per client)
 #   CLIENTS ("16 32 64"), SECONDS_ per run (5), ROUNDS (8), BASEPORT (58500)
 #   CANARY_MAX  before each block, wait until 200 x 8 kB O_DSYNC writes average
 #               at most this many us (700; set ~3x the device's normal value)
@@ -32,7 +33,8 @@ WORKLOAD=${WORKLOAD:-pgbench}; HERE=$(cd "$(dirname "$0")" && pwd)
 case $WORKLOAD in
   pgbench) PGB_ARGS="-N" ;;
   big)     PGB_ARGS="-n -f $HERE/big.sql" ;;
-  *) echo "WORKLOAD must be pgbench or big" >&2; exit 1 ;;
+  bigpc)   PGB_ARGS="-n -f $HERE/bigpc.sql" ;;
+  *) echo "WORKLOAD must be pgbench, big or bigpc" >&2; exit 1 ;;
 esac
 EXTRA_CONF=${EXTRA_CONF-"full_page_writes = off"}; RUN=${RUN:-paired}
 export PGHOST=/tmp PGDATABASE=postgres
@@ -97,6 +99,7 @@ for r in $(seq 1 "$ROUNDS"); do
       i=$(( (k + r) % N ))
       IFS='|' read -ra p <<< "${CFG[$i]}"
       [ "$WORKLOAD" = big ] && PGPORT=$((BASEPORT + i)) "${p[1]}/bin/psql" -XAtqc "TRUNCATE big"
+      [ "$WORKLOAD" = bigpc ] && PGPORT=$((BASEPORT + i)) "${p[1]}/bin/psql" -XAtqc "TRUNCATE bigc"
       res=$(PGPORT=$((BASEPORT + i)) "${p[1]}/bin/pgbench" $PGB_ARGS -c $c -j $j -T "$SECS" 2>&1)
       read -r tps lat < <(echo "$res" | awk '/^tps/ {tps=$3} /^latency average/ {lat=$4} END {print tps, lat}')
       echo "$RUN,$WORKLOAD,$r,\"${p[0]}\",$c,$SECS,$tps,$lat,$cus" >> "$OUT"

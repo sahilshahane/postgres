@@ -268,3 +268,28 @@ At 64 clients: 18,738 TPS vs stock4 17,793, and median latency 3.43 ms vs
 - **Eager issue hurts** here, as in change 1 at low concurrency.
 - Recommended setting for many clients: 4 kB pages, direct IO,
   `wal_io_pipeline_threshold = 4kB`, `wal_io_page_align = on`.
+
+## Phase 6: large transactions with 4 kB pages and change 2 (`06-big-4k-align/`)
+
+`big.sql` (500-row insert into one shared table, ~150 kB of WAL per commit),
+4 kB builds, 6 paired rounds x 10 s, 0 of 24 blocks dropped.
+
+| vs stock4, same mode | 1 | 4 | 16 | 32 |
+|---|---:|---:|---:|---:|
+| aio4 fdatasync, no batching | -2.8% [2] | -3.8% [1] | **+11.6% [5/6]** | -3.6% [1] |
+| aio4 O_DSYNC direct IO, threshold 4kB | -1.4% [1] | +3.7% [4] | +2.8% [4] | -2.7% [0] |
+| aio4 O_DSYNC direct IO, threshold 4kB + page align | -1.5% [2] | +4.5% [4] | +1.8% [3] | -5.0% [1] |
+
+Stock4 TPS (fdatasync): 320 / 562 / 800 / 1,033 (O_DSYNC + direct IO:
+333 / 628 / 802 / 1,079), i.e. at most ~160 MB/s of WAL.
+
+- **fdatasync without batching, 16 clients: +11.6%, 5 of 6 rounds**; it
+  confirms phase 2 (+6.2% at 16 with 8 kB pages).
+- O_DSYNC + direct IO wins small majorities at 4-16 clients (+2-5%) and
+  loses at 32.
+- **Page align makes no difference for large commits**, as expected: a
+  150 kB write spans ~37 pages, and holding back one partial page per write
+  changes little. Its benefit is for many small commits (phase 5).
+- TPS grows only from 800 to 1,033 between 16 and 32 clients: the shared
+  table's extension lock (`Lock:extend`, phase 2) still limits the
+  workload, not WAL. Phase 7 removes it.
