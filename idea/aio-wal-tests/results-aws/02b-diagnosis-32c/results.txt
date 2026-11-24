@@ -1,0 +1,25 @@
+== ctxsw
+stock: 10083.810070 tps; 615525 voluntary switches / 102361 commits = 6.01 per commit
+aio: 9404.509814 tps; 581811 voluntary switches / 95084 commits = 6.12 per commit
+== groups
+c=8 stock: 3297.338713 tps; 248082 voluntary switches / 32575 commits = 7.62 per commit; 9157 WAL fsyncs = 3.56 commits per fsync
+c=8 aio: 3234.067807 tps; 255745 voluntary switches / 32400 commits = 7.89 per commit; 8608 WAL fsyncs = 3.76 commits per fsync
+c=32 stock: 9788.441260 tps; 596120 voluntary switches / 99226 commits = 6.01 per commit; 6502 WAL fsyncs = 15.26 commits per fsync
+c=32 aio: 9413.338821 tps; 587891 voluntary switches / 95726 commits = 6.14 per commit; 6076 WAL fsyncs = 15.75 commits per fsync
+DONE
+== fsynctime
+stock: 9979.301233 tps; 609253 voluntary switches / 100727 commits = 6.05 per commit; 6588 WAL fsyncs = 15.29 commits per fsync; avg fsync 1.477 ms, cycle 1.518 ms
+aio: 9490.748900 tps; 588298 voluntary switches / 95873 commits = 6.14 per commit; 6131 WAL fsyncs = 15.64 commits per fsync; avg fsync 1.488 ms, cycle 1.631 ms
+DONE
+== bigwait
+== stock, big.sql, 16 clients: 783.377709 tps
+   53.7%  LWLock:WALWrite
+   22.0%  Lock:extend
+    8.7%  IO:DataFileWrite
+    5.6%  CPU:running
+    2.7%  IO:WalSync
+    2.4%  IO:DataFileExtend
+    1.6%  IO:WalInitSync
+    1.4%  Buffer:BufferExclusive
+== CPU: 8 vCPUs, load during run: 4.45 3.01 2.29 1/295 12828
+DONE

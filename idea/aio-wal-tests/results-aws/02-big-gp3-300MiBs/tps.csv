@@ -1,0 +1,19 @@
+workload,config,clients,rounds,tps_median,tps_min,tps_max,latency_median_ms
+big,aio fds thr=256kB,1,6,306,284,327,3.266
+big,aio fds thr=256kB,4,6,518,445,571,7.726
+big,aio fds thr=256kB,16,6,718,546,832,22.447
+big,aio fds thr=0,1,6,312,292,326,3.21
+big,aio fds thr=0,4,6,536,471,734,7.468
+big,aio fds thr=0,16,6,670,615,843,23.937
+big,stock odsync+DIO,1,6,316,282,331,3.16
+big,stock odsync+DIO,4,6,617,582,676,6.502
+big,stock odsync+DIO,16,6,660,546,1040,24.274
+big,aio odsDIO thr=256kB,1,6,319,312,330,3.133
+big,aio odsDIO thr=256kB,4,6,603,569,664,6.63
+big,aio odsDIO thr=256kB,16,6,693,558,857,23.381
+big,aio odsDIO thr=0,1,6,312,308,332,3.2
+big,aio odsDIO thr=0,4,6,571,556,690,7.003
+big,aio odsDIO thr=0,16,6,702,563,873,22.943
+big,stock fdatasync,1,6,304,276,332,3.287
+big,stock fdatasync,4,6,557,501,677,7.178
+big,stock fdatasync,16,6,684,517,842,23.746

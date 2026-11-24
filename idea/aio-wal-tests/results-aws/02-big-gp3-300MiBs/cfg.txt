@@ -1,0 +1,7 @@
+# phase 2: large transactions (big.sql, 500-row insert per commit)
+stock fdatasync|INST/stock|wal_sync_method = fdatasync
+aio fds thr=256kB|INST/aio|wal_io_method = aio|io_method = io_uring|wal_sync_method = fdatasync|wal_io_max_inflight = 16
+aio fds thr=0|INST/aio|wal_io_method = aio|io_method = io_uring|wal_sync_method = fdatasync|wal_io_max_inflight = 16|wal_io_pipeline_threshold = 0
+stock odsync+DIO|INST/stock|wal_sync_method = open_datasync|debug_io_direct = wal
+aio odsDIO thr=256kB|INST/aio|wal_io_method = aio|io_method = io_uring|wal_sync_method = open_datasync|wal_io_max_inflight = 16|debug_io_direct = wal
+aio odsDIO thr=0|INST/aio|wal_io_method = aio|io_method = io_uring|wal_sync_method = open_datasync|wal_io_max_inflight = 16|debug_io_direct = wal|wal_io_pipeline_threshold = 0

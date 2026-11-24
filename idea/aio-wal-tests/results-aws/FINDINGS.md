@@ -103,3 +103,61 @@ itself rather than on the lock, as designed. CPU time is the same, so the
 AIO overhead is **added latency per flush cycle**, not CPU work. Suspect:
 the hand-off after an fsync completes (wake the waiters, one of them takes
 WALWriteLock, writes the new WAL, starts the next fsync).
+
+## Phase 2: large transactions (`02-big-gp3-300MiBs/`)
+
+Volume throughput raised from 125 to **300 MiB/s** (the instance's sustained
+EBS limit is 312 MB/s; above it only bursts would help, which would vary
+mid-run). The modification had completed before the run. `big.sql` (500-row
+insert) writes **160 kB of WAL per commit**. 6 configs, 6 paired rounds x
+10 s, 0 of 18 blocks dropped.
+
+| change vs stock | 1 client | 4 | 16 |
+|---|---:|---:|---:|
+| aio fdatasync, batching 256 kB | +0.8% [3/6] | -9.5% [0/6] | +2.0% [4/6] |
+| aio fdatasync, no batching | -1.2% [2/6] | -1.4% [2/6] | **+6.2% [5/6]** |
+| aio O_DSYNC + direct IO, batching 256 kB | -0.2% [3/6] | -0.5% [3/6] | +2.5% [3/6] |
+| aio O_DSYNC + direct IO, no batching | -0.1% [3/6] | -2.3% [2/6] | -6.1% [2/6] |
+
+Stock: 304 / 557 / 684 TPS = 49 / 89 / 110 MB/s of WAL.
+
+- **First majority win for AIO: pipelined large commits at 16 clients,
+  +6.2% (5 of 6 rounds).** As predicted, large commits pipeline without the
+  same-page serialization that hurts small ones.
+- **The workload is not WAL-throughput bound**: 110 MB/s of 300 MiB/s. Wait
+  events at 16 clients (stock): 54% `LWLock:WALWrite`, **22% `Lock:extend`**
+  (16 clients extending the same table), 9% `IO:DataFileWrite`. TPS barely
+  grows from 4 to 16 clients for that reason, which caps any WAL-side gain.
+- The -9.5% at 4 clients for fdatasync + batching is unexplained (one
+  config, 0 of 6 rounds); the no-batching variant is at -1.4% there.
+
+## Phase 2b: why AIO loses 7-13% at 32 clients (`02b-diagnosis-32c/`)
+
+pgbench -N, 32 clients, 10 s windows, stock fdatasync vs aio fdatasync
+(inflight 16, batching 256 kB):
+
+| | stock | aio |
+|---|---:|---:|
+| TPS | 9,979 | 9,491 (-4.9%) |
+| voluntary context switches per commit | 6.05 | 6.14 |
+| commits per WAL fsync (group size) | 15.29 | 15.64 |
+| average fsync (`track_wal_io_timing`) | 1.477 ms | 1.488 ms |
+| flush cycle (10 s / fsyncs) | 1.518 ms | 1.631 ms |
+| **gap: one fsync ends -> next starts** | **0.041 ms** | **0.143 ms** |
+
+- Ruled out: extra wake-ups (switches per commit equal), smaller groups
+  (equal), slower fsyncs (equal). My first hypothesis, extra wake-ups, was
+  wrong.
+- **Cause: the hand-off between consecutive fsyncs is 3.5x longer**, about
+  0.1 ms extra per flush cycle, which is the whole loss. After an inline
+  fsync, the issuer broadcasts `aioWaitCV`. All ~31 waiters wake and each
+  runs the issue path (flush / issued checks, spinlocks, `WaitXLogInsertionsToFinish`)
+  before racing for `WALWriteLock`. The next fsync starts only when the
+  winner gets through. Stock's next leader is already queued on the lock.
+- The existing `wal_io_eager_issue` lets the first backend whose WAL became
+  durable issue the next IO, but not inline: it goes through io_uring (a
+  kernel worker thread hand-off), which is why eager was measured as harmful
+  and is off by default.
+
+**Change 1 (next):** let eager issue run the next fsync / O_DSYNC write
+inline.
