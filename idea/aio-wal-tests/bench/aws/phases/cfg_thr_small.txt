@@ -1,0 +1,4 @@
+# phase 8d (small commits): does a 256 kB threshold cost the 64-client gain?
+stock4 odsync+DIO|INST/stock4|wal_sync_method = open_datasync|debug_io_direct = wal
+aio4 thr=4kB split=16kB|INST/aio4|wal_io_method = aio|io_method = io_uring|wal_sync_method = open_datasync|debug_io_direct = wal|wal_io_page_align = on|wal_io_max_inflight = 8|wal_io_pipeline_threshold = 4kB|wal_io_split_size = 16kB
+aio4 thr=256kB split=16kB|INST/aio4|wal_io_method = aio|io_method = io_uring|wal_sync_method = open_datasync|debug_io_direct = wal|wal_io_page_align = on|wal_io_max_inflight = 8|wal_io_pipeline_threshold = 256kB|wal_io_split_size = 16kB

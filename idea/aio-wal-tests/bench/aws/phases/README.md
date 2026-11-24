@@ -14,6 +14,8 @@ phase on the VM, wait for the marker and copy the results into `results-aws/`.
 | 8a: fio split writes, sync vs async commit | `cfg_m8.txt` | `m8.sh` | `results-aws/08a-large-commit-profile/` |
 | 8b: change 3 (split writes) | `cfg_split.txt` | `run_split.sh` (rebuilds aio4) | `results-aws/08b-split-writes/` |
 | 8c: split writes, in-flight cap | `cfg_split2.txt` | `run_split2.sh` | `results-aws/08c-split-inflight-cap/` |
+| 8d: threshold 256 kB + split | `cfg_thr_big.txt`, `cfg_thr_small.txt` | `run_thr.sh` | `results-aws/08d-threshold-256k/` |
+| 8e: screening (short runs) | `cfg_screen.txt` | `run_screen.sh` | `results-aws/08e-screening/` |
 
 `run_align_tests.sh`: change 2 correctness suite on the lab server
 (`~/pgaio/latest`), results in `results3/change2_align_*.csv`.

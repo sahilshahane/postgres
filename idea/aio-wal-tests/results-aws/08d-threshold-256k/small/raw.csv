@@ -1,0 +1,37 @@
+run,workload,round,config,clients,seconds,tps,latency_avg_ms,canary_us
+paired,pgbench,1,"aio4 thr=4kB split=16kB",16,10,4579.792861,3.494,934
+paired,pgbench,1,"aio4 thr=256kB split=16kB",16,10,4571.042574,3.500,934
+paired,pgbench,1,"stock4 odsync+DIO",16,10,4704.046799,3.401,934
+paired,pgbench,1,"aio4 thr=4kB split=16kB",64,10,15570.076787,4.110,934
+paired,pgbench,1,"aio4 thr=256kB split=16kB",64,10,13533.427998,4.729,934
+paired,pgbench,1,"stock4 odsync+DIO",64,10,14014.442732,4.567,934
+paired,pgbench,2,"aio4 thr=256kB split=16kB",16,10,5240.226442,3.053,929
+paired,pgbench,2,"stock4 odsync+DIO",16,10,5435.470509,2.944,929
+paired,pgbench,2,"aio4 thr=4kB split=16kB",16,10,5231.278964,3.059,929
+paired,pgbench,2,"aio4 thr=256kB split=16kB",64,10,13506.290843,4.739,935
+paired,pgbench,2,"stock4 odsync+DIO",64,10,14045.218905,4.557,935
+paired,pgbench,2,"aio4 thr=4kB split=16kB",64,10,15760.125090,4.061,935
+paired,pgbench,3,"stock4 odsync+DIO",16,10,5430.965055,2.946,932
+paired,pgbench,3,"aio4 thr=4kB split=16kB",16,10,5192.737202,3.081,932
+paired,pgbench,3,"aio4 thr=256kB split=16kB",16,10,5210.083580,3.071,932
+paired,pgbench,3,"stock4 odsync+DIO",64,10,13979.271609,4.578,929
+paired,pgbench,3,"aio4 thr=4kB split=16kB",64,10,15584.686464,4.107,929
+paired,pgbench,3,"aio4 thr=256kB split=16kB",64,10,13435.165960,4.764,929
+paired,pgbench,4,"aio4 thr=4kB split=16kB",16,10,5236.587372,3.055,922
+paired,pgbench,4,"aio4 thr=256kB split=16kB",16,10,5236.471940,3.055,922
+paired,pgbench,4,"stock4 odsync+DIO",16,10,5430.278079,2.946,922
+paired,pgbench,4,"aio4 thr=4kB split=16kB",64,10,15737.554691,4.067,931
+paired,pgbench,4,"aio4 thr=256kB split=16kB",64,10,13523.796310,4.732,931
+paired,pgbench,4,"stock4 odsync+DIO",64,10,14021.457894,4.564,931
+paired,pgbench,5,"aio4 thr=256kB split=16kB",16,10,5217.026044,3.067,940
+paired,pgbench,5,"stock4 odsync+DIO",16,10,5421.813079,2.951,940
+paired,pgbench,5,"aio4 thr=4kB split=16kB",16,10,5215.427206,3.068,940
+paired,pgbench,5,"aio4 thr=256kB split=16kB",64,10,13466.797348,4.752,933
+paired,pgbench,5,"stock4 odsync+DIO",64,10,15240.322175,4.199,933
+paired,pgbench,5,"aio4 thr=4kB split=16kB",64,10,18353.723253,3.487,933
+paired,pgbench,6,"stock4 odsync+DIO",16,10,8507.181639,1.881,934
+paired,pgbench,6,"aio4 thr=4kB split=16kB",16,10,8096.119715,1.976,934
+paired,pgbench,6,"aio4 thr=256kB split=16kB",16,10,7764.519048,2.061,934
+paired,pgbench,6,"stock4 odsync+DIO",64,10,19687.916061,3.251,919
+paired,pgbench,6,"aio4 thr=4kB split=16kB",64,10,19812.248972,3.230,919
+paired,pgbench,6,"aio4 thr=256kB split=16kB",64,10,19963.553658,3.206,919

@@ -1,0 +1,9 @@
+# phase 8e screening: threshold / split / in-flight around the phase-8d best (one setting changed at a time)
+stock4 odsync+DIO|INST/stock4|wal_sync_method = open_datasync|debug_io_direct = wal
+ref T256k S16k I8|INST/aio4|wal_io_method = aio|io_method = io_uring|wal_sync_method = open_datasync|debug_io_direct = wal|wal_io_page_align = on|wal_io_pipeline_threshold = 256kB|wal_io_split_size = 16kB|wal_io_max_inflight = 8
+T64k S16k I8|INST/aio4|wal_io_method = aio|io_method = io_uring|wal_sync_method = open_datasync|debug_io_direct = wal|wal_io_page_align = on|wal_io_pipeline_threshold = 64kB|wal_io_split_size = 16kB|wal_io_max_inflight = 8
+T512k S16k I8|INST/aio4|wal_io_method = aio|io_method = io_uring|wal_sync_method = open_datasync|debug_io_direct = wal|wal_io_page_align = on|wal_io_pipeline_threshold = 512kB|wal_io_split_size = 16kB|wal_io_max_inflight = 8
+T1M S16k I8|INST/aio4|wal_io_method = aio|io_method = io_uring|wal_sync_method = open_datasync|debug_io_direct = wal|wal_io_page_align = on|wal_io_pipeline_threshold = 1MB|wal_io_split_size = 16kB|wal_io_max_inflight = 8
+T256k S32k I8|INST/aio4|wal_io_method = aio|io_method = io_uring|wal_sync_method = open_datasync|debug_io_direct = wal|wal_io_page_align = on|wal_io_pipeline_threshold = 256kB|wal_io_split_size = 32kB|wal_io_max_inflight = 8
+T256k S16k I4|INST/aio4|wal_io_method = aio|io_method = io_uring|wal_sync_method = open_datasync|debug_io_direct = wal|wal_io_page_align = on|wal_io_pipeline_threshold = 256kB|wal_io_split_size = 16kB|wal_io_max_inflight = 4
+T256k S16k I16|INST/aio4|wal_io_method = aio|io_method = io_uring|wal_sync_method = open_datasync|debug_io_direct = wal|wal_io_page_align = on|wal_io_pipeline_threshold = 256kB|wal_io_split_size = 16kB|wal_io_max_inflight = 16

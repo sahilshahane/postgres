@@ -1,0 +1,7 @@
+workload,config,clients,rounds,tps_median,tps_min,tps_max,latency_median_ms
+pgbench,aio4 thr=4kB split=16kB,16,6,5223,4580,8096,3.064
+pgbench,aio4 thr=4kB split=16kB,64,6,15749,15570,19812,4.064
+pgbench,aio4 thr=256kB split=16kB,16,6,5227,4571,7765,3.061
+pgbench,aio4 thr=256kB split=16kB,64,6,13515,13435,19964,4.736
+pgbench,stock4 odsync+DIO,16,6,5431,4704,8507,2.946
+pgbench,stock4 odsync+DIO,64,6,14033,13979,19688,4.561

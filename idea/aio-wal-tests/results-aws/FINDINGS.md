@@ -471,3 +471,41 @@ TPS at 1 client: stock 325 -> 485 (split 16 kB, inflight 8), commit latency
   16-32). Change 3b (split only when nothing else is in flight) is not
   worth testing on this volume: at 16-32 clients it couldn't be told
   apart from noise.
+
+## Phase 8d: pipeline threshold 256 kB with split writes (`08d-threshold-256k/`)
+
+Idea: at high concurrency, batch several large commits into one flush
+(threshold above one commit, 256 kB) and let change 3 split that flush into
+a few parallel IOs: fewer IOs than splitting every commit, still parallel.
+4 kB builds, direct IO, page align, `wal_io_max_inflight = 8`; 6 paired
+rounds x 10 s, 0 blocks dropped.
+
+**Large commits** (`bigpc`), vs stock4 O_DSYNC + direct IO:
+
+| config | 1 | 4 | 16 | 32 |
+|---|---:|---:|---:|---:|
+| threshold 4 kB, split 16 kB | +49.4% [6/6] | **+42.2% [5/6]** | -2.6% [2] | **-20.5% [1/6]** |
+| **threshold 256 kB, split 16 kB** | **+50.4% [6/6]** | +21.1% [4] | +1.3% [3] | **+20.7% [4/6]** |
+| threshold 256 kB, split 32 kB | +35.9% [6/6] | +34.1% [6/6] | -2.1% [2] | +3.2% [3] |
+| threshold 256 kB, no split | -0.1% [2] | -10.2% [1] | +0.3% [3] | +15.5% [5/6] |
+
+**Small commits** (pgbench -N), vs the same stock:
+
+| config | 16 | 64 |
+|---|---:|---:|
+| threshold 4 kB, split 16 kB | -3.8% [0/6] | **+11.8% [6/6]** (15,749 vs 14,033 TPS) |
+| threshold 256 kB, split 16 kB | -3.7% [0/6] | -3.7% [1/6] |
+
+- **Large commits: threshold 256 kB + split 16 kB is the only config
+  positive at every client count** (+50 / +21 / +1 / +21%). The 32-client
+  case goes from -21% to +21%: batching keeps the number of IOs down,
+  splitting keeps them parallel. The cost: 4 clients +42% -> +21%.
+- Splitting gives the 1-4 client gain, the threshold the 32-client gain
+  (256 kB without split: 0% at 1 client, +16% at 32).
+- **Small commits need the 4 kB threshold:** +11.8% at 64 clients, won
+  6 of 6 (better than phase 5's +5.5%, now with split and inflight 8);
+  256 kB loses it (-3.7%).
+- **So no single threshold is best for both**: small commits want to
+  pipeline single full pages, large commits at high concurrency want to
+  batch several commits. Next: screening of threshold / split / in-flight
+  for large commits (8e), then a rule that gives both.

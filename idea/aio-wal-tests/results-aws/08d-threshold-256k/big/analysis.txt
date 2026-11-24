@@ -1,0 +1,10 @@
+dropped 0 of 24 blocks as disturbed: []
+
+== bigpc: median change vs stock of the same mode [rounds won/rounds]
+config                                          1              4             16             32
+aio4 thr=4kB split=16kB              +49.4% [6/6]   +42.2% [5/6]    -2.6% [2/6]   -20.5% [1/6]
+aio4 thr=256kB split=16kB            +50.4% [6/6]   +21.1% [4/6]    +1.3% [3/6]   +20.7% [4/6]
+aio4 thr=256kB split=32kB            +35.9% [6/6]   +34.1% [6/6]    -2.1% [2/6]    +3.2% [3/6]
+aio4 thr=256kB nosplit                -0.1% [2/6]   -10.2% [1/6]    +0.3% [3/6]   +15.5% [5/6]
+
+wrote /home/ubuntu/pgaio/results-aws-thr-big/paired.csv, /home/ubuntu/pgaio/results-aws-thr-big/tps.csv

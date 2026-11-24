@@ -1,0 +1,5 @@
+workload,config,baseline,clients,rounds,median_change_pct,min_change_pct,max_change_pct,rounds_won
+pgbench,aio4 thr=4kB split=16kB,stock4 odsync+DIO,16,6,-3.8,-4.8,-2.6,0
+pgbench,aio4 thr=4kB split=16kB,stock4 odsync+DIO,64,6,11.8,0.6,20.4,6
+pgbench,aio4 thr=256kB split=16kB,stock4 odsync+DIO,16,6,-3.7,-8.7,-2.8,0
+pgbench,aio4 thr=256kB split=16kB,stock4 odsync+DIO,64,6,-3.7,-11.6,1.4,1

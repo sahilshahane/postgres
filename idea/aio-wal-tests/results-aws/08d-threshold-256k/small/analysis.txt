@@ -1,0 +1,8 @@
+dropped 0 of 12 blocks as disturbed: []
+
+== pgbench: median change vs stock of the same mode [rounds won/rounds]
+config                                         16             64
+aio4 thr=4kB split=16kB               -3.8% [0/6]   +11.8% [6/6]
+aio4 thr=256kB split=16kB             -3.7% [0/6]    -3.7% [1/6]
+
+wrote /home/ubuntu/pgaio/results-aws-thr-small/paired.csv, /home/ubuntu/pgaio/results-aws-thr-small/tps.csv
