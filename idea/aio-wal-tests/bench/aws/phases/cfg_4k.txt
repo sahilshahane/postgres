@@ -1,0 +1,7 @@
+# phase 4: 4 kB WAL pages (both builds -Dwal_blocksize=4). User's design:
+# batch within a page, pipeline full pages = direct IO + pipeline threshold 4kB
+stock4 fdatasync|INST/stock4|wal_sync_method = fdatasync
+stock4 odsync+DIO|INST/stock4|wal_sync_method = open_datasync|debug_io_direct = wal
+aio4 odsDIO thr=4kB|INST/aio4|wal_io_method = aio|io_method = io_uring|wal_sync_method = open_datasync|wal_io_max_inflight = 16|debug_io_direct = wal|wal_io_pipeline_threshold = 4kB
+aio4 odsDIO thr=256kB|INST/aio4|wal_io_method = aio|io_method = io_uring|wal_sync_method = open_datasync|wal_io_max_inflight = 16|debug_io_direct = wal
+aio4 fds thr=4kB|INST/aio4|wal_io_method = aio|io_method = io_uring|wal_sync_method = fdatasync|wal_io_max_inflight = 16|wal_io_pipeline_threshold = 4kB
