@@ -10,6 +10,7 @@
 #   dev.sh powercut                       drop all writes from now on
 #   dev.sh restore                        unmount (dirty page cache is lost),
 #                                         writes on again, remount
+#   dev.sh check                          fail unless mounted, writes on, unused
 #   dev.sh teardown                       unmount, remove devices and image
 set -e
 TESTDISK_DIR=${TESTDISK_DIR:-/tmp/pg-aio-testdisk}
@@ -59,6 +60,14 @@ restore)
   echo 3 > /proc/sys/vm/drop_caches
   mount /dev/mapper/pgflakey "$MNT"
   ;;
+check)
+  # ready for a power-cut test: mounted, dm-flakey passing writes, unused
+  mountpoint -q "$MNT" || { echo "$MNT is not mounted (run setup)"; exit 1; }
+  # table: start len flakey dev offset UP_INTERVAL DOWN_INTERVAL [features]
+  dmsetup table pgflakey | awk '$6 == 86400 && $7 == 0 {ok=1} END {exit !ok}' || { echo "dm-flakey is not passing writes (run restore)"; exit 1; }
+  if fuser -m "$MNT" >/dev/null 2>&1; then echo "processes still use $MNT:"; fuser -vm "$MNT"; exit 1; fi
+  echo "power-cut device ready"
+  ;;
 teardown)
   umount "$MNT" 2>/dev/null || true
   dmsetup remove pgflakey 2>/dev/null || true
@@ -67,7 +76,7 @@ teardown)
   rm -f "$IMG"
   ;;
 *)
-  echo "usage: $0 setup DELAY_MS [FLUSH_DELAY_MS] | writethrough | powercut | restore | teardown" >&2
+  echo "usage: $0 setup DELAY_MS [FLUSH_DELAY_MS] | writethrough | powercut | restore | check | teardown" >&2
   exit 1
   ;;
 esac

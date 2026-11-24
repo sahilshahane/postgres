@@ -3,9 +3,24 @@
 the ways the tests need, the workload that records acknowledged commits, and
 the "chaos" thread that reloads the AIO GUCs under load.
 """
-import ctypes, glob, os, random, signal, subprocess, sys, threading, time
+import atexit, ctypes, glob, os, random, signal, subprocess, sys, threading, time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+SERVERS = []        # every Server this process created, killed on exit
+
+
+@atexit.register
+def _kill_servers():
+    """Never leave a server running after a test exits, failed or not: it
+    would keep the next test's data directory (or the power-cut device) busy."""
+    for s in SERVERS:
+        if s.proc and s.proc.poll() is None:
+            for pid in [s.proc.pid] + s.children():
+                try:
+                    os.kill(pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+            s.proc.wait()
 
 
 def read_modes(path=os.path.join(HERE, "modes.txt")):
@@ -76,6 +91,7 @@ class Server:
         self.bin = os.path.join(inst, "bin")
         self.log = datadir + ".log"
         self.proc = None
+        SERVERS.append(self)
 
     def initdb(self, conf_lines):
         subprocess.run(["rm", "-rf", self.datadir, self.log], check=True)

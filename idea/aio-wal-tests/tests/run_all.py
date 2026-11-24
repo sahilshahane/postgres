@@ -4,13 +4,13 @@ per (mode, test) to a CSV.
 
 usage: run_all.py --inst INSTALLDIR --work WORKDIR --out results.csv
                   [--build BUILDDIR]      (needed for the regress test)
-                  [--tests regress,crash,chaos,repl] [--modes a,b,...]
+                  [--tests regress,crash,chaos,reload,repl] [--modes a,b,...]
                   [--epochs 8] [--port 59400] [--label text]
 Each test runs in its own process; its output goes to WORKDIR/<mode>/<test>.test.txt.
 POWERCUT=1 in the environment turns the crash tests into power-cut tests
 (root, dev.sh device; see crash.py).
 """
-import argparse, csv, datetime, os, subprocess, sys, time
+import argparse, csv, datetime, os, re, subprocess, sys, time
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from pgtest import read_modes
@@ -20,7 +20,7 @@ ap.add_argument("--inst", required=True)
 ap.add_argument("--work", required=True)
 ap.add_argument("--out", required=True)
 ap.add_argument("--build")
-ap.add_argument("--tests", default="regress,crash,chaos,repl")
+ap.add_argument("--tests", default="regress,crash,chaos,reload,repl")
 ap.add_argument("--modes")
 ap.add_argument("--epochs", type=int, default=8)
 ap.add_argument("--port", type=int, default=59400)
@@ -52,10 +52,18 @@ for m in names:
         py = [sys.executable, "-u"]
         if t == "regress":
             cmd = py + [f"{HERE}/regress.py", o.build, o.inst, work, str(o.port)]
-        elif t in ("crash", "chaos"):
+        elif t in ("crash", "chaos", "reload"):
             cmd = py + [f"{HERE}/crash.py", o.inst, work, str(o.port), str(o.epochs)]
             if t == "chaos":
                 cmd.append("--chaos")
+            if t == "reload":
+                # switch wal_sync_method to the other durability scheme at
+                # runtime (regression test: commits were acknowledged without
+                # any fsync after fdatasync -> open_datasync)
+                fsync_scheme = not any(re.search(r"wal_sync_method\s*=\s*open_", g)
+                                       for g in modes[m])
+                cmd += ["--reload", "wal_sync_method = " +
+                        ("open_datasync" if fsync_scheme else "fdatasync")]
         elif t == "repl":
             cmd = py + [f"{HERE}/repl.py", o.inst, work, str(o.port)]
         else:
@@ -84,6 +92,8 @@ for m in names:
                          detail=detail, settings="; ".join(modes[m])))
         out.flush()
         print(f"{m:28s} {t:8s} {status:5s} {secs:4d}s  {detail}", flush=True)
+        if "harness problem" in detail:
+            sys.exit("stopping: the test environment is broken, later results would be meaningless")
         # don't leave data directories around (disk space); keep them for a failure
         if status == "pass":
             subprocess.run(["rm", "-rf"] + [os.path.join(work, d) for d in

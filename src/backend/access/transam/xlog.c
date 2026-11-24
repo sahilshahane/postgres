@@ -3907,8 +3907,10 @@ XLogAioStartFsync(bool inline_ok, int fd, XLogSegNo segno, TimeLineID tli,
 		w->status = XLOG_AIO_WRITE_INFLIGHT;
 		SpinLockRelease(&XLogCtl->aio_lck);
 
+		/* open_datasync can be in effect after a reload, see issue_xlog_fsync() */
 		pgaio_io_start_fsync(ioh, fd,
-							 wal_sync_method == WAL_SYNC_METHOD_FDATASYNC);
+							 wal_sync_method == WAL_SYNC_METHOD_FDATASYNC ||
+							 wal_sync_method == WAL_SYNC_METHOD_OPEN_DSYNC);
 		pgaio_submit_staged();
 
 		/* publish only once started, see XLogAioIssue() */
@@ -11466,11 +11468,14 @@ issue_xlog_fsync(int fd, XLogSegNo segno, TimeLineID tli)
 
 	/*
 	 * Quick exit if fsync is disabled or write() has already synced the WAL
-	 * file.
+	 * file, i.e. the file was opened with O_SYNC / O_DSYNC.  Ask
+	 * get_sync_bit() rather than testing for the open_* methods: with
+	 * wal_io_method = aio in the fsync scheme (aioUseFsync), WAL files are
+	 * opened without O_DSYNC even if wal_sync_method has since been reloaded
+	 * to open_sync / open_datasync, so the fsync must still be done.
 	 */
 	if (!enableFsync ||
-		wal_sync_method == WAL_SYNC_METHOD_OPEN ||
-		wal_sync_method == WAL_SYNC_METHOD_OPEN_DSYNC)
+		(get_sync_bit(wal_sync_method) & ~PG_O_DIRECT) != 0)
 		return;
 
 	/*
@@ -11496,9 +11501,16 @@ issue_xlog_fsync(int fd, XLogSegNo segno, TimeLineID tli)
 				msg = _("could not fdatasync file \"%s\": %m");
 			break;
 		case WAL_SYNC_METHOD_OPEN:
+			/* only reachable in the AIO fsync scheme, see above */
+			Assert(XLogAioEnabled() && XLogCtl->aioUseFsync);
+			if (pg_fsync_no_writethrough(fd) != 0)
+				msg = _("could not fsync file \"%s\": %m");
+			break;
 		case WAL_SYNC_METHOD_OPEN_DSYNC:
-			/* not reachable */
-			Assert(false);
+			/* only reachable in the AIO fsync scheme, see above */
+			Assert(XLogAioEnabled() && XLogCtl->aioUseFsync);
+			if (pg_fdatasync(fd) != 0)
+				msg = _("could not fdatasync file \"%s\": %m");
 			break;
 		default:
 			ereport(PANIC,
