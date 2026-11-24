@@ -1,0 +1,7 @@
+# phase 3: eager issue with inline fsync (change 1) vs before
+stock fdatasync|INST/stock|wal_sync_method = fdatasync
+aio fds if=16|INST/aio|wal_io_method = aio|io_method = io_uring|wal_sync_method = fdatasync|wal_io_max_inflight = 16
+aio fds if=16 eager-inline|INST/aio|wal_io_method = aio|io_method = io_uring|wal_sync_method = fdatasync|wal_io_max_inflight = 16|wal_io_eager_issue = on
+stock odsync+DIO|INST/stock|wal_sync_method = open_datasync|debug_io_direct = wal
+aio odsDIO if=16|INST/aio|wal_io_method = aio|io_method = io_uring|wal_sync_method = open_datasync|wal_io_max_inflight = 16|debug_io_direct = wal
+aio odsDIO if=16 eager-inline|INST/aio|wal_io_method = aio|io_method = io_uring|wal_sync_method = open_datasync|wal_io_max_inflight = 16|debug_io_direct = wal|wal_io_eager_issue = on

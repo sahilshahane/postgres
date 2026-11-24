@@ -1,0 +1,3 @@
+stock: 10061.653030 tps; 616589 voluntary switches / 102167 commits = 6.04 per commit; 6569 WAL fsyncs = 15.55 commits per fsync; avg fsync 1.469 ms, cycle 1.522 ms
+aio: 9225.619741 tps; 570826 voluntary switches / 93278 commits = 6.12 per commit; 5981 WAL fsyncs = 15.6 commits per fsync; avg fsync 1.528 ms, cycle 1.672 ms
+aio-eager: 9676.133664 tps; 596638 voluntary switches / 97924 commits = 6.09 per commit; 6438 WAL fsyncs = 15.21 commits per fsync; avg fsync 1.499 ms, cycle 1.553 ms

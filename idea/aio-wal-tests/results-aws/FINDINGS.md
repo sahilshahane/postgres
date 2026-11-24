@@ -161,3 +161,40 @@ pgbench -N, 32 clients, 10 s windows, stock fdatasync vs aio fdatasync
 
 **Change 1 (next):** let eager issue run the next fsync / O_DSYNC write
 inline.
+
+## Change 1: eager issue executes the fsync inline (`03-change1-eager-inline/`)
+
+**Change** (`XLogAioIssuePending()`): with `wal_io_eager_issue = on` and
+`wal_io_inline_fsync = on`, the backend that finds its own WAL durable and
+issues the published requests now runs that fsync (or last O_DSYNC write)
+itself, after releasing WALWriteLock, instead of handing it to io_uring.
+The default stays `wal_io_eager_issue = off`.
+
+**Correctness** (server, `../results3/change1_*.csv`): 5 affected modes
+(eager with io_uring / worker / direct IO / pipelining, plus default) x
+regress, crash, chaos, reload, repl on release and debug+cassert builds,
+plus power cut x crash, chaos, reload: **67 of 67 passed**, 330 crashes or
+power cuts, 169,458 acknowledged commits checked, 0 lost.
+
+**Performance** (gp3, 8 paired rounds x 10 s, 0 of 32 blocks dropped):
+
+| vs stock | 8 | 16 | 32 | 64 |
+|---|---:|---:|---:|---:|
+| aio fdatasync if=16 (before) | -2.4% [1] | -5.5% [0] | **-13.8%** [0] | -6.6% [0] |
+| aio fdatasync if=16 + change 1 | **-13.1%** [0] | -6.7% [0] | **-3.1%** [0] | -6.9% [1] |
+| aio O_DSYNC direct IO if=16 (before) | -2.0% [1] | -4.3% [0] | -12.5% [0] | -0.4% [2] |
+| aio O_DSYNC direct IO + change 1 | -1.9% [1] | -4.1% [0] | -12.2% [0] | -0.2% [2] |
+
+Hand-off gap at 32 clients (`gap.txt`): stock 0.053 ms, aio 0.144 ms,
+**aio + change 1 0.054 ms**: the diagnosed cause is fixed.
+
+- **32 clients: -13.8% -> -3.1%.** The gap between fsyncs is back at stock's.
+- **8 clients: -2.4% -> -13.1%.** The eager backend's own client now waits
+  one extra fsync (~1.5 ms) per cycle. With 8 clients that is a large share
+  of the work; with 32 it is small. A trade, not a win: stays off by default.
+- **No effect with direct IO**: that path is bound by the same-page rule
+  (a write starting mid-page waits for the previous one), not the hand-off.
+- **Next:** make it adaptive (eager-inline only when the pending batch is
+  large), and test the user's design: 4 kB WAL pages, batch within a page,
+  pipeline full pages (`wal_blocksize=4`, direct IO,
+  `wal_io_pipeline_threshold = 4kB`).

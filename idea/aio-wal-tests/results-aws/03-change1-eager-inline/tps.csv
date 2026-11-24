@@ -1,0 +1,25 @@
+workload,config,clients,rounds,tps_median,tps_min,tps_max,latency_median_ms
+pgbench,aio fds if=16,8,8,4002,3206,4019,2.0
+pgbench,aio fds if=16,16,8,7613,5997,7691,2.102
+pgbench,aio fds if=16,32,8,13539,9461,13642,2.364
+pgbench,aio fds if=16,64,8,17941,13159,18331,3.567
+pgbench,aio fds if=16 eager-inline,8,8,3567,2912,3577,2.243
+pgbench,aio fds if=16 eager-inline,16,8,7557,5929,7581,2.117
+pgbench,aio fds if=16 eager-inline,32,8,15217,10070,15320,2.103
+pgbench,aio fds if=16 eager-inline,64,8,17785,13937,18363,3.599
+pgbench,stock odsync+DIO,8,8,4150,3167,4168,1.927
+pgbench,stock odsync+DIO,16,8,8183,6274,8228,1.956
+pgbench,stock odsync+DIO,32,8,15870,10107,16016,2.016
+pgbench,stock odsync+DIO,64,8,19636,13560,20016,3.259
+pgbench,aio odsDIO if=16,8,8,4066,3208,4071,1.968
+pgbench,aio odsDIO if=16,16,8,7826,6044,7875,2.045
+pgbench,aio odsDIO if=16,32,8,13841,9458,13929,2.312
+pgbench,aio odsDIO if=16,64,8,19603,12934,20066,3.265
+pgbench,aio odsDIO if=16 eager-inline,8,8,4066,3208,4076,1.968
+pgbench,aio odsDIO if=16 eager-inline,16,8,7833,6051,7882,2.042
+pgbench,aio odsDIO if=16 eager-inline,32,8,13895,9446,13951,2.303
+pgbench,aio odsDIO if=16 eager-inline,64,8,19605,12924,20012,3.264
+pgbench,stock fdatasync,8,8,4113,3189,4132,1.945
+pgbench,stock fdatasync,16,8,8109,6297,8138,1.973
+pgbench,stock fdatasync,32,8,15733,10215,15875,2.034
+pgbench,stock fdatasync,64,8,19242,13904,19649,3.326

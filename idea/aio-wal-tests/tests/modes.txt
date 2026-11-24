@@ -8,15 +8,18 @@ uring-fds-default|io_method = io_uring|wal_sync_method = fdatasync
 uring-fds-if16|io_method = io_uring|wal_sync_method = fdatasync|wal_io_max_inflight = 16
 uring-fds-pipeline|io_method = io_uring|wal_sync_method = fdatasync|wal_io_max_inflight = 16|wal_io_pipeline_threshold = 0
 uring-fds-eager-noinline|io_method = io_uring|wal_sync_method = fdatasync|wal_io_max_inflight = 16|wal_io_eager_issue = on|wal_io_inline_fsync = off
+uring-fds-eager|io_method = io_uring|wal_sync_method = fdatasync|wal_io_max_inflight = 16|wal_io_eager_issue = on
 uring-fsync-dio|io_method = io_uring|wal_sync_method = fsync|wal_io_max_inflight = 16|debug_io_direct = wal
 # O_DSYNC scheme (open_datasync / open_sync): the writes themselves are AIO
 uring-ods-if16|io_method = io_uring|wal_sync_method = open_datasync|wal_io_max_inflight = 16
 uring-ods-pipeline-eager|io_method = io_uring|wal_sync_method = open_datasync|wal_io_max_inflight = 16|wal_io_pipeline_threshold = 0|wal_io_eager_issue = on
 uring-ods-dio|io_method = io_uring|wal_sync_method = open_datasync|wal_io_max_inflight = 16|debug_io_direct = wal
+uring-ods-dio-eager|io_method = io_uring|wal_sync_method = open_datasync|wal_io_max_inflight = 16|debug_io_direct = wal|wal_io_eager_issue = on
 uring-osync-noinline|io_method = io_uring|wal_sync_method = open_sync|wal_io_max_inflight = 16|wal_io_inline_fsync = off
 # other IO methods: worker (IO done by IO worker processes, reopen path),
 # sync (AIO handles executed synchronously)
 worker-fds-if16|io_method = worker|wal_sync_method = fdatasync|wal_io_max_inflight = 16
+worker-fds-eager|io_method = worker|wal_sync_method = fdatasync|wal_io_max_inflight = 16|wal_io_eager_issue = on
 worker-ods-pipeline-dio|io_method = worker|wal_sync_method = open_datasync|wal_io_max_inflight = 16|wal_io_pipeline_threshold = 0|debug_io_direct = wal
 sync-fds|io_method = sync|wal_sync_method = fdatasync|wal_io_max_inflight = 16
 sync-ods|io_method = sync|wal_sync_method = open_datasync|wal_io_max_inflight = 16

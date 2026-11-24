@@ -2947,6 +2947,7 @@ XLogWrite(XLogwrtRqst WriteRqst, TimeLineID tli, bool flexible)
  *
  * - Eager issue (wal_io_eager_issue): the backend that finds its WAL durable
  *   issues the published requests before returning (XLogAioIssuePending()),
+ *   executing the fsync / last O_DSYNC write inline if wal_io_inline_fsync,
  *   so the device doesn't sit idle while a waiter wakes up to do it.
  *
  * - Inline fsync (wal_io_inline_fsync, fsync case only): a backend that
@@ -4025,6 +4026,12 @@ XLogAioShouldIssue(XLogRecPtr rqst, uint64 ninflight)
  * aioFlushRqst) but nobody has issued yet, if XLogAioShouldIssue() allows
  * it.  Never blocks on WALWriteLock: if somebody holds it, they're issuing.
  * Called in a critical section.
+ *
+ * With wal_io_inline_fsync, the fsync (or last O_DSYNC write) is executed
+ * here, inline, like in XLogFlushAio(): otherwise it would go through the IO
+ * method (for io_uring a hand-off to a kernel worker thread and back), and
+ * the next group commit would start later than if a woken waiter had issued
+ * it.  The caller's own WAL is already durable; it just returns one IO later.
  */
 static void
 XLogAioIssuePending(TimeLineID tli)
@@ -4045,6 +4052,7 @@ XLogAioIssuePending(TimeLineID tli)
 		return;
 	if (insertpos > pg_atomic_read_u64(&XLogCtl->aioIssuedUpTo))
 	{
+		aioInlineAllowed = true;
 		if (XLogCtl->aioUseFsync)
 		{
 			XLogwrtRqst WriteRqst;
@@ -4055,8 +4063,10 @@ XLogAioIssuePending(TimeLineID tli)
 		}
 		else
 			(void) XLogAioIssue(insertpos, tli, true);
+		aioInlineAllowed = false;
 	}
 	LWLockRelease(WALWriteLock);
+	XLogAioRunInlineFsync();
 }
 
 /*
