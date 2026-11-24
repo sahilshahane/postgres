@@ -1,0 +1,8 @@
+dropped 0 of 9 blocks as disturbed: []
+
+== bigpc: median change vs stock of the same mode [rounds won/rounds]
+config                                          1              4             16
+stock4 fds sync                      -59.8% [0/3]   -60.4% [0/3]   -33.9% [0/3]
+stock4 ods+DIO sync                  -63.0% [0/3]   -32.3% [0/3]   -32.8% [0/3]
+
+wrote /home/ubuntu/pgaio/results-aws-m8/paired.csv, /home/ubuntu/pgaio/results-aws-m8/tps.csv

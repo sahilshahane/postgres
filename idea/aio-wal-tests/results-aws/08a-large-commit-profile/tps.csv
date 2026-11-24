@@ -1,0 +1,13 @@
+workload,config,clients,rounds,tps_median,tps_min,tps_max,latency_median_ms
+bigpc,stock4 ods+DIO async,1,3,779,730,1370,1.283
+bigpc,stock4 ods+DIO async,4,3,738,722,1471,5.417
+bigpc,stock4 ods+DIO async,16,3,780,765,926,20.501
+bigpc,stock4 fds sync,1,3,293,208,322,3.413
+bigpc,stock4 fds sync,4,3,347,302,561,11.52
+bigpc,stock4 fds sync,16,3,524,370,605,30.536
+bigpc,stock4 fds async,1,3,742,729,809,1.348
+bigpc,stock4 fds async,4,3,876,759,1318,4.565
+bigpc,stock4 fds async,16,3,793,670,1213,20.185
+bigpc,stock4 ods+DIO sync,1,3,313,288,319,3.192
+bigpc,stock4 ods+DIO sync,4,3,489,429,534,8.188
+bigpc,stock4 ods+DIO sync,16,3,525,490,649,30.489

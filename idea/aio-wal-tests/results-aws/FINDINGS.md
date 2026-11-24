@@ -351,3 +351,46 @@ queue depth 16 than at 1):
   `wal_io_pipeline_threshold = 0`.
 
 The VM was stopped (not terminated) after phase 7; its volume is kept.
+
+## Phase 8a: where a large commit's time goes (`08a-large-commit-profile/`)
+
+Goal: optimize large commits (WAL of one commit spans many pages). Two
+measurements, stock4 only, no code change.
+
+**1. fio, 160 kB of durable writes** (O_DIRECT + O_DSYNC, io_uring, 20 s
+each), split into n parallel writes:
+
+| 160 kB written as | IOPS | latency per IO | **time per 160 kB** |
+|---|---:|---:|---:|
+| 1 x 160 kB (what a large commit does now) | 311 | 3.20 ms | **3.22 ms** |
+| 4 x 40 kB in parallel | 2,224 | 1.79 ms | 1.80 ms |
+| **8 x 20 kB in parallel** | 5,909 | 1.35 ms | **1.35 ms** |
+| 20 x 8 kB in parallel | 6,703 | 3.93 ms | 2.98 ms (IOPS cap) |
+
+- A single large write is slow on gp3 (3.2 ms vs ~1.9 ms for a small one):
+  its bytes are transferred serially. The same bytes as **8 parallel
+  writes finish 2.4x faster**. Splitting further hits the volume's IOPS
+  cap (6,400) and gets slow again.
+- Today one flush is always **one** IO, however many pages it covers (up
+  to 32 MB, `XLOG_AIO_MAX_PAGES`); `wal_io_max_inflight` only lets
+  *different* flushes overlap.
+
+**2. Synchronous vs asynchronous commit** (`bigpc`, 3 paired rounds x 10 s):
+
+| TPS | 1 client | 4 | 16 |
+|---|---:|---:|---:|
+| O_DSYNC + direct IO, `synchronous_commit = on` | 313 | 489 | 525 |
+| same, `synchronous_commit = off` | 779 | 738 | 780 |
+| fdatasync, on | 293 | 347 | 524 |
+| fdatasync, off | 742 | 876 | 793 |
+
+- At 1 client a large transaction takes 3.2 ms, of which **~1.9 ms (60%)
+  is waiting for the commit flush**; without that wait it would take 1.3 ms.
+- So the upper bound of what faster WAL writing can give is about 2.5x at
+  1 client and about +50% at 16 clients (async reaches ~780-880 TPS, the
+  workload's ceiling on this VM).
+
+**Next: change 3, split large writes.** Issue a large flush as several
+parallel writes of whole pages (e.g. up to 8, at least some minimum size)
+instead of one IO. They share no page, so they don't wait for each other,
+and Flush still only advances over the contiguous completed prefix.

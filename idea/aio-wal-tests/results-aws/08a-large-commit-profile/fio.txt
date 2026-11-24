@@ -1,0 +1,4 @@
+bs=160k qd=1: 311 IOPS, clat mean 3.20 ms, p99 3.42 ms, time per 160 kB 3.22 ms, 49 MiB/s
+bs=40k qd=4: 2224 IOPS, clat mean 1.79 ms, p99 2.74 ms, time per 160 kB 1.80 ms, 87 MiB/s
+bs=20k qd=8: 5909 IOPS, clat mean 1.35 ms, p99 2.83 ms, time per 160 kB 1.35 ms, 115 MiB/s
+bs=8k qd=20: 6703 IOPS, clat mean 3.93 ms, p99 6.52 ms, time per 160 kB 2.98 ms, 52 MiB/s

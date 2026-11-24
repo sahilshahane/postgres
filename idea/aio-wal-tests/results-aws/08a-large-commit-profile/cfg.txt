@@ -1,0 +1,5 @@
+# measurement 8a: share of a large commit spent waiting for the commit flush
+stock4 ods+DIO sync|/home/ubuntu/pgaio/inst/stock4|wal_sync_method = open_datasync|debug_io_direct = wal
+stock4 ods+DIO async|/home/ubuntu/pgaio/inst/stock4|wal_sync_method = open_datasync|debug_io_direct = wal|synchronous_commit = off
+stock4 fds sync|/home/ubuntu/pgaio/inst/stock4|wal_sync_method = fdatasync
+stock4 fds async|/home/ubuntu/pgaio/inst/stock4|wal_sync_method = fdatasync|synchronous_commit = off
