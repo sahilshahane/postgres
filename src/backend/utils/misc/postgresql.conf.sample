@@ -267,6 +267,8 @@
 #wal_io_inline_fsync = on               # issuer runs its own fsync, unlocked
 #wal_io_page_align = off                # while a write is in flight, O_DSYNC
                                         # writes end at a page boundary
+#wal_io_split_size = 0                  # split O_DSYNC writes of at least
+                                        # twice this size into parallel ones
 #full_page_writes = on                  # recover from partial page writes
 #wal_log_hints = off                    # also do full page writes of non-critical updates
                                         # (change requires restart)

@@ -143,6 +143,7 @@ int			wal_io_pipeline_threshold = 256;	/* kB */
 bool		wal_io_eager_issue = false;
 bool		wal_io_inline_fsync = true;
 bool		wal_io_page_align = false;
+int			wal_io_split_size = 0;	/* kB */
 int			wal_level = WAL_LEVEL_REPLICA;
 int			CommitDelay = 0;	/* precommit delay in microseconds */
 int			CommitSiblings = 5; /* # concurrent xacts needed to sleep */
@@ -2962,6 +2963,16 @@ XLogWrite(XLogwrtRqst WriteRqst, TimeLineID tli, bool flexible)
  *   waits for the oldest write; once nothing is in flight (or the page has
  *   filled), the page is written.  A lone commit is never delayed.
  *
+ * - Split writes (wal_io_split_size, O_DSYNC case only): one write covers
+ *   all the WAL to be issued, so a large commit is one large IO, which on
+ *   network storage takes much longer than several smaller ones in
+ *   parallel.  XLogAioIssue() therefore cuts a range of at least twice
+ *   wal_io_split_size into writes of whole pages, no more than there are
+ *   free in-flight slots.  Only the last one can end in the middle of a
+ *   page and only the first one can start in one, so the writes don't
+ *   share pages and need no ordering among themselves; Flush still only
+ *   advances once all of them (and everything before) have completed.
+ *
  * - Inline fsync (wal_io_inline_fsync, fsync case only): a backend that
  *   issues an fsync it will wait for anyway executes it itself, after
  *   releasing WALWriteLock (XLogAioRunInlineFsync()); the tracker entry has
@@ -3537,9 +3548,37 @@ XLogAioIssue(XLogRecPtr upto, TimeLineID tli, bool nowait)
 {
 	bool		complete = true;
 	XLogRecPtr	issued = pg_atomic_read_u64(&XLogCtl->aioIssuedUpTo);
+	int			chunkpages = 0;
 
 	Assert(CritSectionCount > 0);
 	Assert(LWLockHeldByMeInMode(WALWriteLock, LW_EXCLUSIVE));
+
+	/*
+	 * Split large writes, see "Split writes": with wal_io_split_size, a range
+	 * of at least twice that size is written as several writes of whole
+	 * pages, at most as many as there are free in-flight slots, which then
+	 * proceed in parallel.  As every write but the last ends at a page
+	 * boundary, they share no page and don't wait for each other.
+	 */
+	if (wal_io_split_size > 0 && upto > issued &&
+		upto - issued >= 2 * (uint64) wal_io_split_size * 1024)
+	{
+		uint64		head;
+		uint64		ninflight = XLogAioInflight(&head);
+		uint64		nfree;
+		uint64		nchunks;
+		uint64		totalpages;
+
+		nfree = ninflight < (uint64) wal_io_max_inflight ?
+			(uint64) wal_io_max_inflight - ninflight : 0;
+		nchunks = Min(nfree, (upto - issued) / ((uint64) wal_io_split_size * 1024));
+		if (nchunks >= 2)
+		{
+			totalpages = (upto - (issued - issued % XLOG_BLCKSZ) + XLOG_BLCKSZ - 1) /
+				XLOG_BLCKSZ;
+			chunkpages = (int) ((totalpages + nchunks - 1) / nchunks);
+		}
+	}
 
 	while (issued < upto)
 	{
@@ -3588,7 +3627,8 @@ XLogAioIssue(XLogRecPtr upto, TimeLineID tli, bool nowait)
 			}
 			if (curridx == XLogCtl->XLogCacheBlck ||
 				XLogSegmentOffset(end, wal_segment_size) == 0 ||
-				npages >= XLOG_AIO_MAX_PAGES)
+				npages >= XLOG_AIO_MAX_PAGES ||
+				(chunkpages > 0 && npages >= chunkpages))
 				break;
 			curridx = NextBufIdx(curridx);
 		}

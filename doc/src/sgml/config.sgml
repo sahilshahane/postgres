@@ -3729,6 +3729,30 @@ include_dir 'conf.d'
       </listitem>
      </varlistentry>
 
+     <varlistentry id="guc-wal-io-split-size" xreflabel="wal_io_split_size">
+      <term><varname>wal_io_split_size</varname> (<type>integer</type>)
+      <indexterm>
+       <primary><varname>wal_io_split_size</varname> configuration parameter</primary>
+      </indexterm>
+      </term>
+      <listitem>
+       <para>
+        When <xref linkend="guc-wal-io-method"/> is <literal>aio</literal> and
+        <xref linkend="guc-wal-sync-method"/> is <literal>open_datasync</literal>
+        or <literal>open_sync</literal>, WAL to be written that amounts to at
+        least twice this size is written as several writes of whole WAL
+        pages, which are in flight at the same time, instead of one large
+        write.  At most as many writes are used as
+        <xref linkend="guc-wal-io-max-inflight"/> has free slots.  On storage
+        that executes writes in parallel this makes large commits faster.
+        If this value is specified without units, it is taken as kilobytes.
+        <literal>0</literal>, the default, disables splitting.
+        This parameter can only be set in the <filename>postgresql.conf</filename>
+        file or on the server command line.
+       </para>
+      </listitem>
+     </varlistentry>
+
      <varlistentry id="guc-wal-io-inline-fsync" xreflabel="wal_io_inline_fsync">
       <term><varname>wal_io_inline_fsync</varname> (<type>boolean</type>)
       <indexterm>

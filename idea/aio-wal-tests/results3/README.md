@@ -84,3 +84,16 @@ chaos now also toggles `wal_io_page_align`. Release and debug+cassert x
 regress, crash, chaos, reload, repl; power cut (debug) x crash, chaos,
 reload: **80 of 80 passed**, 396 crashes or power cuts, 208,165
 acknowledged commits checked, **0 lost**. Files: `change2_align_*.csv`.
+
+## Change 3: wal_io_split_size (2026-11-25)
+
+Modes `uring-ods-dio-split`, `uring-ods-split` (buffered, pipeline
+threshold 0), `uring-ods-dio-split-align`, `uring-osync-split-noinline`,
+`worker-ods-dio-split` (new, all `wal_io_split_size = 4kB`) plus
+`uring-ods-dio-align`, `uring-fds-default`; chaos now also changes
+`wal_io_split_size` (0 / 4kB / 64kB) while running. Release and
+debug+cassert x regress, crash, chaos, reload, repl; power cut (debug) x
+crash, chaos, reload: **93 of 93 passed**, 462 crashes or power cuts,
+238,889 acknowledged commits checked, **0 lost**. The replication test saw
+6-9 writes in flight with splitting (1-4 without). Files:
+`change3_split_*.csv`.
