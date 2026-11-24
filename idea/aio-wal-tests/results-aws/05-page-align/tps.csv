@@ -1,0 +1,37 @@
+workload,config,clients,rounds,tps_median,tps_min,tps_max,latency_median_ms
+pgbench,stock4 odsync+DIO,1,6,852,572,884,1.175
+pgbench,stock4 odsync+DIO,4,6,2035,1663,2182,1.975
+pgbench,stock4 odsync+DIO,8,6,3827,3149,4333,2.126
+pgbench,stock4 odsync+DIO,16,6,6957,5363,8537,2.418
+pgbench,stock4 odsync+DIO,32,6,12252,7840,16531,2.966
+pgbench,stock4 odsync+DIO,64,6,17793,13813,20303,3.648
+pgbench,aio4 odsDIO thr=4kB,1,6,852,566,882,1.175
+pgbench,aio4 odsDIO thr=4kB,4,6,2021,1663,2167,1.989
+pgbench,aio4 odsDIO thr=4kB,8,6,3751,3108,4226,2.168
+pgbench,aio4 odsDIO thr=4kB,16,6,6678,5161,8125,2.513
+pgbench,aio4 odsDIO thr=4kB,32,6,11106,7688,14495,3.155
+pgbench,aio4 odsDIO thr=4kB,64,6,16597,13086,20279,4.018
+pgbench,aio4 odsDIO thr=4kB align,1,6,854,574,880,1.172
+pgbench,aio4 odsDIO thr=4kB align,4,6,2021,1663,2160,1.989
+pgbench,aio4 odsDIO thr=4kB align,8,6,3759,3094,4244,2.163
+pgbench,aio4 odsDIO thr=4kB align,16,6,6668,5160,8107,2.514
+pgbench,aio4 odsDIO thr=4kB align,32,6,11111,7673,14454,3.151
+pgbench,aio4 odsDIO thr=4kB align,64,6,18738,15440,20410,3.43
+pgbench,aio4 odsDIO thr=0 align,1,6,851,574,881,1.175
+pgbench,aio4 odsDIO thr=0 align,4,6,2021,1654,2166,1.988
+pgbench,aio4 odsDIO thr=0 align,8,6,3748,3094,4239,2.169
+pgbench,aio4 odsDIO thr=0 align,16,6,6661,5141,8137,2.521
+pgbench,aio4 odsDIO thr=0 align,32,6,10618,7362,13908,3.305
+pgbench,aio4 odsDIO thr=0 align,64,6,18032,15270,20064,3.573
+pgbench,aio4 odsDIO thr=0 align eager,1,6,853,570,880,1.174
+pgbench,aio4 odsDIO thr=0 align eager,4,6,2019,1668,2164,1.991
+pgbench,aio4 odsDIO thr=0 align eager,8,6,3752,3089,4231,2.167
+pgbench,aio4 odsDIO thr=0 align eager,16,6,6471,4835,8050,2.611
+pgbench,aio4 odsDIO thr=0 align eager,32,6,9709,6964,12612,3.561
+pgbench,aio4 odsDIO thr=0 align eager,64,6,17725,15484,19739,3.635
+pgbench,stock4 fdatasync,1,6,849,571,875,1.179
+pgbench,stock4 fdatasync,4,6,2023,1671,2170,1.987
+pgbench,stock4 fdatasync,8,6,3806,3150,4302,2.135
+pgbench,stock4 fdatasync,16,6,6941,5353,8462,2.417
+pgbench,stock4 fdatasync,32,6,12126,7856,16397,2.975
+pgbench,stock4 fdatasync,64,6,17990,14308,20054,3.586

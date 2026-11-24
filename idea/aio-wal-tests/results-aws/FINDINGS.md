@@ -228,3 +228,43 @@ Stock4 TPS (fdatasync): 848 / 2,022 / 3,802 / 6,945 / 12,207 / 18,216.
 **Change 2 (next):** `wal_io_page_align`. While a write is in flight, a
 new O_DSYNC write ends at the last complete page; the partial page waits
 for the next write, so writes in flight never share a page.
+
+## Change 2: page-aligned pipelining (`05-page-align/`)
+
+**Change** (`wal_io_page_align`, default off, O_DSYNC scheme only): while a
+write is in flight, a new write ends at the last complete WAL page; the
+partially filled page waits for a later write, so writes in flight never
+share a page. A backend whose record is in that page waits for the oldest
+write and retries; with nothing in flight, everything is written.
+
+**Correctness** (`../results3/change2_align_*.csv`): 80 of 80 passed
+(release, debug+cassert, power cut), 396 crashes or power cuts, 208,165
+acknowledged commits checked, 0 lost. The replication test saw up to 4
+writes in flight (1-2 before): full pages really go out in parallel.
+
+**Performance** (4 kB builds as phase 4, aio4 rebuilt with change 2;
+6 paired rounds x 10 s, 0 of 36 blocks dropped). All: io_uring, O_DSYNC,
+direct IO, `wal_io_max_inflight = 16`; vs stock4 O_DSYNC + direct IO:
+
+| config | 1 | 4 | 8 | 16 | 32 | 64 |
+|---|---:|---:|---:|---:|---:|---:|
+| threshold 4kB (phase 4 best) | -0.2% [2] | -0.8% [0] | -2.1% [0] | -4.1% [0] | -7.2% [0] | -2.7% [2] |
+| threshold 4kB + **page align** | -0.0% [3] | -0.7% [0] | -1.9% [0] | -4.3% [0] | -7.6% [0] | **+5.5% [6/6]** |
+| threshold 0 + page align | -0.1% [1] | -0.6% [0] | -1.9% [0] | -4.3% [0] | -11.4% [0] | +2.3% [3] |
+| threshold 0 + page align + eager | -0.1% [3] | -0.8% [1] | -2.0% [0] | -7.2% [0] | -17.8% [0] | +0.6% [3] |
+
+At 64 clients: 18,738 TPS vs stock4 17,793, and median latency 3.43 ms vs
+3.65 ms. The phase-4 config in the same run: 16,597 TPS.
+
+- **64 clients: -2.7% -> +5.5%, won all 6 rounds.** The first configuration
+  to beat stock on small commits on this storage. With 64 clients a group
+  commit carries more than a page, so complete pages go out while the
+  previous write is in flight instead of waiting for it.
+- **1-32 clients: no change.** The WAL waiting in each group is less than
+  one page past the in-flight write, so there is no complete page to
+  pipeline and the behaviour is the same as before (batching).
+- **Threshold 0 is worse** (32 clients -11.4%): every single full page
+  becomes its own trip to storage, which costs the batch. Keep 4kB.
+- **Eager issue hurts** here, as in change 1 at low concurrency.
+- Recommended setting for many clients: 4 kB pages, direct IO,
+  `wal_io_pipeline_threshold = 4kB`, `wal_io_page_align = on`.
