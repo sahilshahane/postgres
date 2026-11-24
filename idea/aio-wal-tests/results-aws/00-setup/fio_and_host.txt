@@ -1,0 +1,14 @@
+== fio: durable 8k writes, QD1 vs QD16 (AIO can win only if QD16 >> QD1)
+QD1:   write: IOPS=534, BW=4278KiB/s (4380kB/s)(62.7MiB/15002msec); 0 zone resets
+       clat (usec): min=1240, max=5658, avg=1865.63, stdev=117.04
+QD16:   write: IOPS=6080, BW=47.5MiB/s (49.8MB/s)(713MiB/15003msec); 0 zone resets
+       clat (usec): min=503, max=7974, avg=2629.05, stdev=779.73
+
+== canary (mean us per 8k O_DSYNC write); set CANARY_MAX ~3x this
+1897
+
+7.0.0-1018-aws
+CPU(s):                                  8
+Model name:                              Intel(R) Xeon(R) Platinum 8375C CPU @ 2.90GHz
+Mem:              15           4           5           3           9          10
+postgres (PostgreSQL) 20devel
