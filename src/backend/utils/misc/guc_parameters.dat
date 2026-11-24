@@ -3501,6 +3501,20 @@
   boot_val => 'true',
 },
 
+{ name => 'wal_io_eager_issue', type => 'bool', context => 'PGC_SIGHUP', group => 'WAL_SETTINGS',
+  short_desc => 'Lets the process that sees an asynchronous WAL write complete start the next one for waiting backends.',
+  long_desc => 'Only used when "wal_io_method" is "aio".',
+  variable => 'wal_io_eager_issue',
+  boot_val => 'false',
+},
+
+{ name => 'wal_io_inline_fsync', type => 'bool', context => 'PGC_SIGHUP', group => 'WAL_SETTINGS',
+  short_desc => 'Lets a backend that needs an asynchronous WAL fsync or O_DSYNC write execute it itself, after releasing WALWriteLock.',
+  long_desc => 'Avoids handing the I/O to the I/O method and back when the backend would wait for it anyway. Only used when "wal_io_method" is "aio".',
+  variable => 'wal_io_inline_fsync',
+  boot_val => 'true',
+},
+
 { name => 'wal_io_max_inflight', type => 'int', context => 'PGC_SIGHUP', group => 'WAL_SETTINGS',
   short_desc => 'Maximum number of asynchronous WAL writes in flight at once.',
   long_desc => 'Only used when "wal_io_method" is "aio".',
@@ -3516,6 +3530,16 @@
   variable => 'wal_io_method',
   boot_val => 'WAL_IO_METHOD_SYNC',
   options => 'wal_io_method_options',
+},
+
+{ name => 'wal_io_pipeline_threshold', type => 'int', context => 'PGC_SIGHUP', group => 'WAL_SETTINGS',
+  short_desc => 'Minimum amount of unwritten WAL needed to start an asynchronous WAL write while another one is in flight.',
+  long_desc => 'Smaller flushes wait for the write in flight and are batched into the next one (group commit). 0 always starts a new write if "wal_io_max_inflight" allows it. Only used when "wal_io_method" is "aio".',
+  flags => 'GUC_UNIT_KB',
+  variable => 'wal_io_pipeline_threshold',
+  boot_val => '256',
+  min => '0',
+  max => 'MAX_KILOBYTES',
 },
 
 { name => 'wal_keep_size', type => 'int', context => 'PGC_SIGHUP', group => 'REPLICATION_SENDING',

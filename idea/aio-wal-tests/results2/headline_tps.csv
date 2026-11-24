@@ -1,0 +1,43 @@
+mode,config,clients,rounds,tps_median,tps_min,tps_max,latency_median_ms
+fdatasync,v5 uring if=1,1,4,1348,1165,1385,0.742
+fdatasync,v5 uring if=1,4,5,3705,2837,3823,1.08
+fdatasync,v5 uring if=1,8,4,6610,5968,6801,1.211
+fdatasync,v5 uring if=1,16,3,11384,11172,12274,1.405
+fdatasync,v5 uring if=1,32,4,21060,16503,26097,1.587
+fdatasync,v5 uring if=1,64,5,22368,21610,36158,2.861
+fdatasync,v5 uring if=16,1,4,1353,1146,1391,0.74
+fdatasync,v5 uring if=16,4,5,3377,2634,3437,1.185
+fdatasync,v5 uring if=16,8,4,4469,3939,4638,1.79
+fdatasync,v5 uring if=16,16,3,7843,7599,8093,2.04
+fdatasync,v5 uring if=16,32,4,13924,13284,15664,2.298
+fdatasync,v5 uring if=16,64,5,21858,21384,24318,2.928
+fdatasync,opt if=16,1,4,1273,1048,1405,0.789
+fdatasync,opt if=16,4,5,3853,2981,4149,1.038
+fdatasync,opt if=16,8,4,6832,6092,8114,1.171
+fdatasync,opt if=16,16,3,11592,11236,14915,1.38
+fdatasync,opt if=16,32,4,17398,15464,27370,1.84
+fdatasync,opt if=16,64,5,23216,23116,37205,2.757
+open_datasync,stock open_datasync,1,4,1388,1183,1416,0.72
+open_datasync,stock open_datasync,4,5,3882,2993,4318,1.03
+open_datasync,stock open_datasync,8,4,7026,6238,8488,1.139
+open_datasync,stock open_datasync,16,3,12102,11722,16174,1.322
+open_datasync,stock open_datasync,32,4,24276,17976,30487,1.401
+open_datasync,stock open_datasync,64,5,30247,24521,40833,2.116
+open_datasync,v5 uring odsync if=16,1,4,1363,1163,1402,0.734
+open_datasync,v5 uring odsync if=16,4,5,3652,2782,3772,1.095
+open_datasync,v5 uring odsync if=16,8,4,5964,5272,6082,1.342
+open_datasync,v5 uring odsync if=16,16,3,8222,8082,8270,1.946
+open_datasync,v5 uring odsync if=16,32,4,15281,14272,22780,2.098
+open_datasync,v5 uring odsync if=16,64,5,21712,20833,35363,2.948
+open_datasync,opt uring odsync if=16,1,4,1387,1182,1423,0.722
+open_datasync,opt uring odsync if=16,4,5,3860,2997,4302,1.036
+open_datasync,opt uring odsync if=16,8,4,6937,6110,8329,1.153
+open_datasync,opt uring odsync if=16,16,3,11770,11426,15686,1.359
+open_datasync,opt uring odsync if=16,32,4,22602,17237,28442,1.492
+open_datasync,opt uring odsync if=16,64,5,23340,23220,40258,2.742
+fdatasync,stock fdatasync,1,4,1373,1172,1413,0.728
+fdatasync,stock fdatasync,4,5,3872,2991,4064,1.033
+fdatasync,stock fdatasync,8,4,6942,6203,7139,1.152
+fdatasync,stock fdatasync,16,3,12104,11675,15704,1.322
+fdatasync,stock fdatasync,32,4,23761,17999,31055,1.425
+fdatasync,stock fdatasync,64,5,25168,17989,40832,2.543

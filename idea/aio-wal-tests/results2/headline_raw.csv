@@ -1,0 +1,230 @@
+run,workload,round,config,clients,seconds,tps,latency_avg_ms,canary_us
+headline,pgbench,1,"v5 uring if=1",1,5,1164.542841,0.859,473
+headline,pgbench,1,"v5 uring if=16",1,5,1145.790715,0.873,473
+headline,pgbench,1,"opt if=16",1,5,1186.462920,0.843,473
+headline,pgbench,1,"stock open_datasync",1,5,1183.129857,0.845,473
+headline,pgbench,1,"v5 uring odsync if=16",1,5,1163.045679,0.860,473
+headline,pgbench,1,"opt uring odsync if=16",1,5,1182.326322,0.846,473
+headline,pgbench,1,"stock fdatasync",1,5,1172.051053,0.853,473
+headline,pgbench,1,"v5 uring if=1",4,5,2837.170008,1.410,457
+headline,pgbench,1,"v5 uring if=16",4,5,2634.292086,1.518,457
+headline,pgbench,1,"opt if=16",4,5,2980.724024,1.342,457
+headline,pgbench,1,"stock open_datasync",4,5,2993.075711,1.336,457
+headline,pgbench,1,"v5 uring odsync if=16",4,5,2781.917437,1.438,457
+headline,pgbench,1,"opt uring odsync if=16",4,5,2996.743140,1.335,457
+headline,pgbench,1,"stock fdatasync",4,5,2991.342451,1.337,457
+headline,pgbench,1,"v5 uring if=1",8,5,5967.719761,1.341,458
+headline,pgbench,1,"v5 uring if=16",8,5,3939.430924,2.031,458
+headline,pgbench,1,"opt if=16",8,5,6091.691180,1.313,458
+headline,pgbench,1,"stock open_datasync",8,5,6238.065869,1.282,458
+headline,pgbench,1,"v5 uring odsync if=16",8,5,5272.340206,1.517,458
+headline,pgbench,1,"opt uring odsync if=16",8,5,6109.795477,1.309,458
+headline,pgbench,1,"stock fdatasync",8,5,6203.033021,1.290,458
+headline,pgbench,1,"v5 uring if=1",16,5,11171.748199,1.432,462
+headline,pgbench,1,"v5 uring if=16",16,5,7599.047508,2.106,462
+headline,pgbench,1,"opt if=16",16,5,11235.732506,1.424,462
+headline,pgbench,1,"stock open_datasync",16,5,11721.654777,1.365,462
+headline,pgbench,1,"v5 uring odsync if=16",16,5,8221.756451,1.946,462
+headline,pgbench,1,"opt uring odsync if=16",16,5,11426.040248,1.400,462
+headline,pgbench,1,"stock fdatasync",16,5,11674.640880,1.370,462
+headline,pgbench,1,"v5 uring if=1",32,5,16705.171744,1.916,459
+headline,pgbench,1,"v5 uring if=16",32,5,13786.601484,2.321,459
+headline,pgbench,1,"opt if=16",32,5,17413.321756,1.838,459
+headline,pgbench,1,"stock open_datasync",32,5,17976.077321,1.780,459
+headline,pgbench,1,"v5 uring odsync if=16",32,5,14272.295998,2.242,459
+headline,pgbench,1,"opt uring odsync if=16",32,5,17237.186313,1.856,459
+headline,pgbench,1,"stock fdatasync",32,5,17998.983911,1.778,459
+headline,pgbench,1,"v5 uring if=1",64,5,22195.333671,2.883,466
+headline,pgbench,1,"v5 uring if=16",64,5,21383.608924,2.993,466
+headline,pgbench,1,"opt if=16",64,5,23115.860135,2.769,466
+headline,pgbench,1,"stock open_datasync",64,5,24521.429265,2.610,466
+headline,pgbench,1,"v5 uring odsync if=16",64,5,20879.035838,3.065,466
+headline,pgbench,1,"opt uring odsync if=16",64,5,23331.585604,2.743,466
+headline,pgbench,1,"stock fdatasync",64,5,17989.168420,3.558,466
+headline,pgbench,2,"v5 uring if=16",1,5,1385.593509,0.722,465
+headline,pgbench,2,"opt if=16",1,5,1404.635417,0.712,465
+headline,pgbench,2,"stock open_datasync",1,5,1415.925096,0.706,465
+headline,pgbench,2,"v5 uring odsync if=16",1,5,1401.846628,0.713,465
+headline,pgbench,2,"opt uring odsync if=16",1,5,1410.713782,0.709,465
+headline,pgbench,2,"stock fdatasync",1,5,1412.758841,0.708,465
+headline,pgbench,2,"v5 uring if=1",1,5,1384.824864,0.722,465
+headline,pgbench,2,"v5 uring if=16",4,5,3436.567762,1.164,456
+headline,pgbench,2,"opt if=16",4,5,3800.904398,1.052,456
+headline,pgbench,2,"stock open_datasync",4,5,3881.948589,1.030,456
+headline,pgbench,2,"v5 uring odsync if=16",4,5,3651.803872,1.095,456
+headline,pgbench,2,"opt uring odsync if=16",4,5,3859.974151,1.036,456
+headline,pgbench,2,"stock fdatasync",4,5,3871.806025,1.033,456
+headline,pgbench,2,"v5 uring if=1",4,5,3675.782904,1.088,456
+headline,pgbench,2,"v5 uring if=16",8,5,4637.967939,1.725,462
+headline,pgbench,2,"opt if=16",8,5,6801.154468,1.176,462
+headline,pgbench,2,"stock open_datasync",8,5,7026.815122,1.138,462
+headline,pgbench,2,"v5 uring odsync if=16",8,5,6082.460425,1.315,462
+headline,pgbench,2,"opt uring odsync if=16",8,5,6997.647041,1.143,462
+headline,pgbench,2,"stock fdatasync",8,5,7139.358509,1.121,462
+headline,pgbench,2,"v5 uring if=1",8,5,6800.802783,1.176,462
+headline,pgbench,2,"v5 uring if=16",16,5,8092.898176,1.977,463
+headline,pgbench,2,"opt if=16",16,5,11592.305251,1.380,463
+headline,pgbench,2,"stock open_datasync",16,5,12101.793665,1.322,463
+headline,pgbench,2,"v5 uring odsync if=16",16,5,8270.173678,1.935,463
+headline,pgbench,2,"opt uring odsync if=16",16,5,11769.609146,1.359,463
+headline,pgbench,2,"stock fdatasync",16,5,12104.244679,1.322,463
+headline,pgbench,2,"v5 uring if=1",16,5,11384.355485,1.405,463
+headline,pgbench,2,"v5 uring if=16",32,5,14061.962341,2.276,459
+headline,pgbench,2,"opt if=16",32,5,17382.582952,1.841,459
+headline,pgbench,2,"stock open_datasync",32,5,18381.182965,1.741,459
+headline,pgbench,2,"v5 uring odsync if=16",32,5,14643.769200,2.185,459
+headline,pgbench,2,"opt uring odsync if=16",32,5,17483.929058,1.830,459
+headline,pgbench,2,"stock fdatasync",32,5,18189.051964,1.759,459
+headline,pgbench,2,"v5 uring if=1",32,5,16502.769210,1.939,459
+headline,pgbench,2,"v5 uring if=16",64,5,21857.899394,2.928,458
+headline,pgbench,2,"opt if=16",64,5,23216.349583,2.757,458
+headline,pgbench,2,"stock open_datasync",64,5,24535.217422,2.608,458
+headline,pgbench,2,"v5 uring odsync if=16",64,5,20833.442082,3.072,458
+headline,pgbench,2,"opt uring odsync if=16",64,5,23219.658696,2.756,458
+headline,pgbench,2,"stock fdatasync",64,5,24507.725435,2.611,458
+headline,pgbench,2,"v5 uring if=1",64,5,21609.667081,2.962,458
+headline,pgbench,3,"opt if=16",1,5,434.590358,2.301,464
+headline,pgbench,3,"stock open_datasync",1,5,196.231516,5.096,464
+headline,pgbench,3,"v5 uring odsync if=16",1,5,212.917090,4.697,464
+headline,pgbench,3,"opt uring odsync if=16",1,5,1313.513667,0.761,464
+headline,pgbench,3,"stock fdatasync",1,5,1417.753304,0.705,464
+headline,pgbench,3,"v5 uring if=1",1,5,1383.595640,0.723,464
+headline,pgbench,3,"v5 uring if=16",1,5,1374.606884,0.727,464
+headline,pgbench,3,"opt if=16",4,5,3853.484744,1.038,461
+headline,pgbench,3,"stock open_datasync",4,5,3871.707643,1.033,461
+headline,pgbench,3,"v5 uring odsync if=16",4,5,3677.804921,1.088,461
+headline,pgbench,3,"opt uring odsync if=16",4,5,3823.772701,1.046,461
+headline,pgbench,3,"stock fdatasync",4,5,3867.363632,1.034,461
+headline,pgbench,3,"v5 uring if=1",4,5,3712.883668,1.077,461
+headline,pgbench,3,"v5 uring if=16",4,5,3350.685323,1.194,461
+headline,pgbench,3,"opt if=16",8,5,6862.066833,1.166,457
+headline,pgbench,3,"stock open_datasync",8,5,7024.751217,1.139,457
+headline,pgbench,3,"v5 uring odsync if=16",8,5,5875.329219,1.362,457
+headline,pgbench,3,"opt uring odsync if=16",8,5,6876.598851,1.163,457
+headline,pgbench,3,"stock fdatasync",8,5,6931.445829,1.154,457
+headline,pgbench,3,"v5 uring if=1",8,5,6547.058887,1.222,457
+headline,pgbench,3,"v5 uring if=16",8,5,4456.488853,1.795,457
+headline,pgbench,3,"opt if=16",16,5,11268.085842,1.420,667
+headline,pgbench,3,"stock open_datasync",16,5,11658.773310,1.372,667
+headline,pgbench,3,"v5 uring odsync if=16",16,5,7314.624688,2.187,667
+headline,pgbench,3,"opt uring odsync if=16",16,5,8790.150547,1.820,667
+headline,pgbench,3,"stock fdatasync",16,5,4762.602434,3.360,667
+headline,pgbench,3,"v5 uring if=1",16,5,160.832703,99.482,667
+headline,pgbench,3,"v5 uring if=16",16,5,142.143768,112.562,667
+headline,pgbench,3,"opt if=16",32,5,17609.273383,1.817,569
+headline,pgbench,3,"stock open_datasync",32,5,18595.556253,1.721,569
+headline,pgbench,3,"v5 uring odsync if=16",32,5,14638.462447,2.186,569
+headline,pgbench,3,"opt uring odsync if=16",32,5,18127.824165,1.765,569
+headline,pgbench,3,"stock fdatasync",32,5,8790.191256,3.640,569
+headline,pgbench,3,"v5 uring if=1",32,5,16103.286056,1.987,569
+headline,pgbench,3,"v5 uring if=16",32,5,14445.154317,2.215,569
+headline,pgbench,3,"opt if=16",64,5,23154.649542,2.764,459
+headline,pgbench,3,"stock open_datasync",64,5,30247.470738,2.116,459
+headline,pgbench,3,"v5 uring odsync if=16",64,5,21711.713682,2.948,459
+headline,pgbench,3,"opt uring odsync if=16",64,5,23339.729225,2.742,459
+headline,pgbench,3,"stock fdatasync",64,5,25167.905907,2.543,459
+headline,pgbench,3,"v5 uring if=1",64,5,22367.915318,2.861,459
+headline,pgbench,3,"v5 uring if=16",64,5,21511.604418,2.975,459
+headline,pgbench,4,"stock open_datasync",1,5,1381.599559,0.724,456
+headline,pgbench,4,"v5 uring odsync if=16",1,5,1345.635448,0.743,456
+headline,pgbench,4,"opt uring odsync if=16",1,5,1363.265692,0.734,456
+headline,pgbench,4,"stock fdatasync",1,5,1364.740093,0.733,456
+headline,pgbench,4,"v5 uring if=1",1,5,1314.252629,0.761,456
+headline,pgbench,4,"v5 uring if=16",1,5,1321.318702,0.757,456
+headline,pgbench,4,"opt if=16",1,5,1047.540197,0.955,456
+headline,pgbench,4,"stock open_datasync",4,5,4318.074044,0.926,481
+headline,pgbench,4,"v5 uring odsync if=16",4,5,3090.138543,1.294,481
+headline,pgbench,4,"opt uring odsync if=16",4,5,4302.356593,0.930,481
+headline,pgbench,4,"stock fdatasync",4,5,3924.625580,1.019,481
+headline,pgbench,4,"v5 uring if=1",4,5,3704.878310,1.080,481
+headline,pgbench,4,"v5 uring if=16",4,5,3376.746743,1.185,481
+headline,pgbench,4,"opt if=16",4,5,4148.984044,0.964,481
+headline,pgbench,4,"stock open_datasync",8,5,8487.841778,0.943,460
+headline,pgbench,4,"v5 uring odsync if=16",8,5,6051.826016,1.322,460
+headline,pgbench,4,"opt uring odsync if=16",8,5,8328.907073,0.961,460
+headline,pgbench,4,"stock fdatasync",8,5,6951.648764,1.151,460
+headline,pgbench,4,"v5 uring if=1",8,5,6673.108545,1.199,460
+headline,pgbench,4,"v5 uring if=16",8,5,4481.186757,1.785,460
+headline,pgbench,4,"opt if=16",8,5,8113.874816,0.986,460
+headline,pgbench,4,"stock open_datasync",16,5,16174.033691,0.989,461
+headline,pgbench,4,"v5 uring odsync if=16",16,5,8082.249385,1.980,461
+headline,pgbench,4,"opt uring odsync if=16",16,5,15685.767670,1.020,461
+headline,pgbench,4,"stock fdatasync",16,5,15703.973974,1.019,461
+headline,pgbench,4,"v5 uring if=1",16,5,12274.002049,1.304,461
+headline,pgbench,4,"v5 uring if=16",16,5,7842.588054,2.040,461
+headline,pgbench,4,"opt if=16",16,5,14914.598796,1.073,461
+headline,pgbench,4,"stock open_datasync",32,5,30170.447108,1.061,459
+headline,pgbench,4,"v5 uring odsync if=16",32,5,15917.338952,2.010,459
+headline,pgbench,4,"opt uring odsync if=16",32,5,27721.042956,1.154,459
+headline,pgbench,4,"stock fdatasync",32,5,29332.161304,1.091,459
+headline,pgbench,4,"v5 uring if=1",32,5,25413.952104,1.259,459
+headline,pgbench,4,"v5 uring if=16",32,5,13284.034649,2.409,459
+headline,pgbench,4,"opt if=16",32,5,15463.829047,2.069,459
+headline,pgbench,4,"stock open_datasync",64,5,40833.339348,1.567,463
+headline,pgbench,4,"v5 uring odsync if=16",64,5,35363.291941,1.810,463
+headline,pgbench,4,"opt uring odsync if=16",64,5,40257.821538,1.590,463
+headline,pgbench,4,"stock fdatasync",64,5,40831.971599,1.567,463
+headline,pgbench,4,"v5 uring if=1",64,5,36157.573882,1.770,463
+headline,pgbench,4,"v5 uring if=16",64,5,24124.017898,2.653,463
+headline,pgbench,4,"opt if=16",64,5,37204.864297,1.720,463
+headline,pgbench,5,"v5 uring odsync if=16",1,5,1380.084686,0.725,463
+headline,pgbench,5,"opt uring odsync if=16",1,5,1423.499933,0.702,463
+headline,pgbench,5,"stock fdatasync",1,5,1381.705704,0.724,463
+headline,pgbench,5,"v5 uring if=1",1,5,1381.255262,0.724,463
+headline,pgbench,5,"v5 uring if=16",1,5,1390.532296,0.719,463
+headline,pgbench,5,"opt if=16",1,5,1359.620667,0.735,463
+headline,pgbench,5,"stock open_datasync",1,5,1393.935271,0.717,463
+headline,pgbench,5,"v5 uring odsync if=16",4,5,3771.586435,1.061,458
+headline,pgbench,5,"opt uring odsync if=16",4,5,3954.566900,1.011,458
+headline,pgbench,5,"stock fdatasync",4,5,4063.876756,0.984,458
+headline,pgbench,5,"v5 uring if=1",4,5,3823.190971,1.046,458
+headline,pgbench,5,"v5 uring if=16",4,5,3409.356924,1.173,458
+headline,pgbench,5,"opt if=16",4,5,3931.926866,1.017,458
+headline,pgbench,5,"stock open_datasync",4,5,4047.331510,0.988,458
+headline,pgbench,5,"v5 uring odsync if=16",8,5,7104.961727,1.126,459
+headline,pgbench,5,"opt uring odsync if=16",8,5,7801.027367,1.026,459
+headline,pgbench,5,"stock fdatasync",8,5,7909.718686,1.011,459
+headline,pgbench,5,"v5 uring if=1",8,5,4180.627384,1.914,459
+headline,pgbench,5,"v5 uring if=16",8,5,436.491313,18.328,459
+headline,pgbench,5,"opt if=16",8,5,906.976851,8.821,459
+headline,pgbench,5,"stock open_datasync",8,5,495.676477,16.140,459
+headline,pgbench,5,"v5 uring odsync if=16",16,5,14273.303711,1.121,466
+headline,pgbench,5,"opt uring odsync if=16",16,5,16340.736401,0.979,466
+headline,pgbench,5,"stock fdatasync",16,5,15951.934204,1.003,466
+headline,pgbench,5,"v5 uring if=1",16,5,4932.271174,3.244,466
+headline,pgbench,5,"v5 uring if=16",16,5,2848.316141,5.617,466
+headline,pgbench,5,"opt if=16",16,5,12510.042580,1.279,466
+headline,pgbench,5,"stock open_datasync",16,5,16831.874698,0.951,466
+headline,pgbench,5,"v5 uring odsync if=16",32,5,22780.387158,1.405,459
+headline,pgbench,5,"opt uring odsync if=16",32,5,28441.650175,1.125,459
+headline,pgbench,5,"stock fdatasync",32,5,31055.005519,1.030,459
+headline,pgbench,5,"v5 uring if=1",32,5,26097.215857,1.226,459
+headline,pgbench,5,"v5 uring if=16",32,5,15664.233790,2.043,459
+headline,pgbench,5,"opt if=16",32,5,27369.739787,1.169,459
+headline,pgbench,5,"stock open_datasync",32,5,30486.661135,1.050,459
+headline,pgbench,5,"v5 uring odsync if=16",64,5,33943.519769,1.885,456
+headline,pgbench,5,"opt uring odsync if=16",64,5,37072.632256,1.726,456
+headline,pgbench,5,"stock fdatasync",64,5,38008.935079,1.684,456
+headline,pgbench,5,"v5 uring if=1",64,5,34523.103431,1.854,456
+headline,pgbench,5,"v5 uring if=16",64,5,24317.989348,2.632,456
+headline,pgbench,5,"opt if=16",64,5,36696.826492,1.744,456
+headline,pgbench,5,"stock open_datasync",64,5,37278.729661,1.717,456
+headline,pgbench,6,"opt uring odsync if=16",1,5,1023.460368,0.977,536
+headline,pgbench,6,"stock fdatasync",1,5,200.364968,4.991,536
+headline,pgbench,6,"v5 uring if=1",1,5,210.760144,4.745,536
+headline,pgbench,6,"v5 uring if=16",1,5,165.013601,6.060,536
+headline,pgbench,6,"opt if=16",1,5,101.732964,9.830,536
+headline,pgbench,6,"stock open_datasync",1,5,110.114382,9.081,536
+headline,pgbench,6,"v5 uring odsync if=16",1,5,1088.902715,0.918,536
+headline,pgbench,6,"opt uring odsync if=16",4,5,4307.926505,0.929,458
+headline,pgbench,6,"stock fdatasync",4,5,4304.642387,0.929,458
+headline,pgbench,6,"v5 uring if=1",4,5,4102.957855,0.975,458
+headline,pgbench,6,"v5 uring if=16",4,5,3492.959257,1.145,458
+headline,pgbench,6,"opt if=16",4,5,4154.063513,0.963,458
+headline,pgbench,6,"stock open_datasync",4,5,4245.871619,0.942,458
+headline,pgbench,6,"v5 uring odsync if=16",4,5,3957.868637,1.011,458
+headline,pgbench,6,"opt uring odsync if=16",8,5,8346.330591,0.959,458
+headline,pgbench,6,"stock fdatasync",8,5,8283.099214,0.966,458
+headline,pgbench,6,"v5 uring if=1",8,5,7930.037278,1.009,458
+headline,pgbench,6,"v5 uring if=16",8,5,4586.514243,1.744,458
+headline,pgbench,6,"opt if=16",8,5,7990.732112,1.001,458

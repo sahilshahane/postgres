@@ -1,0 +1,49 @@
+run,workload,round,config,clients,seconds,tps,latency_avg_ms,canary_us
+final_big,big,1,"v5 uring if=16",1,5,633.963182,1.577,466
+final_big,big,1,"v5 uring if=16",4,5,1168.339128,3.424,466
+final_big,big,1,"v5 uring if=16",8,5,1510.835993,5.295,466
+final_big,big,1,"v5 uring if=16",16,5,1391.404256,11.499,466
+final_big,big,1,"opt uring if=16 thr=256kB",1,5,654.163410,1.529,465
+final_big,big,1,"opt uring if=16 thr=256kB",4,5,1213.312110,3.297,465
+final_big,big,1,"opt uring if=16 thr=256kB",8,5,1504.153553,5.319,465
+final_big,big,1,"opt uring if=16 thr=256kB",16,5,208.179787,76.857,465
+final_big,big,1,"opt uring if=16 thr=64kB",1,5,653.082029,1.531,576
+final_big,big,1,"opt uring if=16 thr=64kB",4,5,1364.316320,2.932,576
+final_big,big,1,"opt uring if=16 thr=64kB",8,5,543.546655,14.718,576
+final_big,big,1,"opt uring if=16 thr=64kB",16,5,57.273813,279.360,576
+final_big,big,1,"stock fdatasync",1,5,660.872299,1.513,465
+final_big,big,1,"stock fdatasync",4,5,1223.085195,3.270,465
+final_big,big,1,"stock fdatasync",8,5,1517.100912,5.273,465
+final_big,big,1,"stock fdatasync",16,5,1819.323502,8.794,465
+final_big,big,2,"opt uring if=16 thr=256kB",1,5,668.415898,1.496,460
+final_big,big,2,"opt uring if=16 thr=256kB",4,5,88.179866,45.362,460
+final_big,big,2,"opt uring if=16 thr=256kB",8,5,988.589216,8.092,460
+final_big,big,2,"opt uring if=16 thr=256kB",16,5,1959.348911,8.166,460
+final_big,big,2,"opt uring if=16 thr=64kB",1,5,668.593625,1.496,458
+final_big,big,2,"opt uring if=16 thr=64kB",4,5,87.427209,45.752,458
+final_big,big,2,"opt uring if=16 thr=64kB",8,5,72.621186,110.161,458
+final_big,big,2,"opt uring if=16 thr=64kB",16,5,777.785067,20.571,458
+final_big,big,2,"stock fdatasync",1,5,665.532707,1.503,459
+final_big,big,2,"stock fdatasync",4,5,1617.336508,2.473,459
+final_big,big,2,"stock fdatasync",8,5,1069.194466,7.482,459
+final_big,big,2,"stock fdatasync",16,5,1933.247376,8.276,459
+final_big,big,2,"v5 uring if=16",1,5,642.579537,1.556,545
+final_big,big,2,"v5 uring if=16",4,5,87.053271,45.949,545
+final_big,big,2,"v5 uring if=16",8,5,904.988059,8.840,545
+final_big,big,2,"v5 uring if=16",16,5,1816.085915,8.810,545
+final_big,big,3,"opt uring if=16 thr=64kB",1,5,671.932774,1.488,470
+final_big,big,3,"opt uring if=16 thr=64kB",4,5,1382.574551,2.893,470
+final_big,big,3,"opt uring if=16 thr=64kB",8,5,1731.999265,4.619,470
+final_big,big,3,"opt uring if=16 thr=64kB",16,5,322.631619,49.592,470
+final_big,big,3,"stock fdatasync",1,5,665.705581,1.502,570
+final_big,big,3,"stock fdatasync",4,5,1652.331856,2.421,570
+final_big,big,3,"stock fdatasync",8,5,94.317893,84.820,570
+final_big,big,3,"stock fdatasync",16,5,1002.904143,15.954,570
+final_big,big,3,"v5 uring if=16",1,5,310.420143,3.221,501
+final_big,big,3,"v5 uring if=16",4,5,1569.263669,2.549,501
+final_big,big,3,"v5 uring if=16",8,5,93.811315,85.278,501
+final_big,big,3,"v5 uring if=16",16,5,37.305057,428.896,501
+final_big,big,3,"opt uring if=16 thr=256kB",1,5,660.838725,1.513,460
+final_big,big,3,"opt uring if=16 thr=256kB",4,5,1632.883142,2.450,460
+final_big,big,3,"opt uring if=16 thr=256kB",8,5,966.211020,8.280,460
+final_big,big,3,"opt uring if=16 thr=256kB",16,5,476.941696,33.547,460

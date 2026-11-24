@@ -1,0 +1,97 @@
+run,workload,round,config,clients,seconds,tps,latency_avg_ms,canary_us
+paired_fdatasync,pgbench,1,"v5 uring if=1",8,5,4896.145491,1.634,464
+paired_fdatasync,pgbench,1,"v5 uring if=16",8,5,3433.333360,2.330,464
+paired_fdatasync,pgbench,1,"opt if=16",8,5,4947.807048,1.617,464
+paired_fdatasync,pgbench,1,"stock fdatasync",8,5,5065.397536,1.579,464
+paired_fdatasync,pgbench,1,"v5 uring if=1",16,5,10540.802490,1.518,460
+paired_fdatasync,pgbench,1,"v5 uring if=16",16,5,6771.064333,2.363,460
+paired_fdatasync,pgbench,1,"opt if=16",16,5,10798.591258,1.482,460
+paired_fdatasync,pgbench,1,"stock fdatasync",16,5,11103.485995,1.441,460
+paired_fdatasync,pgbench,1,"v5 uring if=1",32,5,16790.463217,1.906,461
+paired_fdatasync,pgbench,1,"v5 uring if=16",32,5,13614.121461,2.351,461
+paired_fdatasync,pgbench,1,"opt if=16",32,5,18006.236314,1.777,461
+paired_fdatasync,pgbench,1,"stock fdatasync",32,5,18440.751544,1.735,461
+paired_fdatasync,pgbench,1,"v5 uring if=1",64,5,22219.145038,2.880,458
+paired_fdatasync,pgbench,1,"v5 uring if=16",64,5,22025.394824,2.906,458
+paired_fdatasync,pgbench,1,"opt if=16",64,5,24342.737079,2.629,458
+paired_fdatasync,pgbench,1,"stock fdatasync",64,5,24960.323735,2.564,458
+paired_fdatasync,pgbench,2,"v5 uring if=16",8,5,4503.570721,1.776,466
+paired_fdatasync,pgbench,2,"opt if=16",8,5,6749.629529,1.185,466
+paired_fdatasync,pgbench,2,"stock fdatasync",8,5,6835.454639,1.170,466
+paired_fdatasync,pgbench,2,"v5 uring if=1",8,5,6515.223802,1.228,466
+paired_fdatasync,pgbench,2,"v5 uring if=16",16,5,7741.633219,2.067,459
+paired_fdatasync,pgbench,2,"opt if=16",16,5,11277.095256,1.419,459
+paired_fdatasync,pgbench,2,"stock fdatasync",16,5,11692.460714,1.368,459
+paired_fdatasync,pgbench,2,"v5 uring if=1",16,5,11126.830459,1.438,459
+paired_fdatasync,pgbench,2,"v5 uring if=16",32,5,14372.392022,2.226,458
+paired_fdatasync,pgbench,2,"opt if=16",32,5,17784.481479,1.799,458
+paired_fdatasync,pgbench,2,"stock fdatasync",32,5,18426.273414,1.737,458
+paired_fdatasync,pgbench,2,"v5 uring if=1",32,5,17304.958806,1.849,458
+paired_fdatasync,pgbench,2,"v5 uring if=16",64,5,22699.860076,2.819,464
+paired_fdatasync,pgbench,2,"opt if=16",64,5,25313.527420,2.528,464
+paired_fdatasync,pgbench,2,"stock fdatasync",64,5,26062.989976,2.456,464
+paired_fdatasync,pgbench,2,"v5 uring if=1",64,5,22807.777972,2.806,464
+paired_fdatasync,pgbench,3,"opt if=16",8,5,6899.335219,1.160,460
+paired_fdatasync,pgbench,3,"stock fdatasync",8,5,7062.312224,1.133,460
+paired_fdatasync,pgbench,3,"v5 uring if=1",8,5,6793.944564,1.178,460
+paired_fdatasync,pgbench,3,"v5 uring if=16",8,5,4551.082000,1.758,460
+paired_fdatasync,pgbench,3,"opt if=16",16,5,11038.051387,1.450,504
+paired_fdatasync,pgbench,3,"stock fdatasync",16,5,11796.061893,1.356,504
+paired_fdatasync,pgbench,3,"v5 uring if=1",16,5,11318.953533,1.414,504
+paired_fdatasync,pgbench,3,"v5 uring if=16",16,5,8025.666762,1.994,504
+paired_fdatasync,pgbench,3,"opt if=16",32,5,17715.140981,1.806,458
+paired_fdatasync,pgbench,3,"stock fdatasync",32,5,18367.991892,1.742,458
+paired_fdatasync,pgbench,3,"v5 uring if=1",32,5,16556.855515,1.933,458
+paired_fdatasync,pgbench,3,"v5 uring if=16",32,5,14063.738164,2.275,458
+paired_fdatasync,pgbench,3,"opt if=16",64,5,24275.701174,2.636,465
+paired_fdatasync,pgbench,3,"stock fdatasync",64,5,24728.473686,2.588,465
+paired_fdatasync,pgbench,3,"v5 uring if=1",64,5,21959.643847,2.914,465
+paired_fdatasync,pgbench,3,"v5 uring if=16",64,5,21392.328151,2.992,465
+paired_fdatasync,pgbench,4,"stock fdatasync",8,5,6998.138699,1.143,463
+paired_fdatasync,pgbench,4,"v5 uring if=1",8,5,6601.477023,1.212,463
+paired_fdatasync,pgbench,4,"v5 uring if=16",8,5,3588.009370,2.230,463
+paired_fdatasync,pgbench,4,"opt if=16",8,5,704.580913,11.354,463
+paired_fdatasync,pgbench,4,"stock fdatasync",16,5,16857.897279,0.949,459
+paired_fdatasync,pgbench,4,"v5 uring if=1",16,5,11376.130990,1.406,459
+paired_fdatasync,pgbench,4,"v5 uring if=16",16,5,8227.726138,1.945,459
+paired_fdatasync,pgbench,4,"opt if=16",16,5,12217.223466,1.310,459
+paired_fdatasync,pgbench,4,"stock fdatasync",32,5,31163.748321,1.027,526
+paired_fdatasync,pgbench,4,"v5 uring if=1",32,5,25111.230679,1.274,526
+paired_fdatasync,pgbench,4,"v5 uring if=16",32,5,13936.584369,2.296,526
+paired_fdatasync,pgbench,4,"opt if=16",32,5,28759.741041,1.113,526
+paired_fdatasync,pgbench,4,"stock fdatasync",64,5,38565.050292,1.660,460
+paired_fdatasync,pgbench,4,"v5 uring if=1",64,5,34652.987750,1.847,460
+paired_fdatasync,pgbench,4,"v5 uring if=16",64,5,21127.919501,3.029,460
+paired_fdatasync,pgbench,4,"opt if=16",64,5,36333.715822,1.761,460
+paired_fdatasync,pgbench,5,"v5 uring if=1",8,5,7568.810736,1.057,466
+paired_fdatasync,pgbench,5,"v5 uring if=16",8,5,4385.198739,1.824,466
+paired_fdatasync,pgbench,5,"opt if=16",8,5,7717.927548,1.037,466
+paired_fdatasync,pgbench,5,"stock fdatasync",8,5,7945.680237,1.007,466
+paired_fdatasync,pgbench,5,"v5 uring if=1",16,5,2168.672967,7.378,461
+paired_fdatasync,pgbench,5,"v5 uring if=16",16,5,873.377422,18.320,461
+paired_fdatasync,pgbench,5,"opt if=16",16,5,1504.064195,10.638,461
+paired_fdatasync,pgbench,5,"stock fdatasync",16,5,909.334442,17.595,461
+paired_fdatasync,pgbench,5,"v5 uring if=1",32,5,27058.877161,1.183,501
+paired_fdatasync,pgbench,5,"v5 uring if=16",32,5,16127.357529,1.984,501
+paired_fdatasync,pgbench,5,"opt if=16",32,5,25973.099383,1.232,501
+paired_fdatasync,pgbench,5,"stock fdatasync",32,5,18864.817284,1.696,501
+paired_fdatasync,pgbench,5,"v5 uring if=1",64,5,35403.802360,1.808,464
+paired_fdatasync,pgbench,5,"v5 uring if=16",64,5,25246.472183,2.535,464
+paired_fdatasync,pgbench,5,"opt if=16",64,5,36019.988291,1.777,464
+paired_fdatasync,pgbench,5,"stock fdatasync",64,5,37832.409424,1.692,464
+paired_fdatasync,pgbench,6,"v5 uring if=16",8,5,4890.491727,1.636,466
+paired_fdatasync,pgbench,6,"opt if=16",8,5,7976.250748,1.003,466
+paired_fdatasync,pgbench,6,"stock fdatasync",8,5,8326.075401,0.961,466
+paired_fdatasync,pgbench,6,"v5 uring if=1",8,5,7623.933444,1.049,466
+paired_fdatasync,pgbench,6,"v5 uring if=16",16,5,8174.088832,1.957,462
+paired_fdatasync,pgbench,6,"opt if=16",16,5,15298.091566,1.046,462
+paired_fdatasync,pgbench,6,"stock fdatasync",16,5,15525.581421,1.031,462
+paired_fdatasync,pgbench,6,"v5 uring if=1",16,5,14651.599103,1.092,462
+paired_fdatasync,pgbench,6,"v5 uring if=16",32,5,16085.597278,1.989,496
+paired_fdatasync,pgbench,6,"opt if=16",32,5,29941.295965,1.069,496
+paired_fdatasync,pgbench,6,"stock fdatasync",32,5,31955.851951,1.001,496
+paired_fdatasync,pgbench,6,"v5 uring if=1",32,5,27017.709907,1.184,496
+paired_fdatasync,pgbench,6,"v5 uring if=16",64,5,20498.406211,3.122,461
+paired_fdatasync,pgbench,6,"opt if=16",64,5,12856.885544,4.978,461
+paired_fdatasync,pgbench,6,"stock fdatasync",64,5,23913.165004,2.676,461
+paired_fdatasync,pgbench,6,"v5 uring if=1",64,5,36472.534037,1.755,461

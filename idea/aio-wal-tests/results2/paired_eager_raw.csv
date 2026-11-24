@@ -1,0 +1,145 @@
+run,workload,round,config,clients,seconds,tps,latency_avg_ms,canary_us
+paired_eager,pgbench,1,"opt odsync eager on",2,5,1577.768943,1.268,461
+paired_eager,pgbench,1,"opt odsync eager off",2,5,1665.079210,1.201,461
+paired_eager,pgbench,1,"stock fdatasync",2,5,1661.681555,1.204,461
+paired_eager,pgbench,1,"opt fdatasync eager on",2,5,1654.779835,1.209,461
+paired_eager,pgbench,1,"opt fdatasync eager off",2,5,1635.167441,1.223,461
+paired_eager,pgbench,1,"stock open_datasync",2,5,1609.260892,1.243,461
+paired_eager,pgbench,1,"opt odsync eager on",4,5,2855.687446,1.401,463
+paired_eager,pgbench,1,"opt odsync eager off",4,5,3039.042392,1.316,463
+paired_eager,pgbench,1,"stock fdatasync",4,5,3049.646582,1.312,463
+paired_eager,pgbench,1,"opt fdatasync eager on",4,5,2983.116545,1.341,463
+paired_eager,pgbench,1,"opt fdatasync eager off",4,5,3014.148251,1.327,463
+paired_eager,pgbench,1,"stock open_datasync",4,5,2931.744022,1.364,463
+paired_eager,pgbench,1,"opt odsync eager on",8,5,5977.007630,1.338,458
+paired_eager,pgbench,1,"opt odsync eager off",8,5,6240.274896,1.282,458
+paired_eager,pgbench,1,"stock fdatasync",8,5,6333.075341,1.263,458
+paired_eager,pgbench,1,"opt fdatasync eager on",8,5,6145.727825,1.302,458
+paired_eager,pgbench,1,"opt fdatasync eager off",8,5,6227.373991,1.285,458
+paired_eager,pgbench,1,"stock open_datasync",8,5,6086.970617,1.314,458
+paired_eager,pgbench,1,"opt odsync eager on",16,5,11538.345329,1.387,458
+paired_eager,pgbench,1,"opt odsync eager off",16,5,11417.627741,1.401,458
+paired_eager,pgbench,1,"stock fdatasync",16,5,11728.594255,1.364,458
+paired_eager,pgbench,1,"opt fdatasync eager on",16,5,11370.520555,1.407,458
+paired_eager,pgbench,1,"opt fdatasync eager off",16,5,11324.614262,1.413,458
+paired_eager,pgbench,1,"stock open_datasync",16,5,11703.398359,1.367,458
+paired_eager,pgbench,2,"opt odsync eager off",2,5,1961.318627,1.020,464
+paired_eager,pgbench,2,"stock fdatasync",2,5,1988.758046,1.006,464
+paired_eager,pgbench,2,"opt fdatasync eager on",2,5,1927.813045,1.037,464
+paired_eager,pgbench,2,"opt fdatasync eager off",2,5,1965.525582,1.018,464
+paired_eager,pgbench,2,"stock open_datasync",2,5,1945.599237,1.028,464
+paired_eager,pgbench,2,"opt odsync eager on",2,5,1685.736064,1.186,464
+paired_eager,pgbench,2,"opt odsync eager off",4,5,3763.637258,1.063,464
+paired_eager,pgbench,2,"stock fdatasync",4,5,3732.979622,1.072,464
+paired_eager,pgbench,2,"opt fdatasync eager on",4,5,3668.056858,1.090,464
+paired_eager,pgbench,2,"opt fdatasync eager off",4,5,3686.604782,1.085,464
+paired_eager,pgbench,2,"stock open_datasync",4,5,3728.657905,1.073,464
+paired_eager,pgbench,2,"opt odsync eager on",4,5,3230.961854,1.238,464
+paired_eager,pgbench,2,"opt odsync eager off",8,5,6901.572399,1.159,461
+paired_eager,pgbench,2,"stock fdatasync",8,5,6818.746169,1.173,461
+paired_eager,pgbench,2,"opt fdatasync eager on",8,5,6730.494681,1.189,461
+paired_eager,pgbench,2,"opt fdatasync eager off",8,5,6695.091060,1.195,461
+paired_eager,pgbench,2,"stock open_datasync",8,5,6933.353827,1.154,461
+paired_eager,pgbench,2,"opt odsync eager on",8,5,6558.411061,1.220,461
+paired_eager,pgbench,2,"opt odsync eager off",16,5,11585.647483,1.381,642
+paired_eager,pgbench,2,"stock fdatasync",16,5,11793.383002,1.357,642
+paired_eager,pgbench,2,"opt fdatasync eager on",16,5,11288.047532,1.417,642
+paired_eager,pgbench,2,"opt fdatasync eager off",16,5,11103.456238,1.441,642
+paired_eager,pgbench,2,"stock open_datasync",16,5,11792.738443,1.357,642
+paired_eager,pgbench,2,"opt odsync eager on",16,5,11563.122946,1.384,642
+paired_eager,pgbench,3,"stock fdatasync",2,5,671.495361,2.978,610
+paired_eager,pgbench,3,"opt fdatasync eager on",2,5,203.244330,9.840,610
+paired_eager,pgbench,3,"opt fdatasync eager off",2,5,214.667838,9.317,610
+paired_eager,pgbench,3,"stock open_datasync",2,5,119.949518,16.674,610
+paired_eager,pgbench,3,"opt odsync eager on",2,5,105.664855,18.928,610
+paired_eager,pgbench,3,"opt odsync eager off",2,5,672.625464,2.973,610
+paired_eager,pgbench,3,"stock fdatasync",4,5,3924.947042,1.019,468
+paired_eager,pgbench,3,"opt fdatasync eager on",4,5,3817.908838,1.048,468
+paired_eager,pgbench,3,"opt fdatasync eager off",4,5,3803.292306,1.052,468
+paired_eager,pgbench,3,"stock open_datasync",4,5,3829.977951,1.044,468
+paired_eager,pgbench,3,"opt odsync eager on",4,5,3320.431326,1.205,468
+paired_eager,pgbench,3,"opt odsync eager off",4,5,3827.007343,1.045,468
+paired_eager,pgbench,3,"stock fdatasync",8,5,7131.956810,1.122,463
+paired_eager,pgbench,3,"opt fdatasync eager on",8,5,6845.187765,1.169,463
+paired_eager,pgbench,3,"opt fdatasync eager off",8,5,6940.970235,1.153,463
+paired_eager,pgbench,3,"stock open_datasync",8,5,7099.959594,1.127,463
+paired_eager,pgbench,3,"opt odsync eager on",8,5,6685.663941,1.197,463
+paired_eager,pgbench,3,"opt odsync eager off",8,5,6946.509734,1.152,463
+paired_eager,pgbench,3,"stock fdatasync",16,5,11859.464941,1.349,461
+paired_eager,pgbench,3,"opt fdatasync eager on",16,5,11368.410939,1.407,461
+paired_eager,pgbench,3,"opt fdatasync eager off",16,5,11370.109166,1.407,461
+paired_eager,pgbench,3,"stock open_datasync",16,5,11822.159398,1.353,461
+paired_eager,pgbench,3,"opt odsync eager on",16,5,11536.678539,1.387,461
+paired_eager,pgbench,3,"opt odsync eager off",16,5,11275.424668,1.419,461
+paired_eager,pgbench,4,"opt fdatasync eager on",2,5,1923.331556,1.040,470
+paired_eager,pgbench,4,"opt fdatasync eager off",2,5,1888.296026,1.059,470
+paired_eager,pgbench,4,"stock open_datasync",2,5,1903.401999,1.051,470
+paired_eager,pgbench,4,"opt odsync eager on",2,5,1654.514885,1.209,470
+paired_eager,pgbench,4,"opt odsync eager off",2,5,1928.411909,1.037,470
+paired_eager,pgbench,4,"stock fdatasync",2,5,1901.532049,1.052,470
+paired_eager,pgbench,4,"opt fdatasync eager on",4,5,3533.942919,1.132,465
+paired_eager,pgbench,4,"opt fdatasync eager off",4,5,3668.748632,1.090,465
+paired_eager,pgbench,4,"stock open_datasync",4,5,3630.359933,1.102,465
+paired_eager,pgbench,4,"opt odsync eager on",4,5,3220.612238,1.242,465
+paired_eager,pgbench,4,"opt odsync eager off",4,5,3612.334520,1.107,465
+paired_eager,pgbench,4,"stock fdatasync",4,5,3697.002249,1.082,465
+paired_eager,pgbench,4,"opt fdatasync eager on",8,5,6575.845649,1.217,685
+paired_eager,pgbench,4,"opt fdatasync eager off",8,5,6665.818155,1.200,685
+paired_eager,pgbench,4,"stock open_datasync",8,5,6761.326843,1.183,685
+paired_eager,pgbench,4,"opt odsync eager on",8,5,4028.431430,1.986,685
+paired_eager,pgbench,4,"opt odsync eager off",8,5,2351.109711,3.403,685
+paired_eager,pgbench,4,"stock fdatasync",8,5,2324.627184,3.441,685
+paired_eager,pgbench,4,"opt fdatasync eager on",16,5,11484.824775,1.393,463
+paired_eager,pgbench,4,"opt fdatasync eager off",16,5,11607.451422,1.378,463
+paired_eager,pgbench,4,"stock open_datasync",16,5,12117.279455,1.320,463
+paired_eager,pgbench,4,"opt odsync eager on",16,5,11905.040721,1.344,463
+paired_eager,pgbench,4,"opt odsync eager off",16,5,12196.086353,1.312,463
+paired_eager,pgbench,4,"stock fdatasync",16,5,12467.616904,1.283,463
+paired_eager,pgbench,5,"opt fdatasync eager off",2,5,2008.241813,0.996,460
+paired_eager,pgbench,5,"stock open_datasync",2,5,2031.667200,0.984,460
+paired_eager,pgbench,5,"opt odsync eager on",2,5,1713.208874,1.167,460
+paired_eager,pgbench,5,"opt odsync eager off",2,5,1993.978254,1.003,460
+paired_eager,pgbench,5,"stock fdatasync",2,5,2015.311083,0.992,460
+paired_eager,pgbench,5,"opt fdatasync eager on",2,5,1963.955799,1.018,460
+paired_eager,pgbench,5,"opt fdatasync eager off",4,5,3799.750298,1.053,459
+paired_eager,pgbench,5,"stock open_datasync",4,5,3816.967992,1.048,459
+paired_eager,pgbench,5,"opt odsync eager on",4,5,3310.599722,1.208,459
+paired_eager,pgbench,5,"opt odsync eager off",4,5,3837.055663,1.042,459
+paired_eager,pgbench,5,"stock fdatasync",4,5,3799.355918,1.053,459
+paired_eager,pgbench,5,"opt fdatasync eager on",4,5,3725.484233,1.074,459
+paired_eager,pgbench,5,"opt fdatasync eager off",8,5,6708.719474,1.192,459
+paired_eager,pgbench,5,"stock open_datasync",8,5,7066.736890,1.132,459
+paired_eager,pgbench,5,"opt odsync eager on",8,5,6680.589565,1.197,459
+paired_eager,pgbench,5,"opt odsync eager off",8,5,6970.429759,1.148,459
+paired_eager,pgbench,5,"stock fdatasync",8,5,7019.642792,1.140,459
+paired_eager,pgbench,5,"opt fdatasync eager on",8,5,6772.569194,1.181,459
+paired_eager,pgbench,5,"opt fdatasync eager off",16,5,11507.860314,1.390,471
+paired_eager,pgbench,5,"stock open_datasync",16,5,11867.752692,1.348,471
+paired_eager,pgbench,5,"opt odsync eager on",16,5,11572.686108,1.383,471
+paired_eager,pgbench,5,"opt odsync eager off",16,5,11618.933399,1.377,471
+paired_eager,pgbench,5,"stock fdatasync",16,5,11944.764612,1.339,471
+paired_eager,pgbench,5,"opt fdatasync eager on",16,5,11318.970571,1.414,471
+paired_eager,pgbench,6,"stock open_datasync",2,5,2069.442355,0.966,460
+paired_eager,pgbench,6,"opt odsync eager on",2,5,1751.441363,1.142,460
+paired_eager,pgbench,6,"opt odsync eager off",2,5,2061.416818,0.970,460
+paired_eager,pgbench,6,"stock fdatasync",2,5,2061.938991,0.970,460
+paired_eager,pgbench,6,"opt fdatasync eager on",2,5,2041.623762,0.980,460
+paired_eager,pgbench,6,"opt fdatasync eager off",2,5,2044.644063,0.978,460
+paired_eager,pgbench,6,"stock open_datasync",4,5,3900.217339,1.026,460
+paired_eager,pgbench,6,"opt odsync eager on",4,5,3332.270261,1.200,460
+paired_eager,pgbench,6,"opt odsync eager off",4,5,3831.990276,1.044,460
+paired_eager,pgbench,6,"stock fdatasync",4,5,3870.600220,1.033,460
+paired_eager,pgbench,6,"opt fdatasync eager on",4,5,3767.858915,1.062,460
+paired_eager,pgbench,6,"opt fdatasync eager off",4,5,3821.370628,1.047,460
+paired_eager,pgbench,6,"stock open_datasync",8,5,7019.229692,1.140,469
+paired_eager,pgbench,6,"opt odsync eager on",8,5,6722.983695,1.190,469
+paired_eager,pgbench,6,"opt odsync eager off",8,5,7096.364264,1.127,469
+paired_eager,pgbench,6,"stock fdatasync",8,5,7092.121961,1.128,469
+paired_eager,pgbench,6,"opt fdatasync eager on",8,5,6730.485405,1.189,469
+paired_eager,pgbench,6,"opt fdatasync eager off",8,5,7092.402946,1.128,469
+paired_eager,pgbench,6,"stock open_datasync",16,5,12196.362212,1.312,461
+paired_eager,pgbench,6,"opt odsync eager on",16,5,11771.492394,1.359,461
+paired_eager,pgbench,6,"opt odsync eager off",16,5,11812.252536,1.355,461
+paired_eager,pgbench,6,"stock fdatasync",16,5,12193.371395,1.312,461
+paired_eager,pgbench,6,"opt fdatasync eager on",16,5,11576.677859,1.382,461
+paired_eager,pgbench,6,"opt fdatasync eager off",16,5,11476.643912,1.394,461

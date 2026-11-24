@@ -3658,6 +3658,78 @@ include_dir 'conf.d'
       </listitem>
      </varlistentry>
 
+     <varlistentry id="guc-wal-io-pipeline-threshold" xreflabel="wal_io_pipeline_threshold">
+      <term><varname>wal_io_pipeline_threshold</varname> (<type>integer</type>)
+      <indexterm>
+       <primary><varname>wal_io_pipeline_threshold</varname> configuration parameter</primary>
+      </indexterm>
+      </term>
+      <listitem>
+       <para>
+        When <xref linkend="guc-wal-io-method"/> is <literal>aio</literal> and
+        a WAL write or flush is already in progress, another one is only
+        started if at least this much WAL is waiting to be written (and
+        <xref linkend="guc-wal-io-max-inflight"/> allows it).  Otherwise the
+        committing backends wait for the write in progress, and their WAL is
+        written together by the next one, as with group commit.  This keeps
+        small commits from being written one by one, each paying for a cache
+        flush of the storage device, while large transactions can still be
+        pipelined.  If this value is specified without units, it is taken as
+        kilobytes.  Zero starts a new write whenever
+        <varname>wal_io_max_inflight</varname> allows it.  The default is
+        <literal>256kB</literal>.
+        This parameter can only be set in the <filename>postgresql.conf</filename>
+        file or on the server command line.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry id="guc-wal-io-eager-issue" xreflabel="wal_io_eager_issue">
+      <term><varname>wal_io_eager_issue</varname> (<type>boolean</type>)
+      <indexterm>
+       <primary><varname>wal_io_eager_issue</varname> configuration parameter</primary>
+      </indexterm>
+      </term>
+      <listitem>
+       <para>
+        When <xref linkend="guc-wal-io-method"/> is <literal>aio</literal>, lets
+        the backend that finds its WAL write completed start the next write
+        for backends that are waiting for WAL nobody has written yet, rather
+        than leaving it to one of them, which first has to be woken up.  That
+        write is always handed to the asynchronous I/O subsystem, so with
+        <xref linkend="guc-wal-io-inline-fsync"/> on it is slower at low
+        concurrency.  The default is <literal>off</literal>.
+        This parameter can only be set in the <filename>postgresql.conf</filename>
+        file or on the server command line.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry id="guc-wal-io-inline-fsync" xreflabel="wal_io_inline_fsync">
+      <term><varname>wal_io_inline_fsync</varname> (<type>boolean</type>)
+      <indexterm>
+       <primary><varname>wal_io_inline_fsync</varname> configuration parameter</primary>
+      </indexterm>
+      </term>
+      <listitem>
+       <para>
+        When <xref linkend="guc-wal-io-method"/> is <literal>aio</literal>, a
+        backend that starts a WAL flush (with <xref linkend="guc-wal-sync-method"/>
+        <literal>fdatasync</literal> or <literal>fsync</literal>) or a WAL
+        write (with <literal>open_datasync</literal> or
+        <literal>open_sync</literal>) that it is going to wait for performs it
+        itself, after releasing the WAL write lock, instead of handing it to
+        the asynchronous I/O subsystem.  With <literal>io_uring</literal>, an
+        <function>fsync</function> or a synchronous buffered write cannot be
+        performed without blocking and is handed to a kernel worker thread,
+        which adds two thread switches to every group commit.  Other WAL I/O
+        (for example that of the WAL writer) still uses asynchronous I/O.  The default is <literal>on</literal>.
+        This parameter can only be set in the <filename>postgresql.conf</filename>
+        file or on the server command line.
+       </para>
+      </listitem>
+     </varlistentry>
+
      <varlistentry id="guc-full-page-writes" xreflabel="full_page_writes">
       <term><varname>full_page_writes</varname> (<type>boolean</type>)
       <indexterm>

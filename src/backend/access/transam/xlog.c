@@ -139,6 +139,9 @@ bool		log_checkpoints = true;
 int			wal_sync_method = DEFAULT_WAL_SYNC_METHOD;
 int			wal_io_method = WAL_IO_METHOD_SYNC;
 int			wal_io_max_inflight = 1;
+int			wal_io_pipeline_threshold = 256;	/* kB */
+bool		wal_io_eager_issue = false;
+bool		wal_io_inline_fsync = true;
 int			wal_level = WAL_LEVEL_REPLICA;
 int			CommitDelay = 0;	/* precommit delay in microseconds */
 int			CommitSiblings = 5; /* # concurrent xacts needed to sleep */
@@ -653,6 +656,14 @@ typedef struct XLogCtlData
 	ConditionVariable aioWaitCV;
 
 	/*
+	 * Highest flush request of a backend that is waiting for an AIO write in
+	 * flight instead of issuing its own (adaptive batching), so that whoever
+	 * sees that write complete can issue the next one on its behalf, see
+	 * XLogAioIssuePending().  Only ever advanced.
+	 */
+	pg_atomic_uint64 aioFlushRqst;
+
+	/*
 	 * How AIO WAL writes are made durable, fixed at server start (see
 	 * "Asynchronous WAL writes"): true if WAL is written to the page cache
 	 * and then fsync'ed using AIO, false if it is written with O_DSYNC.
@@ -842,7 +853,7 @@ static void AdvanceXLInsertBuffer(XLogRecPtr upto, TimeLineID tli,
 static void XLogWrite(XLogwrtRqst WriteRqst, TimeLineID tli, bool flexible);
 static inline bool XLogAioEnabled(void);
 static bool XLogAioIssue(XLogRecPtr upto, TimeLineID tli, bool nowait);
-static void XLogAioStartFsync(int fd, XLogSegNo segno, TimeLineID tli,
+static void XLogAioStartFsync(bool inline_ok, int fd, XLogSegNo segno, TimeLineID tli,
 							  XLogRecPtr end);
 static bool XLogAioWaitFlush(XLogRecPtr upto);
 static void XLogAioReap(void);
@@ -2682,7 +2693,7 @@ XLogWrite(XLogwrtRqst WriteRqst, TimeLineID tli, bool flexible)
 				 * notification etc. happen once it's durable, see
 				 * XLogAioProcessFinishedSegments().
 				 */
-				XLogAioStartFsync(openLogFile, openLogSegNo, tli,
+				XLogAioStartFsync(false, openLogFile, openLogSegNo, tli,
 								  LogwrtResult.Write);
 
 				if (IsUnderPostmaster && XLogCheckpointNeeded(openLogSegNo))
@@ -2759,7 +2770,7 @@ XLogWrite(XLogwrtRqst WriteRqst, TimeLineID tli, bool flexible)
 				openLogFile = XLogFileOpen(openLogSegNo, tli);
 				ReserveExternalFD();
 			}
-			XLogAioStartFsync(openLogFile, openLogSegNo, tli,
+			XLogAioStartFsync(true, openLogFile, openLogSegNo, tli,
 							  LogwrtResult.Write);
 		}
 	}
@@ -2924,6 +2935,26 @@ XLogWrite(XLogwrtRqst WriteRqst, TimeLineID tli, bool flexible)
  *
  * - The number of writes in flight is limited by wal_io_max_inflight.
  *
+ * Keeping group commit (both cases):
+ *
+ * - Adaptive batching (wal_io_pipeline_threshold): while a write or fsync is
+ *   in flight, a flush request only starts another one if that would carry
+ *   at least wal_io_pipeline_threshold of WAL.  Otherwise the backend
+ *   publishes its request in aioFlushRqst and waits for the oldest write;
+ *   the WAL of all such waiters goes into the next write.  Starting a write
+ *   per commit instead makes a device that executes cache flushes one at a
+ *   time alternate between a large and a tiny batch.
+ *
+ * - Eager issue (wal_io_eager_issue): the backend that finds its WAL durable
+ *   issues the published requests before returning (XLogAioIssuePending()),
+ *   so the device doesn't sit idle while a waiter wakes up to do it.
+ *
+ * - Inline fsync (wal_io_inline_fsync, fsync case only): a backend that
+ *   issues an fsync it will wait for anyway executes it itself, after
+ *   releasing WALWriteLock (XLogAioRunInlineFsync()); the tracker entry has
+ *   no wait reference, and others wait for it on aioWaitCV.  io_uring would
+ *   hand the fsync to a kernel worker thread and back.
+ *
  * - Errors PANIC, like with synchronous writes.  Short writes are completed
  *   synchronously by the completion callback.
  *
@@ -2956,6 +2987,17 @@ const PgAioTargetInfo aio_wal_target_info = {
 const PgAioHandleCallbacks aio_wal_writev_cb = {
 	.complete_shared = xlog_aio_writev_complete,
 };
+
+/*
+ * Inline fsync (wal_io_inline_fsync): an fsync entered into the tracker by
+ * this backend that it executes itself, synchronously, after releasing
+ * WALWriteLock, see XLogAioRunInlineFsync().  aioInlineAllowed is set by
+ * XLogFlushAio() while it calls XLogWrite(), i.e. only when the issuer is
+ * going to wait for the fsync anyway.
+ */
+static bool aioInlineAllowed = false;
+static uint64 aioInlineSeq = PG_UINT64_MAX;
+static int	aioInlineFd = -1;
 
 /* FD cached by IO workers, see xlog_aio_reopen() */
 static int	aioReopenFile = -1;
@@ -3242,6 +3284,20 @@ XLogAioWaitForWrite(uint64 seqno)
 
 	while (XLogAioWriteInflight(seqno, &wref))
 	{
+		if (!pgaio_wref_valid(&wref))
+		{
+			/*
+			 * An inline fsync, executed by its issuer, which broadcasts once
+			 * it's done (XLogAioRunInlineFsync()).
+			 */
+			ConditionVariablePrepareToSleep(&XLogCtl->aioWaitCV);
+			while (XLogAioWriteInflight(seqno, &wref) &&
+				   !pgaio_wref_valid(&wref))
+				ConditionVariableSleep(&XLogCtl->aioWaitCV, WAIT_EVENT_WAL_SYNC);
+			ConditionVariableCancelSleep();
+			continue;
+		}
+
 		if (pg_atomic_exchange_u32(&XLogCtl->aioReaper, 1) == 0)
 		{
 			/* we're the reaper; returns once completion was processed */
@@ -3341,7 +3397,8 @@ XLogAioReap(void)
 		wref = XLogAioSlot(head)->wref;
 		SpinLockRelease(&XLogCtl->aio_lck);
 
-		if (!pgaio_wref_check_done(&wref))
+		/* an inline fsync completes on its own, see XLogAioRunInlineFsync() */
+		if (!pgaio_wref_valid(&wref) || !pgaio_wref_check_done(&wref))
 			return;
 	}
 }
@@ -3591,7 +3648,31 @@ XLogAioIssue(XLogRecPtr upto, TimeLineID tli, bool nowait)
 		w->error = 0;
 		w->is_fsync = false;
 
-		if (pgaio_can_start_io())
+		if (end == upto && aioInlineAllowed && wal_io_inline_fsync &&
+			aioInlineSeq == PG_UINT64_MAX)
+		{
+			/*
+			 * Inline write, see XLogAioStartFsync(): the caller waits for
+			 * this write anyway, so it performs it itself once WALWriteLock
+			 * has been released.  Only the last write of the loop, as the
+			 * file must stay open until then.
+			 */
+			SpinLockAcquire(&XLogCtl->aio_lck);
+			pgaio_wref_clear(&w->wref);
+			w->status = XLOG_AIO_WRITE_INFLIGHT;
+			XLogCtl->aioNext = seqno + 1;
+			if (writeend == lastpageend)
+			{
+				XLogCtl->aioZeroedUpTo = lastpageend;
+				XLogCtl->aioZeroingSeq = seqno;
+			}
+			SpinLockRelease(&XLogCtl->aio_lck);
+
+			aioInlineSeq = seqno;
+			aioInlineFd = openLogFile;
+			pg_atomic_write_u64(&XLogCtl->aioIssuedUpTo, end);
+		}
+		else if (pgaio_can_start_io())
 		{
 			PgAioHandle *ioh;
 			PgAioTargetData *td;
@@ -3739,7 +3820,8 @@ XLogAioIssue(XLogRecPtr upto, TimeLineID tli, bool nowait)
  * Must be called with WALWriteLock held and in a critical section.
  */
 static void
-XLogAioStartFsync(int fd, XLogSegNo segno, TimeLineID tli, XLogRecPtr end)
+XLogAioStartFsync(bool inline_ok, int fd, XLogSegNo segno, TimeLineID tli,
+				  XLogRecPtr end)
 {
 	uint64		seqno;
 	uint64		head;
@@ -3783,7 +3865,30 @@ XLogAioStartFsync(int fd, XLogSegNo segno, TimeLineID tli, XLogRecPtr end)
 	 * fsync_writethrough isn't supported by AIO; it's only available on
 	 * platforms other than Linux anyway.
 	 */
-	if (pgaio_can_start_io() &&
+	if (inline_ok && aioInlineAllowed && wal_io_inline_fsync &&
+		aioInlineSeq == PG_UINT64_MAX)
+	{
+		/*
+		 * The caller is going to wait for this fsync anyway, so execute it
+		 * ourselves once WALWriteLock has been released, instead of handing
+		 * it to the IO method: with io_uring an fsync can't be executed
+		 * without blocking, so the kernel passes it to a worker thread, and
+		 * the thread switches to it and back are on the critical path of
+		 * every group commit.  Others wait on aioWaitCV (no wait reference).
+		 * The file stays open until then, as we don't write more WAL first.
+		 */
+		SpinLockAcquire(&XLogCtl->aio_lck);
+		pgaio_wref_clear(&w->wref);
+		w->status = XLOG_AIO_WRITE_INFLIGHT;
+		XLogCtl->aioNext = seqno + 1;
+		SpinLockRelease(&XLogCtl->aio_lck);
+
+		aioInlineSeq = seqno;
+		aioInlineFd = fd;
+		pg_atomic_write_u64(&XLogCtl->aioIssuedUpTo, end);
+		return;					/* issue_xlog_fsync() counts it in pg_stat_io */
+	}
+	else if (pgaio_can_start_io() &&
 		wal_sync_method != WAL_SYNC_METHOD_FSYNC_WRITETHROUGH)
 	{
 		PgAioHandle *ioh;
@@ -3830,6 +3935,129 @@ XLogAioStartFsync(int fd, XLogSegNo segno, TimeLineID tli, XLogRecPtr end)
 }
 
 /*
+ * Execute the inline fsync started by this backend, if any, see
+ * XLogAioStartFsync().  Must be called right after releasing WALWriteLock,
+ * before waiting for any WAL write.  Called in a critical section.
+ */
+static void
+XLogAioRunInlineFsync(void)
+{
+	uint64		seqno = aioInlineSeq;
+	XLogAioWrite *w;
+
+	if (seqno == PG_UINT64_MAX)
+		return;
+	aioInlineSeq = PG_UINT64_MAX;
+
+	/* the slot can't be reused before we mark it done */
+	w = XLogAioSlot(seqno);
+	if (w->is_fsync)
+	{
+		issue_xlog_fsync(aioInlineFd, w->segno, w->tli);	/* PANICs on failure */
+
+		SpinLockAcquire(&XLogCtl->aio_lck);
+		w->status = XLOG_AIO_WRITE_DONE;
+		XLogAioAdvanceLocked();
+		SpinLockRelease(&XLogCtl->aio_lck);
+	}
+	else
+	{
+		char	   *from = XLogCtl->pages + w->bufoff;
+		ssize_t		written;
+		int			result;
+		instr_time	start;
+
+		start = pgstat_prepare_io_time(track_wal_io_timing);
+		pgstat_report_wait_start(WAIT_EVENT_WAL_WRITE);
+		do
+		{
+			errno = 0;
+			written = pg_pwrite(aioInlineFd, from, w->nbytes, w->offset);
+		} while (written < 0 && errno == EINTR);
+		pgstat_report_wait_end();
+		result = written >= 0 ? (int) written : -(errno ? errno : EIO);
+		if (written > 0)
+			pgstat_count_io_op_time(IOOBJECT_WAL, IOCONTEXT_NORMAL,
+									IOOP_WRITE, start, 1, written);
+
+		/* finishes short writes, marks it done or failed, advances Flush */
+		XLogAioCompleteWrite(seqno, result);
+
+		/* PANICs if it failed */
+		XLogAioWaitForWrite(seqno);
+	}
+
+	ConditionVariableBroadcast(&XLogCtl->aioWaitCV);
+}
+
+/*
+ * Should a backend that wants WAL up to 'rqst' to be flushed start a new AIO
+ * write (or fsync) now, with 'ninflight' writes in flight?
+ *
+ * Starting a write for every small commit while another one is in flight
+ * destroys group commit: on storage that executes cache flushes one at a
+ * time (most single SSDs), the device then alternates between a large batch
+ * and a tiny one, and every flush is paid for by fewer commits.  So when
+ * something is in flight, only start another write if the WAL it would
+ * carry is at least wal_io_pipeline_threshold; large transactions still get
+ * pipelined.
+ */
+static bool
+XLogAioShouldIssue(XLogRecPtr rqst, uint64 ninflight)
+{
+	XLogRecPtr	issued;
+
+	if (ninflight == 0)
+		return true;
+	if (ninflight >= (uint64) wal_io_max_inflight)
+		return false;
+	if (wal_io_pipeline_threshold == 0)
+		return true;
+	issued = pg_atomic_read_u64(&XLogCtl->aioIssuedUpTo);
+	return rqst > issued &&
+		rqst - issued >= (uint64) wal_io_pipeline_threshold * 1024;
+}
+
+/*
+ * Issue WAL that backends waiting in XLogFlushAio() have asked for (see
+ * aioFlushRqst) but nobody has issued yet, if XLogAioShouldIssue() allows
+ * it.  Never blocks on WALWriteLock: if somebody holds it, they're issuing.
+ * Called in a critical section.
+ */
+static void
+XLogAioIssuePending(TimeLineID tli)
+{
+	XLogRecPtr	rqst = pg_atomic_read_u64(&XLogCtl->aioFlushRqst);
+	XLogRecPtr	insertpos;
+	uint64		head;
+
+	if (rqst <= pg_atomic_read_u64(&XLogCtl->aioIssuedUpTo))
+		return;
+	if (!XLogAioShouldIssue(rqst, XLogAioInflight(&head)))
+		return;
+
+	/* aioFlushRqst only holds LSNs of records that have been inserted */
+	insertpos = WaitXLogInsertionsToFinish(rqst);
+
+	if (!LWLockConditionalAcquire(WALWriteLock, LW_EXCLUSIVE))
+		return;
+	if (insertpos > pg_atomic_read_u64(&XLogCtl->aioIssuedUpTo))
+	{
+		if (XLogCtl->aioUseFsync)
+		{
+			XLogwrtRqst WriteRqst;
+
+			WriteRqst.Write = insertpos;
+			WriteRqst.Flush = insertpos;
+			XLogWrite(WriteRqst, tli, false);
+		}
+		else
+			(void) XLogAioIssue(insertpos, tli, true);
+	}
+	LWLockRelease(WALWriteLock);
+}
+
+/*
  * XLogFlush() for wal_io_method = aio: make sure WAL up to 'record' has been
  * issued, then wait for it to become durable.  Called in a critical section.
  */
@@ -3854,18 +4082,10 @@ XLogFlushAio(XLogRecPtr record, TimeLineID insertTLI)
 		}
 
 		/*
-		 * If issuing would have to wait, for a zeroing write or for the
-		 * number of writes in flight to go down, wait now, before deciding
-		 * how far to write and without holding the lock.  WAL inserted in
-		 * the meantime then goes into the same write, which is how group
-		 * commit happens with AIO, and the waits happen concurrently.
+		 * If issuing would have to wait for a zeroing write, wait now,
+		 * before deciding how far to write and without holding the lock.
 		 */
 		XLogAioWaitForZeroingWrite();
-		if (XLogAioInflight(&head) >= (uint64) wal_io_max_inflight)
-		{
-			XLogAioWaitForWrite(head);
-			continue;
-		}
 
 		/* try to write later additions to XLOG as well, see XLogFlush() */
 		WriteRqstPtr = record;
@@ -3873,6 +4093,26 @@ XLogFlushAio(XLogRecPtr record, TimeLineID insertTLI)
 		if (WriteRqstPtr < XLogCtl->LogwrtRqst.Write)
 			WriteRqstPtr = XLogCtl->LogwrtRqst.Write;
 		SpinLockRelease(&XLogCtl->info_lck);
+		WriteRqstPtr = Max(WriteRqstPtr,
+						   pg_atomic_read_u64(&XLogCtl->aioFlushRqst));
+
+		/*
+		 * Adaptive batching: if a write is already in flight, only start
+		 * another one if it would carry enough WAL to be worth a separate
+		 * trip to storage (or if the in-flight limit is reached, not at
+		 * all).  Otherwise wait for the oldest write; WAL inserted in the
+		 * meantime then goes into the next write, which is how group commit
+		 * happens with AIO, and the waits happen concurrently.  Publish our
+		 * request first, so that whoever processes the completion can issue
+		 * the next write for us right away (XLogAioIssuePending()).
+		 */
+		if (!XLogAioShouldIssue(WriteRqstPtr, XLogAioInflight(&head)))
+		{
+			pg_atomic_monotonic_advance_u64(&XLogCtl->aioFlushRqst, record);
+			XLogAioWaitForWrite(head);
+			continue;
+		}
+
 		insertpos = WaitXLogInsertionsToFinish(WriteRqstPtr);
 
 		if (!LWLockAcquireOrWait(WALWriteLock, LW_EXCLUSIVE))
@@ -3901,15 +4141,27 @@ XLogFlushAio(XLogRecPtr record, TimeLineID insertTLI)
 			/* write synchronously, then start an fsync, see XLogWrite() */
 			WriteRqst.Write = insertpos;
 			WriteRqst.Flush = insertpos;
+			aioInlineAllowed = true;
 			XLogWrite(WriteRqst, insertTLI, false);
+			aioInlineAllowed = false;
 		}
-		else if (!XLogAioIssue(insertpos, insertTLI, true))
+		else
 		{
-			/* would have to wait; do that without the lock, then retry */
-			LWLockRelease(WALWriteLock);
-			continue;
+			bool		issued_all;
+
+			aioInlineAllowed = true;
+			issued_all = XLogAioIssue(insertpos, insertTLI, true);
+			aioInlineAllowed = false;
+			if (!issued_all)
+			{
+				/* would have to wait; do that without the lock, then retry */
+				LWLockRelease(WALWriteLock);
+				XLogAioRunInlineFsync();
+				continue;
+			}
 		}
 		LWLockRelease(WALWriteLock);
+		XLogAioRunInlineFsync();
 
 		/*
 		 * If the request is past the end of WAL, we can't do better than
@@ -3918,6 +4170,15 @@ XLogFlushAio(XLogRecPtr record, TimeLineID insertTLI)
 		if (!XLogAioWaitFlush(Min(record, insertpos)) || insertpos < record)
 			break;
 	}
+
+	/*
+	 * Our WAL is durable.  If other backends are waiting for WAL that nobody
+	 * has issued yet, start that write now instead of leaving it to one of
+	 * them, which would first have to be woken up.  This keeps the device
+	 * busy between group commits.
+	 */
+	if (wal_io_eager_issue)
+		XLogAioIssuePending(insertTLI);
 
 	/* do end-of-segment work, if the writes we waited for finished one */
 	if (XLogAioSegmentsPending())
@@ -6932,6 +7193,7 @@ XLOGShmemInit(void *arg)
 	XLogCtl->aioZeroingSeq = PG_UINT64_MAX;
 	pg_atomic_init_u32(&XLogCtl->aioReaper, 0);
 	ConditionVariableInit(&XLogCtl->aioWaitCV);
+	pg_atomic_init_u64(&XLogCtl->aioFlushRqst, InvalidXLogRecPtr);
 
 	/*
 	 * Decide once, so that a reload of wal_sync_method or fsync can't mix

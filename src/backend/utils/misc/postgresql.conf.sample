@@ -261,6 +261,10 @@
 #wal_io_method = sync                   # sync, aio
                                         # (change requires restart)
 #wal_io_max_inflight = 1                # max concurrent WAL writes with aio
+#wal_io_pipeline_threshold = 256kB      # min unwritten WAL to start a write
+                                        # while another is in flight
+#wal_io_eager_issue = off               # completer starts the next write
+#wal_io_inline_fsync = on               # issuer runs its own fsync, unlocked
 #full_page_writes = on                  # recover from partial page writes
 #wal_log_hints = off                    # also do full page writes of non-critical updates
                                         # (change requires restart)

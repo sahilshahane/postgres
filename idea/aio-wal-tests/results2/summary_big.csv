@@ -1,0 +1,17 @@
+workload,config,clients,n,tps_median,tps_min,tps_max,tps_stdev,latency_median_ms,vs_baseline_pct
+big,v5 uring if=16,1,3,634,310,643,189,1.577,-4.7
+big,v5 uring if=16,4,3,1168,87,1569,767,3.424,-27.8
+big,v5 uring if=16,8,3,905,94,1511,711,8.84,-15.4
+big,v5 uring if=16,16,3,1391,37,1816,929,11.499,-23.5
+big,opt uring if=16 thr=256kB,1,3,661,654,668,7,1.513,-0.7
+big,opt uring if=16 thr=256kB,4,3,1213,88,1633,799,3.297,-25.0
+big,opt uring if=16 thr=256kB,8,3,989,966,1504,304,8.092,-7.5
+big,opt uring if=16 thr=256kB,16,3,477,208,1959,943,33.547,-73.8
+big,opt uring if=16 thr=64kB,1,3,669,653,672,10,1.496,0.5
+big,opt uring if=16 thr=64kB,4,3,1364,87,1383,743,2.932,-15.6
+big,opt uring if=16 thr=64kB,8,3,544,73,1732,855,14.718,-49.2
+big,opt uring if=16 thr=64kB,16,3,323,57,778,364,49.592,-82.3
+big,stock fdatasync,1,3,666,661,666,3,1.503,0.0
+big,stock fdatasync,4,3,1617,1223,1652,238,2.473,0.0
+big,stock fdatasync,8,3,1069,94,1517,727,7.482,0.0
+big,stock fdatasync,16,3,1819,1003,1933,507,8.794,0.0

@@ -1,0 +1,169 @@
+run,workload,round,config,clients,seconds,tps,latency_avg_ms,canary_us
+final_fdatasync,pgbench,1,"v5 uring if=1",1,6,1124.847015,0.889,464
+final_fdatasync,pgbench,1,"v5 uring if=1",4,6,2856.344572,1.400,464
+final_fdatasync,pgbench,1,"v5 uring if=1",8,6,6087.162403,1.314,464
+final_fdatasync,pgbench,1,"v5 uring if=1",16,6,11252.830221,1.422,464
+final_fdatasync,pgbench,1,"v5 uring if=1",32,6,16728.228004,1.913,464
+final_fdatasync,pgbench,1,"v5 uring if=1",64,6,22174.051501,2.886,464
+final_fdatasync,pgbench,1,"v5 uring if=16",1,6,1122.159882,0.891,460
+final_fdatasync,pgbench,1,"v5 uring if=16",4,6,2666.109171,1.500,460
+final_fdatasync,pgbench,1,"v5 uring if=16",8,6,4119.934233,1.942,460
+final_fdatasync,pgbench,1,"v5 uring if=16",16,6,8051.012248,1.987,460
+final_fdatasync,pgbench,1,"v5 uring if=16",32,6,14673.117358,2.181,460
+final_fdatasync,pgbench,1,"v5 uring if=16",64,6,22397.826129,2.857,460
+final_fdatasync,pgbench,1,"opt if=16 full (batch+eager+inline)",1,6,1147.014179,0.872,614
+final_fdatasync,pgbench,1,"opt if=16 full (batch+eager+inline)",4,6,2995.833638,1.335,614
+final_fdatasync,pgbench,1,"opt if=16 full (batch+eager+inline)",8,6,6325.389845,1.265,614
+final_fdatasync,pgbench,1,"opt if=16 full (batch+eager+inline)",16,6,11827.789651,1.353,614
+final_fdatasync,pgbench,1,"opt if=16 full (batch+eager+inline)",32,6,12860.395208,2.488,614
+final_fdatasync,pgbench,1,"opt if=16 full (batch+eager+inline)",64,6,19402.318910,3.299,614
+final_fdatasync,pgbench,1,"opt if=16 batch+eager",1,6,1140.417178,0.877,469
+final_fdatasync,pgbench,1,"opt if=16 batch+eager",4,6,2979.196964,1.343,469
+final_fdatasync,pgbench,1,"opt if=16 batch+eager",8,6,6339.287173,1.262,469
+final_fdatasync,pgbench,1,"opt if=16 batch+eager",16,6,11838.185173,1.352,469
+final_fdatasync,pgbench,1,"opt if=16 batch+eager",32,6,18409.468336,1.738,469
+final_fdatasync,pgbench,1,"opt if=16 batch+eager",64,6,24615.066032,2.600,469
+final_fdatasync,pgbench,1,"opt if=16 batch+inline",1,6,1153.921683,0.867,467
+final_fdatasync,pgbench,1,"opt if=16 batch+inline",4,6,3024.613875,1.322,467
+final_fdatasync,pgbench,1,"opt if=16 batch+inline",8,6,6385.599144,1.253,467
+final_fdatasync,pgbench,1,"opt if=16 batch+inline",16,6,11421.763704,1.401,467
+final_fdatasync,pgbench,1,"opt if=16 batch+inline",32,6,17271.702120,1.853,467
+final_fdatasync,pgbench,1,"opt if=16 batch+inline",64,6,23956.713144,2.671,467
+final_fdatasync,pgbench,1,"opt if=16 batch only",1,6,1143.948078,0.874,459
+final_fdatasync,pgbench,1,"opt if=16 batch only",4,6,2971.370161,1.346,459
+final_fdatasync,pgbench,1,"opt if=16 batch only",8,6,6247.633567,1.280,459
+final_fdatasync,pgbench,1,"opt if=16 batch only",16,6,11291.418945,1.417,459
+final_fdatasync,pgbench,1,"opt if=16 batch only",32,6,16691.984565,1.917,459
+final_fdatasync,pgbench,1,"opt if=16 batch only",64,6,23054.211864,2.776,459
+final_fdatasync,pgbench,1,"stock fdatasync",1,6,1157.444448,0.864,479
+final_fdatasync,pgbench,1,"stock fdatasync",4,6,3030.011519,1.320,479
+final_fdatasync,pgbench,1,"stock fdatasync",8,6,6498.326648,1.231,479
+final_fdatasync,pgbench,1,"stock fdatasync",16,6,12280.751476,1.303,479
+final_fdatasync,pgbench,1,"stock fdatasync",32,6,14186.822806,2.256,479
+final_fdatasync,pgbench,1,"stock fdatasync",64,6,18941.136358,3.379,479
+final_fdatasync,pgbench,2,"v5 uring if=16",1,6,1378.262662,0.726,463
+final_fdatasync,pgbench,2,"v5 uring if=16",4,6,3427.198577,1.167,463
+final_fdatasync,pgbench,2,"v5 uring if=16",8,6,4758.324818,1.681,463
+final_fdatasync,pgbench,2,"v5 uring if=16",16,6,8389.160501,1.907,463
+final_fdatasync,pgbench,2,"v5 uring if=16",32,6,14455.168452,2.214,463
+final_fdatasync,pgbench,2,"v5 uring if=16",64,6,22536.321082,2.840,463
+final_fdatasync,pgbench,2,"opt if=16 full (batch+eager+inline)",1,6,1401.457469,0.714,456
+final_fdatasync,pgbench,2,"opt if=16 full (batch+eager+inline)",4,6,3831.088029,1.044,456
+final_fdatasync,pgbench,2,"opt if=16 full (batch+eager+inline)",8,6,7055.586504,1.134,456
+final_fdatasync,pgbench,2,"opt if=16 full (batch+eager+inline)",16,6,12003.212726,1.333,456
+final_fdatasync,pgbench,2,"opt if=16 full (batch+eager+inline)",32,6,18430.559473,1.736,456
+final_fdatasync,pgbench,2,"opt if=16 full (batch+eager+inline)",64,6,24294.275191,2.634,456
+final_fdatasync,pgbench,2,"opt if=16 batch+eager",1,6,1380.208980,0.725,459
+final_fdatasync,pgbench,2,"opt if=16 batch+eager",4,6,3836.176220,1.043,459
+final_fdatasync,pgbench,2,"opt if=16 batch+eager",8,6,7045.617128,1.135,459
+final_fdatasync,pgbench,2,"opt if=16 batch+eager",16,6,11964.942224,1.337,459
+final_fdatasync,pgbench,2,"opt if=16 batch+eager",32,6,18260.600227,1.752,459
+final_fdatasync,pgbench,2,"opt if=16 batch+eager",64,6,24749.651683,2.586,459
+final_fdatasync,pgbench,2,"opt if=16 batch+inline",1,6,1392.368746,0.718,460
+final_fdatasync,pgbench,2,"opt if=16 batch+inline",4,6,3890.816403,1.028,460
+final_fdatasync,pgbench,2,"opt if=16 batch+inline",8,6,7100.968358,1.127,460
+final_fdatasync,pgbench,2,"opt if=16 batch+inline",16,6,11853.650411,1.350,460
+final_fdatasync,pgbench,2,"opt if=16 batch+inline",32,6,18045.598459,1.773,460
+final_fdatasync,pgbench,2,"opt if=16 batch+inline",64,6,23100.357621,2.771,460
+final_fdatasync,pgbench,2,"opt if=16 batch only",1,6,1376.375417,0.727,495
+final_fdatasync,pgbench,2,"opt if=16 batch only",4,6,3786.901914,1.056,495
+final_fdatasync,pgbench,2,"opt if=16 batch only",8,6,6935.313018,1.154,495
+final_fdatasync,pgbench,2,"opt if=16 batch only",16,6,11769.658897,1.359,495
+final_fdatasync,pgbench,2,"opt if=16 batch only",32,6,11102.472021,2.882,495
+final_fdatasync,pgbench,2,"opt if=16 batch only",64,6,16992.802371,3.766,495
+final_fdatasync,pgbench,2,"stock fdatasync",1,6,1392.997039,0.718,460
+final_fdatasync,pgbench,2,"stock fdatasync",4,6,3930.487310,1.018,460
+final_fdatasync,pgbench,2,"stock fdatasync",8,6,7299.361354,1.096,460
+final_fdatasync,pgbench,2,"stock fdatasync",16,6,12492.292336,1.281,460
+final_fdatasync,pgbench,2,"stock fdatasync",32,6,18823.727446,1.700,460
+final_fdatasync,pgbench,2,"stock fdatasync",64,6,25531.447381,2.507,460
+final_fdatasync,pgbench,2,"v5 uring if=1",1,6,1180.733011,0.847,659
+final_fdatasync,pgbench,2,"v5 uring if=1",4,6,3079.625457,1.299,659
+final_fdatasync,pgbench,2,"v5 uring if=1",8,6,6578.091703,1.216,659
+final_fdatasync,pgbench,2,"v5 uring if=1",16,6,11743.197455,1.362,659
+final_fdatasync,pgbench,2,"v5 uring if=1",32,6,17165.441219,1.864,659
+final_fdatasync,pgbench,2,"v5 uring if=1",64,6,21387.864375,2.992,659
+final_fdatasync,pgbench,3,"opt if=16 full (batch+eager+inline)",1,6,1365.383900,0.732,460
+final_fdatasync,pgbench,3,"opt if=16 full (batch+eager+inline)",4,6,3739.744088,1.070,460
+final_fdatasync,pgbench,3,"opt if=16 full (batch+eager+inline)",8,6,7009.896177,1.141,460
+final_fdatasync,pgbench,3,"opt if=16 full (batch+eager+inline)",16,6,12025.001600,1.331,460
+final_fdatasync,pgbench,3,"opt if=16 full (batch+eager+inline)",32,6,25872.563531,1.237,460
+final_fdatasync,pgbench,3,"opt if=16 full (batch+eager+inline)",64,6,36073.759053,1.774,460
+final_fdatasync,pgbench,3,"opt if=16 batch+eager",1,6,1377.958335,0.726,494
+final_fdatasync,pgbench,3,"opt if=16 batch+eager",4,6,3843.569153,1.041,494
+final_fdatasync,pgbench,3,"opt if=16 batch+eager",8,6,7061.731458,1.133,494
+final_fdatasync,pgbench,3,"opt if=16 batch+eager",16,6,13697.645293,1.168,494
+final_fdatasync,pgbench,3,"opt if=16 batch+eager",32,6,13006.950331,2.460,494
+final_fdatasync,pgbench,3,"opt if=16 batch+eager",64,6,38563.515274,1.660,494
+final_fdatasync,pgbench,3,"opt if=16 batch+inline",1,6,1381.793170,0.724,532
+final_fdatasync,pgbench,3,"opt if=16 batch+inline",4,6,3893.869752,1.027,532
+final_fdatasync,pgbench,3,"opt if=16 batch+inline",8,6,7127.050828,1.122,532
+final_fdatasync,pgbench,3,"opt if=16 batch+inline",16,6,12169.721668,1.315,532
+final_fdatasync,pgbench,3,"opt if=16 batch+inline",32,6,28520.579911,1.122,532
+final_fdatasync,pgbench,3,"opt if=16 batch+inline",64,6,36351.462288,1.761,532
+final_fdatasync,pgbench,3,"opt if=16 batch only",1,6,1380.663772,0.724,468
+final_fdatasync,pgbench,3,"opt if=16 batch only",4,6,3748.128811,1.067,468
+final_fdatasync,pgbench,3,"opt if=16 batch only",8,6,6848.822880,1.168,468
+final_fdatasync,pgbench,3,"opt if=16 batch only",16,6,11425.875119,1.400,468
+final_fdatasync,pgbench,3,"opt if=16 batch only",32,6,17825.839419,1.795,468
+final_fdatasync,pgbench,3,"opt if=16 batch only",64,6,38266.120104,1.672,468
+final_fdatasync,pgbench,3,"stock fdatasync",1,6,1385.911385,0.722,490
+final_fdatasync,pgbench,3,"stock fdatasync",4,6,3934.741507,1.017,490
+final_fdatasync,pgbench,3,"stock fdatasync",8,6,7267.234651,1.101,490
+final_fdatasync,pgbench,3,"stock fdatasync",16,6,12240.793536,1.307,490
+final_fdatasync,pgbench,3,"stock fdatasync",32,6,13112.727390,2.440,490
+final_fdatasync,pgbench,3,"stock fdatasync",64,6,40329.780296,1.587,490
+final_fdatasync,pgbench,3,"v5 uring if=1",1,6,1377.090122,0.726,465
+final_fdatasync,pgbench,3,"v5 uring if=1",4,6,3787.245373,1.056,465
+final_fdatasync,pgbench,3,"v5 uring if=1",8,6,6964.234201,1.149,465
+final_fdatasync,pgbench,3,"v5 uring if=1",16,6,11763.344055,1.360,465
+final_fdatasync,pgbench,3,"v5 uring if=1",32,6,22531.216403,1.420,465
+final_fdatasync,pgbench,3,"v5 uring if=1",64,6,36127.045174,1.772,465
+final_fdatasync,pgbench,3,"v5 uring if=16",1,6,1161.751713,0.861,462
+final_fdatasync,pgbench,3,"v5 uring if=16",4,6,2809.572251,1.424,462
+final_fdatasync,pgbench,3,"v5 uring if=16",8,6,4270.466075,1.873,462
+final_fdatasync,pgbench,3,"v5 uring if=16",16,6,8003.775429,1.999,462
+final_fdatasync,pgbench,3,"v5 uring if=16",32,6,14238.667668,2.247,462
+final_fdatasync,pgbench,3,"v5 uring if=16",64,6,23169.715324,2.762,462
+final_fdatasync,pgbench,4,"opt if=16 batch+eager",1,6,1241.390324,0.806,463
+final_fdatasync,pgbench,4,"opt if=16 batch+eager",4,6,3299.479395,1.212,463
+final_fdatasync,pgbench,4,"opt if=16 batch+eager",8,6,6883.458225,1.162,463
+final_fdatasync,pgbench,4,"opt if=16 batch+eager",16,6,16061.784612,0.996,463
+final_fdatasync,pgbench,4,"opt if=16 batch+eager",32,6,29426.165369,1.087,463
+final_fdatasync,pgbench,4,"opt if=16 batch+eager",64,6,37634.439971,1.701,463
+final_fdatasync,pgbench,4,"opt if=16 batch+inline",1,6,1388.841424,0.720,507
+final_fdatasync,pgbench,4,"opt if=16 batch+inline",4,6,4224.451405,0.947,507
+final_fdatasync,pgbench,4,"opt if=16 batch+inline",8,6,8335.573451,0.960,507
+final_fdatasync,pgbench,4,"opt if=16 batch+inline",16,6,8832.474334,1.811,507
+final_fdatasync,pgbench,4,"opt if=16 batch+inline",32,6,26735.144299,1.197,507
+final_fdatasync,pgbench,4,"opt if=16 batch+inline",64,6,38950.041630,1.643,507
+final_fdatasync,pgbench,4,"opt if=16 batch only",1,6,1420.882217,0.704,462
+final_fdatasync,pgbench,4,"opt if=16 batch only",4,6,4143.126931,0.965,462
+final_fdatasync,pgbench,4,"opt if=16 batch only",8,6,7212.384172,1.109,462
+final_fdatasync,pgbench,4,"opt if=16 batch only",16,6,14621.716124,1.094,462
+final_fdatasync,pgbench,4,"opt if=16 batch only",32,6,27277.423408,1.173,462
+final_fdatasync,pgbench,4,"opt if=16 batch only",64,6,38329.065944,1.670,462
+final_fdatasync,pgbench,4,"stock fdatasync",1,6,1379.745877,0.725,544
+final_fdatasync,pgbench,4,"stock fdatasync",4,6,3899.931164,1.026,544
+final_fdatasync,pgbench,4,"stock fdatasync",8,6,8607.540568,0.929,544
+final_fdatasync,pgbench,4,"stock fdatasync",16,6,16796.804552,0.953,544
+final_fdatasync,pgbench,4,"stock fdatasync",32,6,31364.785670,1.020,544
+final_fdatasync,pgbench,4,"stock fdatasync",64,6,39405.572375,1.624,544
+final_fdatasync,pgbench,4,"v5 uring if=1",1,6,1360.309924,0.735,576
+final_fdatasync,pgbench,4,"v5 uring if=1",4,6,3727.555350,1.073,576
+final_fdatasync,pgbench,4,"v5 uring if=1",8,6,7951.455221,1.006,576
+final_fdatasync,pgbench,4,"v5 uring if=1",16,6,15840.575455,1.010,576
+final_fdatasync,pgbench,4,"v5 uring if=1",32,6,26994.919479,1.185,576
+final_fdatasync,pgbench,4,"v5 uring if=1",64,6,36034.769836,1.776,576
+final_fdatasync,pgbench,4,"v5 uring if=16",1,6,1423.664573,0.702,459
+final_fdatasync,pgbench,4,"v5 uring if=16",4,6,3715.930221,1.076,459
+final_fdatasync,pgbench,4,"v5 uring if=16",8,6,4980.773986,1.606,459
+final_fdatasync,pgbench,4,"v5 uring if=16",16,6,9089.220614,1.760,459
+final_fdatasync,pgbench,4,"v5 uring if=16",32,6,16030.652721,1.996,459
+final_fdatasync,pgbench,4,"v5 uring if=16",64,6,23429.588281,2.732,459
+final_fdatasync,pgbench,4,"opt if=16 full (batch+eager+inline)",1,6,1252.510272,0.798,478
+final_fdatasync,pgbench,4,"opt if=16 full (batch+eager+inline)",4,6,3392.905755,1.179,478
+final_fdatasync,pgbench,4,"opt if=16 full (batch+eager+inline)",8,6,7856.861427,1.018,478
+final_fdatasync,pgbench,4,"opt if=16 full (batch+eager+inline)",16,6,9107.086116,1.757,478
+final_fdatasync,pgbench,4,"opt if=16 full (batch+eager+inline)",32,6,8687.810086,3.683,478
+final_fdatasync,pgbench,4,"opt if=16 full (batch+eager+inline)",64,6,32501.291106,1.969,478

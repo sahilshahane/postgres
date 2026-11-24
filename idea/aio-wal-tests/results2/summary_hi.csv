@@ -1,0 +1,17 @@
+workload,config,clients,n,tps_median,tps_min,tps_max,tps_stdev,latency_median_ms,vs_baseline_pct
+pgbench,v5 uring if=1,8,6,6698,4896,7624,991,1.195,-4.7
+pgbench,v5 uring if=1,16,6,11223,2169,14652,4194,1.426,-4.4
+pgbench,v5 uring if=1,32,6,21208,16557,27059,5263,1.562,13.7
+pgbench,v5 uring if=1,64,6,28730,21960,36473,7248,2.327,12.6
+pgbench,v5 uring if=16,8,6,4444,3433,4890,581,1.8,-36.8
+pgbench,v5 uring if=16,16,6,7884,873,8228,2873,2.03,-32.9
+pgbench,v5 uring if=16,32,6,14218,13614,16127,1116,2.25,-23.8
+pgbench,v5 uring if=16,64,6,21709,20498,25246,1688,2.949,-14.9
+pgbench,opt if=16,8,6,6824,705,7976,2728,1.172,-2.9
+pgbench,opt if=16,16,6,11158,1504,15298,4642,1.434,-5.0
+pgbench,opt if=16,32,6,21990,17715,29941,5835,1.504,17.9
+pgbench,opt if=16,64,6,24828,12857,36334,8769,2.579,-2.7
+pgbench,stock fdatasync,8,6,7030,5065,8326,1133,1.138,0.0
+pgbench,stock fdatasync,16,6,11744,909,16858,5606,1.362,0.0
+pgbench,stock fdatasync,32,6,18653,18368,31956,6738,1.716,0.0
+pgbench,stock fdatasync,64,6,25512,23913,38565,6897,2.51,0.0

@@ -1,0 +1,43 @@
+workload,config,clients,n,tps_median,tps_min,tps_max,tps_stdev,latency_median_ms,vs_baseline_pct
+pgbench,v5 uring if=1,1,4,1271,1125,1377,127,0.791,-8.1
+pgbench,v5 uring if=1,4,4,3404,2856,3787,465,1.186,-13.1
+pgbench,v5 uring if=1,8,4,6771,6087,7951,790,1.183,-7.0
+pgbench,v5 uring if=1,16,4,11753,11253,15841,2140,1.361,-5.1
+pgbench,v5 uring if=1,32,4,19848,16728,26995,4870,1.642,20.3
+pgbench,v5 uring if=1,64,4,29104,21388,36127,8262,2.331,-10.4
+pgbench,v5 uring if=16,1,4,1270,1122,1424,152,0.793,-8.2
+pgbench,v5 uring if=16,4,4,3118,2666,3716,499,1.296,-20.4
+pgbench,v5 uring if=16,8,4,4514,4120,4981,404,1.777,-38.0
+pgbench,v5 uring if=16,16,4,8220,8004,9089,501,1.947,-33.6
+pgbench,v5 uring if=16,32,4,14564,14239,16031,807,2.197,-11.8
+pgbench,v5 uring if=16,64,4,22853,22398,23430,495,2.801,-29.6
+pgbench,opt if=16 full (batch+eager+inline),1,4,1309,1147,1401,115,0.765,-5.3
+pgbench,opt if=16 full (batch+eager+inline),4,4,3566,2996,3831,380,1.125,-8.9
+pgbench,opt if=16 full (batch+eager+inline),8,4,7033,6325,7857,626,1.137,-3.4
+pgbench,opt if=16 full (batch+eager+inline),16,4,11916,9107,12025,1425,1.343,-3.8
+pgbench,opt if=16 full (batch+eager+inline),32,4,15645,8688,25873,7435,2.112,-5.2
+pgbench,opt if=16 full (batch+eager+inline),64,4,28398,19402,36074,7596,2.301,-12.5
+pgbench,opt if=16 batch+eager,1,4,1310,1140,1380,116,0.766,-5.3
+pgbench,opt if=16 batch+eager,4,4,3568,2979,3844,425,1.127,-8.9
+pgbench,opt if=16 batch+eager,8,4,6965,6339,7062,339,1.148,-4.4
+pgbench,opt if=16 batch+eager,16,4,12831,11838,16062,1972,1.252,3.6
+pgbench,opt if=16 batch+eager,32,4,18335,13007,29426,6907,1.745,11.1
+pgbench,opt if=16 batch+eager,64,4,31192,24615,38564,7756,2.143,-3.9
+pgbench,opt if=16 batch+inline,1,4,1385,1154,1392,117,0.722,0.2
+pgbench,opt if=16 batch+inline,4,4,3892,3025,4224,514,1.027,-0.6
+pgbench,opt if=16 batch+inline,8,4,7114,6386,8336,809,1.125,-2.3
+pgbench,opt if=16 batch+inline,16,4,11638,8832,12170,1522,1.376,-6.0
+pgbench,opt if=16 batch+inline,32,4,22390,17272,28521,5810,1.485,35.7
+pgbench,opt if=16 batch+inline,64,4,30154,23100,38950,8230,2.216,-7.1
+pgbench,opt if=16 batch only,1,4,1379,1144,1421,126,0.726,-0.3
+pgbench,opt if=16 batch only,4,4,3768,2971,4143,494,1.062,-3.8
+pgbench,opt if=16 batch only,8,4,6892,6248,7212,406,1.161,-5.4
+pgbench,opt if=16 batch only,16,4,11598,11291,14622,1576,1.379,-6.4
+pgbench,opt if=16 batch only,32,4,17259,11102,27277,6713,1.856,4.6
+pgbench,opt if=16 batch only,64,4,30660,16993,38329,10837,2.224,-5.6
+pgbench,stock fdatasync,1,4,1383,1157,1393,115,0.724,0.0
+pgbench,stock fdatasync,4,4,3915,3030,3935,446,1.022,0.0
+pgbench,stock fdatasync,8,4,7283,6498,8608,875,1.099,0.0
+pgbench,stock fdatasync,16,4,12387,12241,16797,2232,1.292,0.0
+pgbench,stock fdatasync,32,4,16505,13113,31365,8370,1.978,0.0
+pgbench,stock fdatasync,64,4,32469,18941,40330,10536,2.066,0.0

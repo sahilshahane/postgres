@@ -1,0 +1,21 @@
+workload,config,clients,rounds,median_change_pct,min_change_pct,max_change_pct,rounds_won
+pgbench,v5 uring odsync if=16,4,6,-4.8,-5.8,-4.2,0
+pgbench,v5 uring odsync if=16,8,6,-14.7,-51.7,-10.2,0
+pgbench,v5 uring odsync if=16,16,6,-26.0,-46.4,-12.6,0
+pgbench,v5 uring odsync if=16,32,6,-20.5,-52.4,-12.5,0
+pgbench,v5 uring odsync if=16,64,6,-13.9,-37.5,-10.9,0
+pgbench,opt uring odsync if=16,4,6,-13.1,-15.9,167.2,1
+pgbench,opt uring odsync if=16,8,6,-5.6,-70.8,0.0,1
+pgbench,opt uring odsync if=16,16,6,-2.9,-14.0,-0.2,0
+pgbench,opt uring odsync if=16,32,6,-2.2,-8.2,9.8,1
+pgbench,opt uring odsync if=16,64,6,-2.6,-6.9,4.4,2
+pgbench,stock open_datasync+DIO,4,6,3.1,-2.1,96.0,3
+pgbench,stock open_datasync+DIO,8,6,-4.4,-68.0,4.4,1
+pgbench,stock open_datasync+DIO,16,6,-9.0,-29.8,8.8,2
+pgbench,stock open_datasync+DIO,32,6,-16.7,-20.5,20.0,2
+pgbench,stock open_datasync+DIO,64,6,-2.3,-26.0,98.9,2
+pgbench,opt uring odsync+DIO if=16,4,6,-0.7,-4.5,4.9,3
+pgbench,opt uring odsync+DIO if=16,8,6,-6.5,-60.8,-4.3,0
+pgbench,opt uring odsync+DIO if=16,16,6,-10.3,-32.0,3.3,2
+pgbench,opt uring odsync+DIO if=16,32,6,-17.3,-51.9,17.4,1
+pgbench,opt uring odsync+DIO if=16,64,6,1.0,-26.9,33.2,4
