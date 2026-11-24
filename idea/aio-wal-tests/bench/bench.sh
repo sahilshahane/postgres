@@ -20,6 +20,9 @@
 #   CLIENTS ("16 32 64"), SECONDS_ per run (5), ROUNDS (8), BASEPORT (58500)
 #   CANARY_MAX  before each block, wait until 200 x 8 kB O_DSYNC writes average
 #               at most this many us (700; set ~3x the device's normal value)
+#   QUIESCE     1: after each run, CHECKPOINT that server and sync, so the next
+#               run doesn't share the device with this run's leftover data
+#               writes (dirty shared buffers and page cache); default 0
 #   EXTRA_CONF  extra postgresql.conf lines (default full_page_writes = off:
 #               the post-checkpoint FPI burst is identical for all configs)
 #   KEEP=1      keep the data directories afterwards
@@ -36,7 +39,7 @@ case $WORKLOAD in
   bigpc)   PGB_ARGS="-n -f $HERE/bigpc.sql" ;;
   *) echo "WORKLOAD must be pgbench, big or bigpc" >&2; exit 1 ;;
 esac
-EXTRA_CONF=${EXTRA_CONF-"full_page_writes = off"}; RUN=${RUN:-paired}
+EXTRA_CONF=${EXTRA_CONF-"full_page_writes = off"}; RUN=${RUN:-paired}; QUIESCE=${QUIESCE:-0}
 export PGHOST=/tmp PGDATABASE=postgres
 
 mapfile -t CFG < <(grep -v '^\s*\(#\|$\)' "$CONFIGS")
@@ -101,6 +104,9 @@ for r in $(seq 1 "$ROUNDS"); do
       [ "$WORKLOAD" = big ] && PGPORT=$((BASEPORT + i)) "${p[1]}/bin/psql" -XAtqc "TRUNCATE big"
       [ "$WORKLOAD" = bigpc ] && PGPORT=$((BASEPORT + i)) "${p[1]}/bin/psql" -XAtqc "TRUNCATE bigc"
       res=$(PGPORT=$((BASEPORT + i)) "${p[1]}/bin/pgbench" $PGB_ARGS -c $c -j $j -T "$SECS" 2>&1)
+      if [ "$QUIESCE" = 1 ]; then
+        PGPORT=$((BASEPORT + i)) "${p[1]}/bin/psql" -XAtqc "CHECKPOINT" >/dev/null 2>&1; sync
+      fi
       read -r tps lat < <(echo "$res" | awk '/^tps/ {tps=$3} /^latency average/ {lat=$4} END {print tps, lat}')
       echo "$RUN,$WORKLOAD,$r,\"${p[0]}\",$c,$SECS,$tps,$lat,$cus" >> "$OUT"
       printf "r%-2s %-40s c=%-4s %9.0f tps  (canary %s us)\n" "$r" "${p[0]}" "$c" "$tps" "$cus"

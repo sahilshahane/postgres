@@ -509,3 +509,36 @@ rounds x 10 s, 0 blocks dropped.
   pipeline single full pages, large commits at high concurrency want to
   batch several commits. Next: screening of threshold / split / in-flight
   for large commits (8e), then a rule that gives both.
+
+## Phase 8e: screening of threshold / split / in-flight (`08e-screening/`)
+
+Short runs (3 rounds x 8 s, `bigpc`, 1/4/32 clients) changing one setting
+at a time from the phase-8d best (T = pipeline threshold, S = split size,
+I = `wal_io_max_inflight`), vs stock4 O_DSYNC + direct IO:
+
+| config | 1 | 4 | 32 |
+|---|---:|---:|---:|
+| T 256k, S 16k, I 8 (reference) | +50.2% [3/3] | +20.0% [3/3] | -27.4% [1/3] |
+| T 64k, S 16k, I 8 | +52.6% [3/3] | +23.0% [3/3] | +4.0% [3/3] |
+| T 512k, S 16k, I 8 | +50.0% [3/3] | +16.4% [3/3] | -21.5% [1/3] |
+| T 1M, S 16k, I 8 | +47.0% [3/3] | +22.7% [3/3] | -1.8% [0/3] |
+| T 256k, S 32k, I 8 | +39.3% [3/3] | +22.8% [2/3] | -27.9% [1/3] |
+| T 256k, S 16k, I 4 | +40.3% [3/3] | +11.0% [3/3] | +0.3% [2/3] |
+| T 256k, S 16k, I 16 | +50.6% [3/3] | +39.3% [2/3] | -26.3% [1/3] |
+
+- 1 client: split 16 kB with 8-16 in flight is best (+50-53%); fewer
+  chunks (S 32k, or I 4) give ~+40%.
+- **The 32-client column is a harness artifact, not a config effect.** In
+  run order the TPS alternates between ~520 and ~720 in every round,
+  whatever the config (round 1: 696 541 699 514 732 517 726 521; rounds 2
+  and 3 the same pattern). So the result depends on the position in the
+  sequence. The reference config was +20.7% in 8d and is -27.4% here.
+- **Cause (likely):** all servers share the volume, and a heavy run leaves
+  hundreds of MB of dirty data behind (each server still had 36,000-62,000
+  dirty buffers, 300-500 MB, at shutdown; data files also go through the
+  page cache), which is written out during the *next* server's run. The
+  kernel flushes once enough has piled up, which gives every-other-run.
+  This likely explains much of the 16-32 client noise in all phases.
+- **Harness fix:** `bench.sh` option `QUIESCE=1`: after each run,
+  `CHECKPOINT` that server and `sync`, so the next run starts on a quiet
+  device. Phase 8f reruns this screening with it.
