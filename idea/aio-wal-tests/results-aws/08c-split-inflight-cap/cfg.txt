@@ -1,0 +1,6 @@
+# phase 8c: change 3, cap total writes in flight via wal_io_max_inflight (no code change)
+stock4 odsync+DIO|/home/ubuntu/pgaio/inst/stock4|wal_sync_method = open_datasync|debug_io_direct = wal
+aio4 split=32kB if=16|/home/ubuntu/pgaio/inst/aio4|wal_io_method = aio|io_method = io_uring|wal_sync_method = open_datasync|debug_io_direct = wal|wal_io_pipeline_threshold = 4kB|wal_io_page_align = on|wal_io_max_inflight = 16|wal_io_split_size = 32kB
+aio4 split=32kB if=8|/home/ubuntu/pgaio/inst/aio4|wal_io_method = aio|io_method = io_uring|wal_sync_method = open_datasync|debug_io_direct = wal|wal_io_pipeline_threshold = 4kB|wal_io_page_align = on|wal_io_max_inflight = 8|wal_io_split_size = 32kB
+aio4 split=32kB if=4|/home/ubuntu/pgaio/inst/aio4|wal_io_method = aio|io_method = io_uring|wal_sync_method = open_datasync|debug_io_direct = wal|wal_io_pipeline_threshold = 4kB|wal_io_page_align = on|wal_io_max_inflight = 4|wal_io_split_size = 32kB
+aio4 split=16kB if=8|/home/ubuntu/pgaio/inst/aio4|wal_io_method = aio|io_method = io_uring|wal_sync_method = open_datasync|debug_io_direct = wal|wal_io_pipeline_threshold = 4kB|wal_io_page_align = on|wal_io_max_inflight = 8|wal_io_split_size = 16kB

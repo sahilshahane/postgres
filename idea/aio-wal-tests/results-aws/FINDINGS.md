@@ -437,3 +437,37 @@ TPS at 1 client: stock 317 -> **500** (split 16 kB); commit latency
 **Next (change 3b):** split only while nothing else is in flight, i.e.
 when the device would otherwise serve this one write alone. That should
 keep the 1-4 client gain and leave 16-32 clients as without splitting.
+
+## Phase 8c: capping writes in flight with split writes (`08c-split-inflight-cap/`)
+
+No code change: the split uses at most the free slots of
+`wal_io_max_inflight`, so lowering it caps the total IOs in flight. Same
+workload and settings as 8b (`bigpc`, 4 kB builds, direct IO, threshold
+4kB, page align), 6 paired rounds x 10 s, 0 of 24 blocks dropped.
+
+| vs stock4 O_DSYNC + direct IO | 1 | 4 | 16 | 32 |
+|---|---:|---:|---:|---:|
+| split 32 kB, inflight 16 | +41.0% [6/6] | +23.1% [4] | -4.2% [2] | -7.1% [3] |
+| split 32 kB, inflight 8 | +41.1% [6/6] | +13.5% [4] | -1.0% [2] | +10.2% [3] |
+| split 32 kB, inflight 4 | +36.8% [6/6] | +19.8% [4] | -6.0% [2] | -10.2% [2] |
+| **split 16 kB, inflight 8** | **+52.2% [6/6]** | +11.7% [4] | -0.8% [2] | +4.7% [3] |
+
+TPS at 1 client: stock 325 -> 485 (split 16 kB, inflight 8), commit latency
+3.08 ms -> 2.06 ms.
+
+- **1 client is solid: +37% to +52%, every config won all 6 rounds, in
+  both 8b and 8c.** Splitting a large commit's write is a real gain.
+- **4 clients: +12% to +23%, 4 of 6 rounds** (8b: +45-49%, 5 of 6). A gain,
+  but smaller than 8b suggested; the 4-client numbers swing a lot between
+  rounds (stock 493-684 TPS across both runs).
+- **16-32 clients: no consistent effect.** Every cell is within +-10% and
+  won in only 2-3 of 6 rounds; the 32 kB/inflight-16 config went from
+  -2.2% (8b) to -7.1% here. The in-flight cap doesn't show a clear trend,
+  so the 8b loss at 32 clients can't be attributed to it; at this
+  concurrency the volume's own variation (stock at 32: 547-1,001 TPS)
+  is larger than any effect.
+- **Recommended for large commits:** `wal_io_split_size = 16kB`,
+  `wal_io_max_inflight = 8` (best 1-client result, neutral within noise at
+  16-32). Change 3b (split only when nothing else is in flight) is not
+  worth testing on this volume: at 16-32 clients it couldn't be told
+  apart from noise.

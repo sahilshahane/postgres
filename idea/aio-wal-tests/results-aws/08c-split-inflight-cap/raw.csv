@@ -1,0 +1,121 @@
+run,workload,round,config,clients,seconds,tps,latency_avg_ms,canary_us
+paired,bigpc,1,"aio4 split=32kB if=16",1,10,452.372561,2.211,1946
+paired,bigpc,1,"aio4 split=32kB if=8",1,10,437.134053,2.288,1946
+paired,bigpc,1,"aio4 split=32kB if=4",1,10,401.883563,2.488,1946
+paired,bigpc,1,"aio4 split=16kB if=8",1,10,473.668445,2.111,1946
+paired,bigpc,1,"stock4 odsync+DIO",1,10,311.848025,3.207,1946
+paired,bigpc,1,"aio4 split=32kB if=16",4,10,613.229663,6.523,1018
+paired,bigpc,1,"aio4 split=32kB if=8",4,10,597.487772,6.695,1018
+paired,bigpc,1,"aio4 split=32kB if=4",4,10,640.022010,6.250,1018
+paired,bigpc,1,"aio4 split=16kB if=8",4,10,496.491414,8.057,1018
+paired,bigpc,1,"stock4 odsync+DIO",4,10,652.573205,6.130,1018
+paired,bigpc,1,"aio4 split=32kB if=16",16,10,598.586115,26.730,1025
+paired,bigpc,1,"aio4 split=32kB if=8",16,10,729.856111,21.922,1025
+paired,bigpc,1,"aio4 split=32kB if=4",16,10,573.974901,27.876,1025
+paired,bigpc,1,"aio4 split=16kB if=8",16,10,664.251376,24.087,1025
+paired,bigpc,1,"stock4 odsync+DIO",16,10,647.429402,24.713,1025
+paired,bigpc,1,"aio4 split=32kB if=16",32,10,622.716618,51.388,994
+paired,bigpc,1,"aio4 split=32kB if=8",32,10,717.898908,44.575,994
+paired,bigpc,1,"aio4 split=32kB if=4",32,10,571.065038,56.036,994
+paired,bigpc,1,"aio4 split=16kB if=8",32,10,737.955445,43.363,994
+paired,bigpc,1,"stock4 odsync+DIO",32,10,547.424599,58.456,994
+paired,bigpc,2,"aio4 split=32kB if=8",1,10,439.899736,2.273,4683
+paired,bigpc,2,"aio4 split=32kB if=4",1,10,450.031007,2.222,4683
+paired,bigpc,2,"aio4 split=16kB if=8",1,10,477.899713,2.092,4683
+paired,bigpc,2,"stock4 odsync+DIO",1,10,311.312359,3.212,4683
+paired,bigpc,2,"aio4 split=32kB if=16",1,10,439.726283,2.274,4683
+paired,bigpc,2,"aio4 split=32kB if=8",4,10,593.088095,6.744,1104
+paired,bigpc,2,"aio4 split=32kB if=4",4,10,623.989299,6.410,1104
+paired,bigpc,2,"aio4 split=16kB if=8",4,10,518.081608,7.721,1104
+paired,bigpc,2,"stock4 odsync+DIO",4,10,647.731276,6.175,1104
+paired,bigpc,2,"aio4 split=32kB if=16",4,10,519.677953,7.697,1104
+paired,bigpc,2,"aio4 split=32kB if=8",16,10,802.062292,19.949,992
+paired,bigpc,2,"aio4 split=32kB if=4",16,10,610.151687,26.223,992
+paired,bigpc,2,"aio4 split=16kB if=8",16,10,577.775368,27.692,992
+paired,bigpc,2,"stock4 odsync+DIO",16,10,717.900194,22.287,992
+paired,bigpc,2,"aio4 split=32kB if=16",16,10,534.158648,29.954,992
+paired,bigpc,2,"aio4 split=32kB if=8",32,10,764.874798,41.837,4990
+paired,bigpc,2,"aio4 split=32kB if=4",32,10,694.924881,46.048,4990
+paired,bigpc,2,"aio4 split=16kB if=8",32,10,525.797108,60.860,4990
+paired,bigpc,2,"stock4 odsync+DIO",32,10,787.768510,40.621,4990
+paired,bigpc,2,"aio4 split=32kB if=16",32,10,580.899238,55.087,4990
+paired,bigpc,3,"aio4 split=32kB if=4",1,10,425.840212,2.348,973
+paired,bigpc,3,"aio4 split=16kB if=8",1,10,462.564990,2.162,973
+paired,bigpc,3,"stock4 odsync+DIO",1,10,322.511159,3.101,973
+paired,bigpc,3,"aio4 split=32kB if=16",1,10,439.131398,2.277,973
+paired,bigpc,3,"aio4 split=32kB if=8",1,10,471.875547,2.119,973
+paired,bigpc,3,"aio4 split=32kB if=4",4,10,818.526911,4.887,971
+paired,bigpc,3,"aio4 split=16kB if=8",4,10,703.590502,5.685,971
+paired,bigpc,3,"stock4 odsync+DIO",4,10,683.640854,5.851,971
+paired,bigpc,3,"aio4 split=32kB if=16",4,10,950.474698,4.208,971
+paired,bigpc,3,"aio4 split=32kB if=8",4,10,882.969762,4.530,971
+paired,bigpc,3,"aio4 split=32kB if=4",16,10,886.654988,18.045,972
+paired,bigpc,3,"aio4 split=16kB if=8",16,10,952.650635,16.795,972
+paired,bigpc,3,"stock4 odsync+DIO",16,10,952.948005,16.790,972
+paired,bigpc,3,"aio4 split=32kB if=16",16,10,963.475195,16.607,972
+paired,bigpc,3,"aio4 split=32kB if=8",16,10,937.577975,17.065,972
+paired,bigpc,3,"aio4 split=32kB if=4",32,10,1105.263310,28.952,4873
+paired,bigpc,3,"aio4 split=16kB if=8",32,10,1035.192142,30.912,4873
+paired,bigpc,3,"stock4 odsync+DIO",32,10,889.100112,35.991,4873
+paired,bigpc,3,"aio4 split=32kB if=16",32,10,996.920142,32.099,4873
+paired,bigpc,3,"aio4 split=32kB if=8",32,10,613.452415,52.164,4873
+paired,bigpc,4,"aio4 split=16kB if=8",1,10,491.169451,2.036,4220
+paired,bigpc,4,"stock4 odsync+DIO",1,10,344.957401,2.899,4220
+paired,bigpc,4,"aio4 split=32kB if=16",1,10,485.399078,2.060,4220
+paired,bigpc,4,"aio4 split=32kB if=8",1,10,480.165495,2.083,4220
+paired,bigpc,4,"aio4 split=32kB if=4",1,10,462.374304,2.163,4220
+paired,bigpc,4,"aio4 split=16kB if=8",4,10,808.795249,4.946,970
+paired,bigpc,4,"stock4 odsync+DIO",4,10,671.724095,5.955,970
+paired,bigpc,4,"aio4 split=32kB if=16",4,10,876.758015,4.562,970
+paired,bigpc,4,"aio4 split=32kB if=8",4,10,799.166035,5.005,970
+paired,bigpc,4,"aio4 split=32kB if=4",4,10,825.758795,4.844,970
+paired,bigpc,4,"aio4 split=16kB if=8",16,10,948.110176,16.876,990
+paired,bigpc,4,"stock4 odsync+DIO",16,10,962.793139,16.618,990
+paired,bigpc,4,"aio4 split=32kB if=16",16,10,955.476814,16.746,990
+paired,bigpc,4,"aio4 split=32kB if=8",16,10,940.628724,17.010,990
+paired,bigpc,4,"aio4 split=32kB if=4",16,10,981.151943,16.307,990
+paired,bigpc,4,"aio4 split=16kB if=8",32,10,930.726342,34.382,1316
+paired,bigpc,4,"stock4 odsync+DIO",32,10,1001.266930,31.960,1316
+paired,bigpc,4,"aio4 split=32kB if=16",32,10,708.358592,45.175,1316
+paired,bigpc,4,"aio4 split=32kB if=8",32,10,708.330820,45.177,1316
+paired,bigpc,4,"aio4 split=32kB if=4",32,10,914.941634,34.975,1316
+paired,bigpc,5,"stock4 odsync+DIO",1,10,343.351571,2.912,954
+paired,bigpc,5,"aio4 split=32kB if=16",1,10,492.638377,2.030,954
+paired,bigpc,5,"aio4 split=32kB if=8",1,10,483.560445,2.068,954
+paired,bigpc,5,"aio4 split=32kB if=4",1,10,478.910440,2.088,954
+paired,bigpc,5,"aio4 split=16kB if=8",1,10,523.397174,1.911,954
+paired,bigpc,5,"stock4 odsync+DIO",4,10,644.171745,6.210,956
+paired,bigpc,5,"aio4 split=32kB if=16",4,10,834.774372,4.792,956
+paired,bigpc,5,"aio4 split=32kB if=8",4,10,695.779427,5.749,956
+paired,bigpc,5,"aio4 split=32kB if=4",4,10,975.410185,4.101,956
+paired,bigpc,5,"aio4 split=16kB if=8",4,10,890.904479,4.490,956
+paired,bigpc,5,"stock4 odsync+DIO",16,10,971.993083,16.461,5564
+paired,bigpc,5,"aio4 split=32kB if=16",16,10,988.226117,16.191,5564
+paired,bigpc,5,"aio4 split=32kB if=8",16,10,967.462325,16.538,5564
+paired,bigpc,5,"aio4 split=32kB if=4",16,10,923.181318,17.331,5564
+paired,bigpc,5,"aio4 split=16kB if=8",16,10,1008.063206,15.872,5564
+paired,bigpc,5,"stock4 odsync+DIO",32,10,991.618458,32.270,969
+paired,bigpc,5,"aio4 split=32kB if=16",32,10,562.599234,56.879,969
+paired,bigpc,5,"aio4 split=32kB if=8",32,10,1222.886666,26.168,969
+paired,bigpc,5,"aio4 split=32kB if=4",32,10,697.189074,45.899,969
+paired,bigpc,5,"aio4 split=16kB if=8",32,10,629.258085,50.854,969
+paired,bigpc,6,"aio4 split=32kB if=16",1,10,406.154303,2.462,1397
+paired,bigpc,6,"aio4 split=32kB if=8",1,10,490.471903,2.039,1397
+paired,bigpc,6,"aio4 split=32kB if=4",1,10,479.728400,2.085,1397
+paired,bigpc,6,"aio4 split=16kB if=8",1,10,518.561035,1.928,1397
+paired,bigpc,6,"stock4 odsync+DIO",1,10,327.925381,3.049,1397
+paired,bigpc,6,"aio4 split=32kB if=16",4,10,770.756144,5.190,1017
+paired,bigpc,6,"aio4 split=32kB if=8",4,10,891.815339,4.485,1017
+paired,bigpc,6,"aio4 split=32kB if=4",4,10,791.951034,5.051,1017
+paired,bigpc,6,"aio4 split=16kB if=8",4,10,845.570236,4.731,1017
+paired,bigpc,6,"stock4 odsync+DIO",4,10,660.501123,6.056,1017
+paired,bigpc,6,"aio4 split=32kB if=16",16,10,903.576518,17.707,1026
+paired,bigpc,6,"aio4 split=32kB if=8",16,10,693.778580,23.062,1026
+paired,bigpc,6,"aio4 split=32kB if=4",16,10,1062.907978,15.053,1026
+paired,bigpc,6,"aio4 split=16kB if=8",16,10,926.199195,17.275,1026
+paired,bigpc,6,"stock4 odsync+DIO",16,10,1061.676097,15.071,1026
+paired,bigpc,6,"aio4 split=32kB if=16",32,10,1064.937578,30.049,1439
+paired,bigpc,6,"aio4 split=32kB if=8",32,10,1032.453117,30.994,1439
+paired,bigpc,6,"aio4 split=32kB if=4",32,10,579.932170,55.179,1439
+paired,bigpc,6,"aio4 split=16kB if=8",32,10,1042.434244,30.697,1439
+paired,bigpc,6,"stock4 odsync+DIO",32,10,815.739011,39.228,1439

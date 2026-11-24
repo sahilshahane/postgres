@@ -1,0 +1,21 @@
+workload,config,clients,rounds,tps_median,tps_min,tps_max,latency_median_ms
+bigpc,aio4 split=32kB if=16,1,6,446,406,493,2.242
+bigpc,aio4 split=32kB if=16,4,6,803,520,950,4.991
+bigpc,aio4 split=32kB if=16,16,6,930,534,988,17.227
+bigpc,aio4 split=32kB if=16,32,6,666,563,1065,48.281
+bigpc,aio4 split=32kB if=8,1,6,476,437,490,2.101
+bigpc,aio4 split=32kB if=8,4,6,747,593,892,5.377
+bigpc,aio4 split=32kB if=8,16,6,870,694,967,18.507
+bigpc,aio4 split=32kB if=8,32,6,741,613,1223,43.206
+bigpc,aio4 split=32kB if=4,1,6,456,402,480,2.192
+bigpc,aio4 split=32kB if=4,4,6,805,624,975,4.969
+bigpc,aio4 split=32kB if=4,16,6,905,574,1063,17.688
+bigpc,aio4 split=32kB if=4,32,6,696,571,1105,45.974
+bigpc,aio4 split=16kB if=8,1,6,485,463,523,2.064
+bigpc,aio4 split=16kB if=8,4,6,756,496,891,5.316
+bigpc,aio4 split=16kB if=8,16,6,937,578,1008,17.075
+bigpc,aio4 split=16kB if=8,32,6,834,526,1042,38.873
+bigpc,stock4 odsync+DIO,1,6,325,311,345,3.075
+bigpc,stock4 odsync+DIO,4,6,657,644,684,6.093
+bigpc,stock4 odsync+DIO,16,6,958,647,1062,16.704
+bigpc,stock4 odsync+DIO,32,6,852,547,1001,37.609
