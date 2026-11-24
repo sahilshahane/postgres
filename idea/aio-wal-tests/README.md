@@ -79,64 +79,54 @@ per-crash lines of the latest run of each test that was still on disk.
 - `wait_events.csv`: `pg_stat_activity` wait-event samples (every 50 ms)
   during large-transaction runs, used to find bottlenecks.
 
-## Scripts (`scripts/`)
+## Test suite (`tests/`): correctness of the current code
 
-Build PostgreSQL from this tree with `-Dliburing=enabled` (for `io_uring`).
-Use a build with `-Dcassert=true` for the correctness tests and one with
-`-Dcassert=false --buildtype=release` for benchmarks. `INSTALLDIR` below is
-the install prefix.
-
-**Throughput** (`bench.sh`): appends rows to a CSV with the same columns as
-`throughput.csv`:
+Build with `-Dliburing=enabled`. Use `-Dcassert=true` (assertions) for these
+tests; a release build is also worth running, since races depend on timing.
+`run_all.py` runs every test for every configuration in `tests/modes.txt` and
+appends one CSV row per (mode, test):
 
 ```sh
-RUN=nvme_rerun CODE_VERSION=v4 STORAGE="local NVMe" \
-  scripts/bench.sh INSTALLDIR /tmp/benchdata my_results.csv
-WORKLOAD=big CLIENTS="1 8 32" scripts/bench.sh INSTALLDIR /tmp/benchdata my_results.csv
+tests/run_all.py --inst INSTALLDIR --build BUILDDIR --work /tmp/aiotest \
+                 --out results3/correctness.csv --label "laptop ext4 cassert"
+tests/run_all.py ... --tests crash,repl --modes uring-ods-if16,worker-fds-if16
 ```
 
-Settings via environment: `WORKLOAD`, `CLIENTS`, `SECONDS_`, `REPS`, `PORT`,
-`CONFIGS` (a file with lines like
-`label|wal_io_method = aio|io_method = io_uring|wal_io_max_inflight = 4`), and
-the CSV labels `RUN`, `CODE_VERSION`, `STORAGE`, `LATENCY_MS`, `WRITE_CACHE`.
+| test | what it checks |
+|---|---|
+| `regress` (`regress.py`) | PostgreSQL's regression and isolation suites (meson `running` setup) against a server writing WAL with AIO. Also run once with `wal_io_method = sync` (mode `stock`) as the baseline, so environment failures can't be mistaken for AIO failures. |
+| `crash` (`crash.py`) | 16 clients commit small, large (40 rows), async and two-phase transactions; the server is crashed at a random moment, alternately SIGKILL of every process and of the postmaster only (children must exit on their own, with IO possibly in flight). After each recovery: every acknowledged commit present in full, `amcheck` (B-tree + heap) clean. Logs must have no PANIC or assertion failure. |
+| `chaos` (`crash.py --chaos`) | The crash test while a thread reloads random values of `wal_io_max_inflight`, `wal_io_pipeline_threshold`, `wal_io_eager_issue`, `wal_io_inline_fsync` and `wal_sync_method` every 50-300 ms (changing `wal_sync_method` closes and reopens the WAL segment while IO may be in flight). |
+| `repl` (`repl.py`) | Streaming standby + archiving. The primary is crashed under chaos load; the standby must never have received WAL beyond what the primary recovered (the walsender may only send WAL that is durable), must reconnect and end up with identical contents. The archive must have no gaps and `pg_waldump` must parse all of it. Then the standby is promoted (AIO WAL on a new timeline), crashed and recovered (acknowledged commits, amcheck). Finally single-user mode (where AIO is not used) with `wal_io_method = aio`. |
+| power cut | `POWERCUT=1` turns `crash`/`chaos` into power-loss tests: the data directory must be on the `dev.sh` device (file -> loop -> dm-delay -> dm-flakey -> ext4), which drops every write from the cut on; the page cache is lost. Needs root (`sudo -v` first): `sudo -E tests/dev.sh setup 0 0`, then `POWERCUT=1 PGDATA_DIR=/tmp/pg-aio-testdisk/mnt/data tests/run_all.py ... --tests crash,chaos`. |
 
-**Emulated slow disk** (`dev.sh`, needs root; only uses an image file under
-`$TESTDISK_DIR`, default `/tmp/pg-aio-testdisk`):
+Modes (`tests/modes.txt`) cover both durability schemes (fsync: `fdatasync`,
+`fsync`; O_DSYNC: `open_datasync`, `open_sync`), buffered and direct IO,
+`io_method` `io_uring` / `worker` / `sync`, `wal_io_max_inflight` 1 and 16,
+pipelining (`wal_io_pipeline_threshold = 0`) and the eager-issue / inline
+switches. Each test can also be run on its own; see the usage line at the
+top of each script.
+
+## Benchmarks (`bench/`)
+
+| file | purpose |
+|---|---|
+| `bench.sh` | Paired throughput benchmark: every config's server runs at the same time; pgbench alternates between them (5 s runs, order rotated each round), so changes in the device's speed hit all configs alike. Device canary gate before every block. `WORKLOAD=pgbench` (`pgbench -N`) or `big` (`big.sql`). |
+| `analyze.py` | Each config vs the stock config of the same durability mode: per-round TPS ratio, median over rounds, min/max, rounds won; drops blocks where the device collapsed. Writes `paired.csv` and `tps.csv`. |
+| `make_golden.sh` | The pgbench scale-20 cluster that `bench.sh` reflink-copies (no setup writes). |
+| `cfg_default.txt` | Stock vs AIO in both durability modes. |
+| `azure/` | Same benchmark on an Azure VM with a network disk: `pack.sh` (laptop) -> `vm_setup.sh` (VM) -> `run_azure.sh`. |
 
 ```sh
-sudo -E scripts/dev.sh setup 4 4          # 4 ms per read/write/flush
-sudo -E scripts/dev.sh writethrough       # cloud-disk model
-LATENCY_MS=4 WRITE_CACHE="write through" STORAGE="dm-delay 4ms" \
-  scripts/bench.sh INSTALLDIR /tmp/pg-aio-testdisk/mnt/data my_results.csv
-sudo -E scripts/dev.sh teardown
+bench/make_golden.sh STOCK_INST /mnt/xfs/golden-s20
+sed "s|INST|$HOME/pgaio/inst|" bench/cfg_default.txt > /tmp/cfg.txt
+CLIENTS="1 4 16 64" ROUNDS=6 bench/bench.sh /tmp/cfg.txt raw.csv
+bench/analyze.py /tmp/cfg.txt raw.csv
 ```
 
-**Crash test** (`crash_test.py`): 16 clients commit transactions; the server
-is killed and recovered `ITERATIONS` times; fails if any acknowledged commit
-is missing.
+`tests/dev.sh` also provides the emulated slow disk for benchmarks
+(`sudo -E tests/dev.sh setup 4 4; sudo -E tests/dev.sh writethrough`).
 
-```sh
-scripts/crash_test.py INSTALLDIR /tmp/crashwork io_uring 6 58101
-scripts/crash_test.py INSTALLDIR /tmp/crashwork io_uring 6 58101 "debug_io_direct = wal"
-```
-
-**Power-loss test**: the same script with `POWERCUT=1`, data directory on the
-emulated disk:
-
-```sh
-sudo -E scripts/dev.sh setup 0 0
-sudo -v
-POWERCUT=1 PGDATA_DIR=/tmp/pg-aio-testdisk/mnt/data \
-  scripts/crash_test.py INSTALLDIR /tmp/pcwork worker 6 58401
-```
-
-**Archive / pg_waldump check** (`steady_test.sh`):
-
-```sh
-scripts/steady_test.sh INSTALLDIR /tmp/steady io_uring 58201
-EXTRA_CONF='debug_io_direct = wal' scripts/steady_test.sh INSTALLDIR /tmp/steady io_uring 58201
-```
-
-The crash and steady tests print summary lines rather than CSV. To add a new
-run to `crash_tests.csv` or `steady_archive.csv`, copy its numbers into the
-`CRASH` / `STEADY` lists in `results/build_csv.py` and rerun that script.
+`results/` and `results2/` hold earlier campaigns; the scripts that produced
+them (bench.sh v1, bench2.sh, crash_test.py, steady_test.sh, paired2.py, ...)
+were replaced by the ones above.

@@ -7,15 +7,33 @@
 # alike.  Output has the same columns as bench2.sh (round = repetition), so
 # summarize2.py and paired2.py read it.
 #
-# usage: bench3.sh CONFIGS OUT_RAW.csv
-# Environment: GOLDEN, WORKDIR (/mnt/xfs/b3), CLIENTS ("16 32 64"),
-#   SECONDS_ (5), ROUNDS (8), CANARY_MAX (700), EXTRA_CONF, RUN, BASEPORT (58500)
+# Summarize/compare with analyze.py.
+#
+# usage: bench.sh CONFIGS OUT_RAW.csv
+# CONFIGS: one config per line, "label|INSTALLDIR|guc = val|..." (see cfg_*.txt)
+# Environment:
+#   GOLDEN      data directory from make_golden.sh, reflink-copied per config
+#   WORKDIR     per-config data directories, same filesystem as GOLDEN (/mnt/xfs/b3)
+#   WORKLOAD    pgbench (pgbench -N, ~0.5 kB WAL per commit) |
+#               big (big.sql, 500-row insert, ~150 kB WAL per commit)
+#   CLIENTS ("16 32 64"), SECONDS_ per run (5), ROUNDS (8), BASEPORT (58500)
+#   CANARY_MAX  before each block, wait until 200 x 8 kB O_DSYNC writes average
+#               at most this many us (700; set ~3x the device's normal value)
+#   EXTRA_CONF  extra postgresql.conf lines (default full_page_writes = off:
+#               the post-checkpoint FPI burst is identical for all configs)
+#   KEEP=1      keep the data directories afterwards
 set -e
 CONFIGS=$1; OUT=$2
 [ -n "$OUT" ] || { echo "usage: $0 CONFIGS OUT_RAW.csv" >&2; exit 1; }
 GOLDEN=${GOLDEN:-/mnt/xfs/golden-s20}; WORKDIR=${WORKDIR:-/mnt/xfs/b3}
 CLIENTS=${CLIENTS:-"16 32 64"}; SECS=${SECONDS_:-5}; ROUNDS=${ROUNDS:-8}
 CANARY_MAX=${CANARY_MAX:-700}; BASEPORT=${BASEPORT:-58500}
+WORKLOAD=${WORKLOAD:-pgbench}; HERE=$(cd "$(dirname "$0")" && pwd)
+case $WORKLOAD in
+  pgbench) PGB_ARGS="-N" ;;
+  big)     PGB_ARGS="-n -f $HERE/big.sql" ;;
+  *) echo "WORKLOAD must be pgbench or big" >&2; exit 1 ;;
+esac
 EXTRA_CONF=${EXTRA_CONF-"full_page_writes = off"}; RUN=${RUN:-paired}
 export PGHOST=/tmp PGDATABASE=postgres
 
@@ -64,7 +82,7 @@ for i in $(seq 0 $((N-1))); do
   IFS='|' read -ra p <<< "${CFG[$i]}"
   "${p[1]}/bin/pg_ctl" -D "$WORKDIR/d$i" -l "$WORKDIR/d$i.log" -w start >/dev/null
   PGPORT=$((BASEPORT + i)) "${p[1]}/bin/psql" -XAtqc CHECKPOINT
-  PGPORT=$((BASEPORT + i)) "${p[1]}/bin/pgbench" -N -c 8 -j 8 -T 3 >/dev/null 2>&1
+  PGPORT=$((BASEPORT + i)) "${p[1]}/bin/pgbench" $PGB_ARGS -c 8 -j 8 -T 3 >/dev/null 2>&1
 done
 
 [ -f "$OUT" ] || echo "run,workload,round,config,clients,seconds,tps,latency_avg_ms,canary_us" > "$OUT"
@@ -78,9 +96,10 @@ for r in $(seq 1 "$ROUNDS"); do
     for k in $(seq 0 $((N-1))); do
       i=$(( (k + r) % N ))
       IFS='|' read -ra p <<< "${CFG[$i]}"
-      res=$(PGPORT=$((BASEPORT + i)) "${p[1]}/bin/pgbench" -N -c $c -j $j -T "$SECS" 2>&1)
+      [ "$WORKLOAD" = big ] && PGPORT=$((BASEPORT + i)) "${p[1]}/bin/psql" -XAtqc "TRUNCATE big"
+      res=$(PGPORT=$((BASEPORT + i)) "${p[1]}/bin/pgbench" $PGB_ARGS -c $c -j $j -T "$SECS" 2>&1)
       read -r tps lat < <(echo "$res" | awk '/^tps/ {tps=$3} /^latency average/ {lat=$4} END {print tps, lat}')
-      echo "$RUN,pgbench,$r,\"${p[0]}\",$c,$SECS,$tps,$lat,$cus" >> "$OUT"
+      echo "$RUN,$WORKLOAD,$r,\"${p[0]}\",$c,$SECS,$tps,$lat,$cus" >> "$OUT"
       printf "r%-2s %-40s c=%-4s %9.0f tps  (canary %s us)\n" "$r" "${p[0]}" "$c" "$tps" "$cus"
     done
   done

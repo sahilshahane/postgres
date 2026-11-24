@@ -1,0 +1,4 @@
+date,label,mode,test,status,seconds,detail,settings
+2026-11-24T15:54:34,laptop ext4 debug+cassert,stock,regress,pass,44,test=regress suites_ok=2 suites_failed=0 suites_timeout=0 subtests_passed=373 subtests_failed=0 status=pass,
+2026-11-24T15:55:18,laptop ext4 debug+cassert,uring-fds-default,regress,pass,44,test=regress suites_ok=2 suites_failed=0 suites_timeout=0 subtests_passed=373 subtests_failed=0 status=pass,io_method = io_uring; wal_sync_method = fdatasync
+2026-11-24T15:55:35,laptop ext4 debug+cassert,uring-fds-default,crash,pass,16,test=crash crashes=8 acked=3362 lost=0 reloads=0 status=pass,io_method = io_uring; wal_sync_method = fdatasync
