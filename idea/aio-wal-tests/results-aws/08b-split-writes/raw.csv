@@ -1,0 +1,145 @@
+run,workload,round,config,clients,seconds,tps,latency_avg_ms,canary_us
+paired,bigpc,1,"aio4 odsDIO thr=4kB align",1,10,312.858796,3.196,1916
+paired,bigpc,1,"aio4 odsDIO align split=16kB",1,10,428.758826,2.332,1916
+paired,bigpc,1,"aio4 odsDIO align split=32kB",1,10,432.317984,2.313,1916
+paired,bigpc,1,"stock4 fdatasync",1,10,285.334868,3.505,1916
+paired,bigpc,1,"aio4 fds thr=0",1,10,302.852810,3.302,1916
+paired,bigpc,1,"stock4 odsync+DIO",1,10,307.811204,3.249,1916
+paired,bigpc,1,"aio4 odsDIO thr=4kB align",4,10,581.669310,6.877,993
+paired,bigpc,1,"aio4 odsDIO align split=16kB",4,10,529.583795,7.553,993
+paired,bigpc,1,"aio4 odsDIO align split=32kB",4,10,791.198813,5.056,993
+paired,bigpc,1,"stock4 fdatasync",4,10,529.179139,7.559,993
+paired,bigpc,1,"aio4 fds thr=0",4,10,480.954127,8.317,993
+paired,bigpc,1,"stock4 odsync+DIO",4,10,493.010591,8.113,993
+paired,bigpc,1,"aio4 odsDIO thr=4kB align",16,10,823.000915,19.441,989
+paired,bigpc,1,"aio4 odsDIO align split=16kB",16,10,588.700484,27.179,989
+paired,bigpc,1,"aio4 odsDIO align split=32kB",16,10,607.426612,26.341,989
+paired,bigpc,1,"stock4 fdatasync",16,10,683.771646,23.400,989
+paired,bigpc,1,"aio4 fds thr=0",16,10,484.183811,33.045,989
+paired,bigpc,1,"stock4 odsync+DIO",16,10,809.965828,19.754,989
+paired,bigpc,1,"aio4 odsDIO thr=4kB align",32,10,615.083918,52.025,950
+paired,bigpc,1,"aio4 odsDIO align split=16kB",32,10,650.903506,49.162,950
+paired,bigpc,1,"aio4 odsDIO align split=32kB",32,10,663.739061,48.212,950
+paired,bigpc,1,"stock4 fdatasync",32,10,568.042250,56.334,950
+paired,bigpc,1,"aio4 fds thr=0",32,10,740.410563,43.219,950
+paired,bigpc,1,"stock4 odsync+DIO",32,10,541.703320,59.073,950
+paired,bigpc,2,"aio4 odsDIO align split=16kB",1,10,487.355412,2.052,4894
+paired,bigpc,2,"aio4 odsDIO align split=32kB",1,10,444.849499,2.248,4894
+paired,bigpc,2,"stock4 fdatasync",1,10,322.033975,3.105,4894
+paired,bigpc,2,"aio4 fds thr=0",1,10,295.130516,3.388,4894
+paired,bigpc,2,"stock4 odsync+DIO",1,10,312.792524,3.197,4894
+paired,bigpc,2,"aio4 odsDIO thr=4kB align",1,10,309.528786,3.231,4894
+paired,bigpc,2,"aio4 odsDIO align split=16kB",4,10,599.773430,6.669,998
+paired,bigpc,2,"aio4 odsDIO align split=32kB",4,10,583.184879,6.859,998
+paired,bigpc,2,"stock4 fdatasync",4,10,615.963716,6.494,998
+paired,bigpc,2,"aio4 fds thr=0",4,10,439.231730,9.107,998
+paired,bigpc,2,"stock4 odsync+DIO",4,10,652.580162,6.130,998
+paired,bigpc,2,"aio4 odsDIO thr=4kB align",4,10,554.872213,7.209,998
+paired,bigpc,2,"aio4 odsDIO align split=16kB",16,10,686.743474,23.298,1003
+paired,bigpc,2,"aio4 odsDIO align split=32kB",16,10,623.446545,25.664,1003
+paired,bigpc,2,"stock4 fdatasync",16,10,572.192811,27.963,1003
+paired,bigpc,2,"aio4 fds thr=0",16,10,751.595001,21.288,1003
+paired,bigpc,2,"stock4 odsync+DIO",16,10,457.694948,34.958,1003
+paired,bigpc,2,"aio4 odsDIO thr=4kB align",16,10,823.545350,19.428,1003
+paired,bigpc,2,"aio4 odsDIO align split=16kB",32,10,621.814058,51.462,1547
+paired,bigpc,2,"aio4 odsDIO align split=32kB",32,10,640.152622,49.988,1547
+paired,bigpc,2,"stock4 fdatasync",32,10,648.938921,49.311,1547
+paired,bigpc,2,"aio4 fds thr=0",32,10,563.776970,56.760,1547
+paired,bigpc,2,"stock4 odsync+DIO",32,10,739.074151,43.297,1547
+paired,bigpc,2,"aio4 odsDIO thr=4kB align",32,10,555.958386,57.558,1547
+paired,bigpc,3,"aio4 odsDIO align split=32kB",1,10,408.932796,2.445,4735
+paired,bigpc,3,"stock4 fdatasync",1,10,321.331683,3.112,4735
+paired,bigpc,3,"aio4 fds thr=0",1,10,318.899075,3.136,4735
+paired,bigpc,3,"stock4 odsync+DIO",1,10,323.778048,3.089,4735
+paired,bigpc,3,"aio4 odsDIO thr=4kB align",1,10,309.643195,3.230,4735
+paired,bigpc,3,"aio4 odsDIO align split=16kB",1,10,465.946929,2.146,4735
+paired,bigpc,3,"aio4 odsDIO align split=32kB",4,10,914.373699,4.375,947
+paired,bigpc,3,"stock4 fdatasync",4,10,572.819633,6.983,947
+paired,bigpc,3,"aio4 fds thr=0",4,10,522.074128,7.662,947
+paired,bigpc,3,"stock4 odsync+DIO",4,10,566.222541,7.064,947
+paired,bigpc,3,"aio4 odsDIO thr=4kB align",4,10,568.104402,7.041,947
+paired,bigpc,3,"aio4 odsDIO align split=16kB",4,10,791.706341,5.052,947
+paired,bigpc,3,"aio4 odsDIO align split=32kB",16,10,954.742260,16.758,972
+paired,bigpc,3,"stock4 fdatasync",16,10,827.527037,19.335,972
+paired,bigpc,3,"aio4 fds thr=0",16,10,810.007867,19.753,972
+paired,bigpc,3,"stock4 odsync+DIO",16,10,951.139986,16.822,972
+paired,bigpc,3,"aio4 odsDIO thr=4kB align",16,10,950.185052,16.839,972
+paired,bigpc,3,"aio4 odsDIO align split=16kB",16,10,935.064748,17.111,972
+paired,bigpc,3,"aio4 odsDIO align split=32kB",32,10,981.166356,32.614,4910
+paired,bigpc,3,"stock4 fdatasync",32,10,987.517945,32.404,4910
+paired,bigpc,3,"aio4 fds thr=0",32,10,963.728903,33.204,4910
+paired,bigpc,3,"stock4 odsync+DIO",32,10,968.415618,33.044,4910
+paired,bigpc,3,"aio4 odsDIO thr=4kB align",32,10,1084.089127,29.518,4910
+paired,bigpc,3,"aio4 odsDIO align split=16kB",32,10,963.977706,33.196,4910
+paired,bigpc,4,"stock4 fdatasync",1,10,339.826337,2.943,959
+paired,bigpc,4,"aio4 fds thr=0",1,10,335.299396,2.982,959
+paired,bigpc,4,"stock4 odsync+DIO",1,10,341.539687,2.928,959
+paired,bigpc,4,"aio4 odsDIO thr=4kB align",1,10,325.757000,3.070,959
+paired,bigpc,4,"aio4 odsDIO align split=16kB",1,10,534.949911,1.869,959
+paired,bigpc,4,"aio4 odsDIO align split=32kB",1,10,486.155422,2.057,959
+paired,bigpc,4,"stock4 fdatasync",4,10,643.578223,6.215,950
+paired,bigpc,4,"aio4 fds thr=0",4,10,652.075388,6.134,950
+paired,bigpc,4,"stock4 odsync+DIO",4,10,625.907679,6.391,950
+paired,bigpc,4,"aio4 odsDIO thr=4kB align",4,10,655.479326,6.102,950
+paired,bigpc,4,"aio4 odsDIO align split=16kB",4,10,934.926571,4.278,950
+paired,bigpc,4,"aio4 odsDIO align split=32kB",4,10,873.573157,4.579,950
+paired,bigpc,4,"stock4 fdatasync",16,10,808.856363,19.781,962
+paired,bigpc,4,"aio4 fds thr=0",16,10,905.429040,17.671,962
+paired,bigpc,4,"stock4 odsync+DIO",16,10,957.030307,16.718,962
+paired,bigpc,4,"aio4 odsDIO thr=4kB align",16,10,959.607391,16.673,962
+paired,bigpc,4,"aio4 odsDIO align split=16kB",16,10,914.516275,17.496,962
+paired,bigpc,4,"aio4 odsDIO align split=32kB",16,10,977.420077,16.370,962
+paired,bigpc,4,"stock4 fdatasync",32,10,969.089237,33.021,1597
+paired,bigpc,4,"aio4 fds thr=0",32,10,929.160163,34.440,1597
+paired,bigpc,4,"stock4 odsync+DIO",32,10,998.639452,32.044,1597
+paired,bigpc,4,"aio4 odsDIO thr=4kB align",32,10,1070.107725,29.904,1597
+paired,bigpc,4,"aio4 odsDIO align split=16kB",32,10,663.256789,48.247,1597
+paired,bigpc,4,"aio4 odsDIO align split=32kB",32,10,681.557601,46.951,1597
+paired,bigpc,5,"aio4 fds thr=0",1,10,329.020169,3.039,3514
+paired,bigpc,5,"stock4 odsync+DIO",1,10,320.284947,3.122,3514
+paired,bigpc,5,"aio4 odsDIO thr=4kB align",1,10,327.717730,3.051,3514
+paired,bigpc,5,"aio4 odsDIO align split=16kB",1,10,511.970703,1.953,3514
+paired,bigpc,5,"aio4 odsDIO align split=32kB",1,10,483.104348,2.070,3514
+paired,bigpc,5,"stock4 fdatasync",1,10,320.520289,3.120,3514
+paired,bigpc,5,"aio4 fds thr=0",4,10,750.452739,5.330,990
+paired,bigpc,5,"stock4 odsync+DIO",4,10,578.875542,6.910,990
+paired,bigpc,5,"aio4 odsDIO thr=4kB align",4,10,649.821242,6.156,990
+paired,bigpc,5,"aio4 odsDIO align split=16kB",4,10,898.961338,4.450,990
+paired,bigpc,5,"aio4 odsDIO align split=32kB",4,10,921.859345,4.339,990
+paired,bigpc,5,"stock4 fdatasync",4,10,544.778297,7.342,990
+paired,bigpc,5,"aio4 fds thr=0",16,10,914.487929,17.496,1054
+paired,bigpc,5,"stock4 odsync+DIO",16,10,935.237987,17.108,1054
+paired,bigpc,5,"aio4 odsDIO thr=4kB align",16,10,974.401946,16.420,1054
+paired,bigpc,5,"aio4 odsDIO align split=16kB",16,10,897.035730,17.837,1054
+paired,bigpc,5,"aio4 odsDIO align split=32kB",16,10,985.304702,16.239,1054
+paired,bigpc,5,"stock4 fdatasync",16,10,719.823703,22.228,1054
+paired,bigpc,5,"aio4 fds thr=0",32,10,908.918312,35.207,964
+paired,bigpc,5,"stock4 odsync+DIO",32,10,1043.842169,30.656,964
+paired,bigpc,5,"aio4 odsDIO thr=4kB align",32,10,983.361253,32.541,964
+paired,bigpc,5,"aio4 odsDIO align split=16kB",32,10,966.694937,33.102,964
+paired,bigpc,5,"aio4 odsDIO align split=32kB",32,10,1056.424512,30.291,964
+paired,bigpc,5,"stock4 fdatasync",32,10,878.819853,36.412,964
+paired,bigpc,6,"stock4 odsync+DIO",1,10,308.568217,3.241,1375
+paired,bigpc,6,"aio4 odsDIO thr=4kB align",1,10,342.720563,2.918,1375
+paired,bigpc,6,"aio4 odsDIO align split=16kB",1,10,525.554553,1.903,1375
+paired,bigpc,6,"aio4 odsDIO align split=32kB",1,10,480.286648,2.082,1375
+paired,bigpc,6,"stock4 fdatasync",1,10,318.929948,3.135,1375
+paired,bigpc,6,"aio4 fds thr=0",1,10,317.641420,3.148,1375
+paired,bigpc,6,"stock4 odsync+DIO",4,10,665.529425,6.010,993
+paired,bigpc,6,"aio4 odsDIO thr=4kB align",4,10,665.747121,6.008,993
+paired,bigpc,6,"aio4 odsDIO align split=16kB",4,10,1096.749471,3.647,993
+paired,bigpc,6,"aio4 odsDIO align split=32kB",4,10,827.552498,4.834,993
+paired,bigpc,6,"stock4 fdatasync",4,10,598.688663,6.681,993
+paired,bigpc,6,"aio4 fds thr=0",4,10,658.571081,6.074,993
+paired,bigpc,6,"stock4 odsync+DIO",16,10,1068.344612,14.976,1429
+paired,bigpc,6,"aio4 odsDIO thr=4kB align",16,10,959.247686,16.680,1429
+paired,bigpc,6,"aio4 odsDIO align split=16kB",16,10,624.748664,25.610,1429
+paired,bigpc,6,"aio4 odsDIO align split=32kB",16,10,808.469151,19.790,1429
+paired,bigpc,6,"stock4 fdatasync",16,10,852.900230,18.760,1429
+paired,bigpc,6,"aio4 fds thr=0",16,10,804.428103,19.890,1429
+paired,bigpc,6,"stock4 odsync+DIO",32,10,1140.674076,28.054,992
+paired,bigpc,6,"aio4 odsDIO thr=4kB align",32,10,897.713183,35.646,992
+paired,bigpc,6,"aio4 odsDIO align split=16kB",32,10,1006.189220,31.803,992
+paired,bigpc,6,"aio4 odsDIO align split=32kB",32,10,1077.240024,29.706,992
+paired,bigpc,6,"stock4 fdatasync",32,10,802.686118,39.866,992
+paired,bigpc,6,"aio4 fds thr=0",32,10,961.821048,33.270,992

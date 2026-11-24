@@ -1,0 +1,7 @@
+# phase 8b: change 3 (wal_io_split_size), large commits with one table per client (bigpc.sql), 4 kB WAL pages
+stock4 odsync+DIO|INST/stock4|wal_sync_method = open_datasync|debug_io_direct = wal
+aio4 odsDIO thr=4kB align|INST/aio4|wal_io_method = aio|io_method = io_uring|wal_sync_method = open_datasync|wal_io_max_inflight = 16|debug_io_direct = wal|wal_io_pipeline_threshold = 4kB|wal_io_page_align = on
+aio4 odsDIO align split=16kB|INST/aio4|wal_io_method = aio|io_method = io_uring|wal_sync_method = open_datasync|wal_io_max_inflight = 16|debug_io_direct = wal|wal_io_pipeline_threshold = 4kB|wal_io_page_align = on|wal_io_split_size = 16kB
+aio4 odsDIO align split=32kB|INST/aio4|wal_io_method = aio|io_method = io_uring|wal_sync_method = open_datasync|wal_io_max_inflight = 16|debug_io_direct = wal|wal_io_pipeline_threshold = 4kB|wal_io_page_align = on|wal_io_split_size = 32kB
+stock4 fdatasync|INST/stock4|wal_sync_method = fdatasync
+aio4 fds thr=0|INST/aio4|wal_io_method = aio|io_method = io_uring|wal_sync_method = fdatasync|wal_io_max_inflight = 16|wal_io_pipeline_threshold = 0

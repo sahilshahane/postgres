@@ -394,3 +394,46 @@ each), split into n parallel writes:
 parallel writes of whole pages (e.g. up to 8, at least some minimum size)
 instead of one IO. They share no page, so they don't wait for each other,
 and Flush still only advances over the contiguous completed prefix.
+
+## Change 3: split large writes (`08b-split-writes/`)
+
+**Change** (`wal_io_split_size`, default 0 = off, O_DSYNC scheme only): a
+flush of at least twice that size is issued as several writes of whole
+pages, at most as many as `wal_io_max_inflight` has free slots, instead of
+one IO. Only the first chunk can start mid-page and only the last can end
+mid-page, so the chunks share no page and run in parallel; Flush still
+advances only over the contiguous completed prefix.
+
+**Correctness** (`../results3/change3_split_*.csv`): 93 of 93 passed
+(release, debug+cassert, power cut), 462 crashes or power cuts, 238,889
+acknowledged commits checked, 0 lost; 6-9 writes in flight with splitting.
+
+**Performance** (`bigpc`: 500-row insert, one table per client, ~150 kB of
+WAL per commit; 4 kB builds; 6 paired rounds x 10 s, 1 of 24 blocks
+dropped). All AIO O_DSYNC configs: io_uring, direct IO, inflight 16,
+threshold 4kB, page align:
+
+| vs stock4, same mode | 1 | 4 | 16 | 32 |
+|---|---:|---:|---:|---:|
+| AIO O_DSYNC, no split | +0.3% [3] | +2.5% [5] | +0.3% [3/5] | +0.7% [3] |
+| **+ split 16 kB** | **+56.2% [6/6]** | **+44.6% [5/6]** | -4.4% [0/5] | -9.6% [1] |
+| **+ split 32 kB** | **+42.3% [6/6]** | **+49.4% [5/6]** | +0.4% [3/5] | -2.2% [3] |
+| AIO fdatasync, no batching (vs stock4 fdatasync) | -0.6% [2] | -3.8% [3] | -2.1% [2/5] | +0.5% [3] |
+
+TPS at 1 client: stock 317 -> **500** (split 16 kB); commit latency
+3.16 ms -> **2.00 ms**. At 4 clients: 602 -> 851 (split 32 kB).
+
+- **The largest AIO gain so far: +56% at 1 client, +45-49% at 4, winning
+  all or 5 of 6 rounds.** It matches fio (one 160 kB write 3.2 ms, 8
+  parallel ones 1.35 ms) and phase 8a (60% of a large commit is the commit
+  write).
+- **At 16-32 clients splitting doesn't help and 16 kB hurts (-10% at 32).**
+  There, writes of different commits already overlap, and splitting
+  multiplies the number of IOs. Likely cause (not measured): the volume's
+  IOPS cap; at ~900 commits/s, 16 kB chunks mean ~9 IOs per commit, over
+  6,400 IOPS. 32 kB chunks (~5 per commit) stay about neutral.
+- The fdatasync result (+11% in phase 7) did not repeat: noise in phase 7.
+
+**Next (change 3b):** split only while nothing else is in flight, i.e.
+when the device would otherwise serve this one write alone. That should
+keep the 1-4 client gain and leave 16-32 clients as without splitting.
