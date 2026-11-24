@@ -1,0 +1,6 @@
+# phase 7: large transactions, one table per client (bigpc.sql, ~150 kB WAL per commit), 4 kB WAL pages, change 2
+stock4 fdatasync|/home/ubuntu/pgaio/inst/stock4|wal_sync_method = fdatasync
+aio4 fds thr=0|/home/ubuntu/pgaio/inst/aio4|wal_io_method = aio|io_method = io_uring|wal_sync_method = fdatasync|wal_io_max_inflight = 16|wal_io_pipeline_threshold = 0
+stock4 odsync+DIO|/home/ubuntu/pgaio/inst/stock4|wal_sync_method = open_datasync|debug_io_direct = wal
+aio4 odsDIO thr=4kB|/home/ubuntu/pgaio/inst/aio4|wal_io_method = aio|io_method = io_uring|wal_sync_method = open_datasync|wal_io_max_inflight = 16|debug_io_direct = wal|wal_io_pipeline_threshold = 4kB
+aio4 odsDIO thr=4kB align|/home/ubuntu/pgaio/inst/aio4|wal_io_method = aio|io_method = io_uring|wal_sync_method = open_datasync|wal_io_max_inflight = 16|debug_io_direct = wal|wal_io_pipeline_threshold = 4kB|wal_io_page_align = on

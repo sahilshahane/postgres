@@ -1,0 +1,16 @@
+workload,config,baseline,clients,rounds,median_change_pct,min_change_pct,max_change_pct,rounds_won
+bigpc,aio4 fds thr=0,stock4 fdatasync,1,6,1.0,-14.4,10.6,4
+bigpc,aio4 fds thr=0,stock4 fdatasync,4,6,5.2,-15.4,42.3,4
+bigpc,aio4 fds thr=0,stock4 fdatasync,16,6,-8.8,-27.0,4.2,2
+bigpc,aio4 fds thr=0,stock4 fdatasync,32,6,4.6,-13.7,41.4,4
+bigpc,aio4 fds thr=0,stock4 fdatasync,64,5,11.3,-25.7,36.9,4
+bigpc,aio4 odsDIO thr=4kB,stock4 odsync+DIO,1,6,-0.4,-9.2,15.4,3
+bigpc,aio4 odsDIO thr=4kB,stock4 odsync+DIO,4,6,0.6,-8.1,14.2,3
+bigpc,aio4 odsDIO thr=4kB,stock4 odsync+DIO,16,6,4.6,-38.1,59.2,3
+bigpc,aio4 odsDIO thr=4kB,stock4 odsync+DIO,32,6,-3.9,-15.3,22.5,1
+bigpc,aio4 odsDIO thr=4kB,stock4 odsync+DIO,64,5,-7.8,-17.8,31.5,2
+bigpc,aio4 odsDIO thr=4kB align,stock4 odsync+DIO,1,6,1.5,-10.0,11.5,3
+bigpc,aio4 odsDIO thr=4kB align,stock4 odsync+DIO,4,6,0.2,-16.7,25.4,3
+bigpc,aio4 odsDIO thr=4kB align,stock4 odsync+DIO,16,6,-11.1,-28.8,59.5,2
+bigpc,aio4 odsDIO thr=4kB align,stock4 odsync+DIO,32,6,-1.8,-41.6,27.4,3
+bigpc,aio4 odsDIO thr=4kB align,stock4 odsync+DIO,64,5,5.7,-25.9,15.5,3

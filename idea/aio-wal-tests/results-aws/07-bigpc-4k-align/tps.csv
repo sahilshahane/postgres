@@ -1,0 +1,26 @@
+workload,config,clients,rounds,tps_median,tps_min,tps_max,latency_median_ms
+bigpc,aio4 fds thr=0,1,6,330,262,348,3.035
+bigpc,aio4 fds thr=0,4,6,643,445,817,6.223
+bigpc,aio4 fds thr=0,16,6,809,503,1182,20.236
+bigpc,aio4 fds thr=0,32,6,875,577,1021,37.096
+bigpc,aio4 fds thr=0,64,5,1021,627,1026,62.692
+bigpc,stock4 odsync+DIO,1,6,330,291,357,3.032
+bigpc,stock4 odsync+DIO,4,6,642,496,721,6.229
+bigpc,stock4 odsync+DIO,16,6,774,562,1148,21.034
+bigpc,stock4 odsync+DIO,32,6,920,678,1225,34.95
+bigpc,stock4 odsync+DIO,64,5,1181,722,1311,54.204
+bigpc,aio4 odsDIO thr=4kB,1,6,326,311,337,3.064
+bigpc,aio4 odsDIO thr=4kB,4,6,652,566,674,6.133
+bigpc,aio4 odsDIO thr=4kB,16,6,809,581,1070,19.974
+bigpc,aio4 odsDIO thr=4kB,32,6,903,630,1079,35.629
+bigpc,aio4 odsDIO thr=4kB,64,5,1159,620,1209,55.215
+bigpc,aio4 odsDIO thr=4kB align,1,6,331,284,354,3.025
+bigpc,aio4 odsDIO thr=4kB align,4,6,632,543,688,6.331
+bigpc,aio4 odsDIO thr=4kB align,16,6,855,520,1071,18.749
+bigpc,aio4 odsDIO thr=4kB align,32,6,821,645,1095,39.611
+bigpc,aio4 odsDIO thr=4kB align,64,5,1018,706,1257,62.854
+bigpc,stock4 fdatasync,1,6,330,282,339,3.034
+bigpc,stock4 fdatasync,4,6,591,526,631,6.767
+bigpc,stock4 fdatasync,16,6,897,689,1135,17.858
+bigpc,stock4 fdatasync,32,6,787,546,1042,41.304
+bigpc,stock4 fdatasync,64,5,756,603,1088,84.623

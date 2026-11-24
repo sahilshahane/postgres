@@ -293,3 +293,61 @@ Stock4 TPS (fdatasync): 320 / 562 / 800 / 1,033 (O_DSYNC + direct IO:
 - TPS grows only from 800 to 1,033 between 16 and 32 clients: the shared
   table's extension lock (`Lock:extend`, phase 2) still limits the
   workload, not WAL. Phase 7 removes it.
+
+## Phase 7: large transactions, one table per client (`07-bigpc-4k-align/`)
+
+`bigpc.sql`: the same 500-row insert, but each client into its own table
+(`big_<client_id>`), so there is no shared extension lock. 4 kB builds,
+6 paired rounds x 10 s, 1 of 30 blocks dropped (64 clients, round 2).
+
+| vs stock4, same mode | 1 | 4 | 16 | 32 | 64 |
+|---|---:|---:|---:|---:|---:|
+| aio4 fdatasync, no batching | +1.0% [4] | +5.2% [4] | -8.8% [2] | +4.6% [4] | +11.3% [4/5] |
+| aio4 O_DSYNC direct IO, threshold 4kB | -0.4% [3] | +0.6% [3] | +4.6% [3] | -3.9% [1] | -7.8% [2/5] |
+| aio4 O_DSYNC direct IO, threshold 4kB + page align | +1.5% [3] | +0.2% [3] | -11.1% [2] | -1.8% [3] | +5.7% [3/5] |
+
+- **Inconclusive.** The spread between rounds is very wide (stock4
+  O_DSYNC at 16 clients: 562-1,148 TPS), the canary had to wait for the
+  device 4 times (up to 8.7 ms per write instead of ~1 ms), and most cells
+  are won in only 2-4 of 6 rounds. The signs flip between neighbouring
+  client counts, which is noise, not behaviour.
+- Removing the shared table did **not** make the workload scale: about
+  1,100-1,200 TPS at most = ~180 MB/s of WAL, still below the volume's
+  300 MiB/s. With 150 kB per commit the volume also has to absorb the
+  heap writes, so the run seems to hit the volume's IOPS/throughput budget
+  (and its throttling) rather than the WAL path.
+- The one consistent signal across phases 2, 6 and 7: **AIO fdatasync
+  without batching does well with large commits at higher concurrency**
+  (+6.2%, +11.6%, +11.3% at its best client count, winning 4-5 rounds).
+- A conclusive large-commit test needs storage with more headroom than
+  this gp3 volume (io2, or a larger gp3 provisioning), plus longer runs.
+
+## Summary (2026-11-25)
+
+On EBS gp3 (network storage, ~1.9 ms per durable write, 11x more IOPS at
+queue depth 16 than at 1):
+
+- **Small commits, 8 kB pages:** AIO is at parity at 1-8 clients and loses
+  4-13% at 16-32. Cause diagnosed (phase 2b): the hand-off gap between
+  fsyncs; change 1 fixes it at 32 clients (-13.8% -> -3.1%) but costs 8
+  clients, so it stays off by default.
+- **Small commits, 4 kB pages + change 2 (`wal_io_page_align`):** **+5.5%
+  at 64 clients, 6 of 6 rounds**, the first small-commit win on this
+  storage; neutral at 1-32. Phase 4 showed why it was needed: without it,
+  every write ended mid-page and the next one had to wait for it, so a
+  4kB threshold behaved exactly like 256kB.
+- **Large commits:** AIO fdatasync without batching wins at higher
+  concurrency (+6% to +12%, phases 2, 6, 7); change 2 doesn't matter there.
+  The workload is limited by the table extension lock (shared table) or
+  the volume's budget (per-client tables), so the ceiling of the WAL-side
+  gain is not measured.
+- **Correctness:** every change passed the full suite including power
+  cuts (210 + 67 + 80 runs, 0 acknowledged commits lost); one durability
+  bug was found and fixed on the way (`5a78e355b7`).
+- **Recommended settings:** small commits, many clients: 4 kB WAL pages,
+  O_DSYNC + direct IO, `wal_io_max_inflight = 16`,
+  `wal_io_pipeline_threshold = 4kB`, `wal_io_page_align = on`. Large
+  commits: fdatasync, `wal_io_max_inflight = 16`,
+  `wal_io_pipeline_threshold = 0`.
+
+The VM was stopped (not terminated) after phase 7; its volume is kept.

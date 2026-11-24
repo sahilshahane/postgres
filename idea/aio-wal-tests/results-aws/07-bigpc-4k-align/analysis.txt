@@ -1,0 +1,9 @@
+dropped 1 of 30 blocks as disturbed: [(64, 2)]
+
+== bigpc: median change vs stock of the same mode [rounds won/rounds]
+config                                          1              4             16             32             64
+aio4 fds thr=0                        +1.0% [4/6]    +5.2% [4/6]    -8.8% [2/6]    +4.6% [4/6]   +11.3% [4/5]
+aio4 odsDIO thr=4kB                   -0.4% [3/6]    +0.6% [3/6]    +4.6% [3/6]    -3.9% [1/6]    -7.8% [2/5]
+aio4 odsDIO thr=4kB align             +1.5% [3/6]    +0.2% [3/6]   -11.1% [2/6]    -1.8% [3/6]    +5.7% [3/5]
+
+wrote /home/ubuntu/pgaio/results-aws-bigpc/paired.csv, /home/ubuntu/pgaio/results-aws-bigpc/tps.csv
