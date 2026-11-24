@@ -75,3 +75,12 @@ points, which this build doesn't have (`-Dinjection_points=false`):
 Not covered: a drive losing data it had already acknowledged from its own
 volatile cache (dm-flakey drops writes only from the cut on); the TAP suite
 for the other configurations.
+
+## Change 2: wal_io_page_align (2026-11-24)
+
+Modes `uring-ods-align`, `uring-ods-dio-align`, `uring-ods-dio-align-eager`,
+`worker-ods-dio-align` (new) plus `uring-ods-dio-eager`, `uring-fds-default`;
+chaos now also toggles `wal_io_page_align`. Release and debug+cassert x
+regress, crash, chaos, reload, repl; power cut (debug) x crash, chaos,
+reload: **80 of 80 passed**, 396 crashes or power cuts, 208,165
+acknowledged commits checked, **0 lost**. Files: `change2_align_*.csv`.
