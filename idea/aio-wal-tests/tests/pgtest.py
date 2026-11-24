@@ -292,6 +292,7 @@ CHAOS_CHOICES = {
     "wal_io_pipeline_threshold": ["0", "'8kB'", "'256kB'", "'4MB'"],
     "wal_io_eager_issue": ["on", "off"],
     "wal_io_inline_fsync": ["on", "off"],
+    "wal_io_page_align": ["on", "off"],
     # changing it closes and reopens the WAL segment; every method is durable
     "wal_sync_method": ["fdatasync", "fsync", "open_datasync", "open_sync"],
 }

@@ -265,6 +265,8 @@
                                         # while another is in flight
 #wal_io_eager_issue = off               # completer starts the next write
 #wal_io_inline_fsync = on               # issuer runs its own fsync, unlocked
+#wal_io_page_align = off                # while a write is in flight, O_DSYNC
+                                        # writes end at a page boundary
 #full_page_writes = on                  # recover from partial page writes
 #wal_log_hints = off                    # also do full page writes of non-critical updates
                                         # (change requires restart)

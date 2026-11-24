@@ -34,7 +34,7 @@ for line in open(cfgfile):
         continue
     label, inst, *gucs = [x.strip() for x in line.split("|")]
     cfg_mode[label] = mode(gucs)
-    if inst.rstrip("/").endswith("stock"):
+    if inst.rstrip("/").rstrip("0123456789").endswith("stock"):
         stock_of[cfg_mode[label]] = label
 
 tps = defaultdict(dict); lat = defaultdict(dict); order = []

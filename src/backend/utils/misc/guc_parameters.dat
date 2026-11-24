@@ -3532,6 +3532,13 @@
   options => 'wal_io_method_options',
 },
 
+{ name => 'wal_io_page_align', type => 'bool', context => 'PGC_SIGHUP', group => 'WAL_SETTINGS',
+  short_desc => 'While an asynchronous WAL write is in flight, ends further O_DSYNC writes at a WAL page boundary.',
+  long_desc => 'The partially filled last page is written by a later write, so that writes in flight never share a page. Only used when "wal_io_method" is "aio" and "wal_sync_method" is "open_datasync" or "open_sync".',
+  variable => 'wal_io_page_align',
+  boot_val => 'false',
+},
+
 { name => 'wal_io_pipeline_threshold', type => 'int', context => 'PGC_SIGHUP', group => 'WAL_SETTINGS',
   short_desc => 'Minimum amount of unwritten WAL needed to start an asynchronous WAL write while another one is in flight.',
   long_desc => 'Smaller flushes wait for the write in flight and are batched into the next one (group commit). 0 always starts a new write if "wal_io_max_inflight" allows it. Only used when "wal_io_method" is "aio".',

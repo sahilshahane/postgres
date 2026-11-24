@@ -142,6 +142,7 @@ int			wal_io_max_inflight = 1;
 int			wal_io_pipeline_threshold = 256;	/* kB */
 bool		wal_io_eager_issue = false;
 bool		wal_io_inline_fsync = true;
+bool		wal_io_page_align = false;
 int			wal_level = WAL_LEVEL_REPLICA;
 int			CommitDelay = 0;	/* precommit delay in microseconds */
 int			CommitSiblings = 5; /* # concurrent xacts needed to sleep */
@@ -2950,6 +2951,17 @@ XLogWrite(XLogwrtRqst WriteRqst, TimeLineID tli, bool flexible)
  *   executing the fsync / last O_DSYNC write inline if wal_io_inline_fsync,
  *   so the device doesn't sit idle while a waiter wakes up to do it.
  *
+ * - Page-aligned pipelining (wal_io_page_align, O_DSYNC case only): WAL is
+ *   contiguous, so a write ending in the middle of a page makes the next
+ *   write start in that page, and it has to wait for the first one (see
+ *   above).  With small commits nearly every write ends mid-page, which
+ *   serializes the writes.  So while a write is in flight, a new write ends
+ *   at the last complete page (XLogAioIssueTarget()); the partially filled
+ *   page is left for a later write, and writes in flight never share a
+ *   page.  A backend whose record is in that page publishes its request and
+ *   waits for the oldest write; once nothing is in flight (or the page has
+ *   filled), the page is written.  A lone commit is never delayed.
+ *
  * - Inline fsync (wal_io_inline_fsync, fsync case only): a backend that
  *   issues an fsync it will wait for anyway executes it itself, after
  *   releasing WALWriteLock (XLogAioRunInlineFsync()); the tracker entry has
@@ -4022,6 +4034,24 @@ XLogAioShouldIssue(XLogRecPtr rqst, uint64 ninflight)
 }
 
 /*
+ * How far to issue O_DSYNC writes for a request up to 'insertpos', see
+ * "Page-aligned pipelining".  Returns 'insertpos', or, with
+ * wal_io_page_align while a write is in flight, the start of the page
+ * containing it.  Also returns the oldest write in flight in *head.
+ *
+ * Called with WALWriteLock held, so that no write can be issued
+ * concurrently; writes in flight can still complete, which only means that
+ * we might hold back a page needlessly, and then retry.
+ */
+static XLogRecPtr
+XLogAioIssueTarget(XLogRecPtr insertpos, uint64 *head)
+{
+	if (XLogAioInflight(head) == 0 || !wal_io_page_align)
+		return insertpos;
+	return insertpos - insertpos % XLOG_BLCKSZ;
+}
+
+/*
  * Issue WAL that backends waiting in XLogFlushAio() have asked for (see
  * aioFlushRqst) but nobody has issued yet, if XLogAioShouldIssue() allows
  * it.  Never blocks on WALWriteLock: if somebody holds it, they're issuing.
@@ -4062,7 +4092,12 @@ XLogAioIssuePending(TimeLineID tli)
 			XLogWrite(WriteRqst, tli, false);
 		}
 		else
-			(void) XLogAioIssue(insertpos, tli, true);
+		{
+			XLogRecPtr	target = XLogAioIssueTarget(insertpos, &head);
+
+			if (target > pg_atomic_read_u64(&XLogCtl->aioIssuedUpTo))
+				(void) XLogAioIssue(target, tli, true);
+		}
 		aioInlineAllowed = false;
 	}
 	LWLockRelease(WALWriteLock);
@@ -4160,9 +4195,28 @@ XLogFlushAio(XLogRecPtr record, TimeLineID insertTLI)
 		else
 		{
 			bool		issued_all;
+			XLogRecPtr	target = XLogAioIssueTarget(insertpos, &head);
+
+			if (target < Min(record, insertpos))
+			{
+				/*
+				 * Our record is in the partially filled last page, which is
+				 * held back while writes are in flight, see "Page-aligned
+				 * pipelining".  Issue the complete pages, for us and others,
+				 * as a separate trip to storage, then wait for the oldest
+				 * write and retry; the last page goes out with the next
+				 * write.
+				 */
+				if (target > pg_atomic_read_u64(&XLogCtl->aioIssuedUpTo))
+					(void) XLogAioIssue(target, insertTLI, true);
+				LWLockRelease(WALWriteLock);
+				pg_atomic_monotonic_advance_u64(&XLogCtl->aioFlushRqst, record);
+				XLogAioWaitForWrite(head);
+				continue;
+			}
 
 			aioInlineAllowed = true;
-			issued_all = XLogAioIssue(insertpos, insertTLI, true);
+			issued_all = XLogAioIssue(target, insertTLI, true);
 			aioInlineAllowed = false;
 			if (!issued_all)
 			{

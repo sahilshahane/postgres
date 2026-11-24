@@ -3705,6 +3705,30 @@ include_dir 'conf.d'
       </listitem>
      </varlistentry>
 
+     <varlistentry id="guc-wal-io-page-align" xreflabel="wal_io_page_align">
+      <term><varname>wal_io_page_align</varname> (<type>boolean</type>)
+      <indexterm>
+       <primary><varname>wal_io_page_align</varname> configuration parameter</primary>
+      </indexterm>
+      </term>
+      <listitem>
+       <para>
+        When <xref linkend="guc-wal-io-method"/> is <literal>aio</literal> and
+        <xref linkend="guc-wal-sync-method"/> is <literal>open_datasync</literal>
+        or <literal>open_sync</literal>, a write started while another one is
+        in flight ends at the last complete WAL page; the partially filled
+        last page is left for a later write.  Writes in flight then never
+        share a page, so the next one does not have to wait for the previous
+        one.  A commit whose record is in that last page waits until the
+        writes in flight have completed or the page has filled.  When no
+        write is in flight, everything is written.  The default is
+        <literal>off</literal>.
+        This parameter can only be set in the <filename>postgresql.conf</filename>
+        file or on the server command line.
+       </para>
+      </listitem>
+     </varlistentry>
+
      <varlistentry id="guc-wal-io-inline-fsync" xreflabel="wal_io_inline_fsync">
       <term><varname>wal_io_inline_fsync</varname> (<type>boolean</type>)
       <indexterm>

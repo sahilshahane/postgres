@@ -41,6 +41,7 @@ extern PGDLLIMPORT int wal_io_max_inflight;
 extern PGDLLIMPORT int wal_io_pipeline_threshold;
 extern PGDLLIMPORT bool wal_io_eager_issue;
 extern PGDLLIMPORT bool wal_io_inline_fsync;
+extern PGDLLIMPORT bool wal_io_page_align;
 
 /* upper limit for wal_io_max_inflight, size of the in-flight write tracker */
 #define XLOG_AIO_MAX_INFLIGHT 64
