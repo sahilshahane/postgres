@@ -198,3 +198,33 @@ Hand-off gap at 32 clients (`gap.txt`): stock 0.053 ms, aio 0.144 ms,
   large), and test the user's design: 4 kB WAL pages, batch within a page,
   pipeline full pages (`wal_blocksize=4`, direct IO,
   `wal_io_pipeline_threshold = 4kB`).
+
+## Phase 4: 4 kB WAL pages (`04-4k-pages/`)
+
+The user's design: batch commits within a page, pipeline complete pages.
+Both builds with `-Dwal_blocksize=4` (`stock4`, `aio4`, code as of change 1),
+golden cluster made with them, pgbench -N, 6 paired rounds x 10 s, 0 of 36
+blocks dropped. AIO configs: io_uring, `wal_io_max_inflight = 16`.
+
+| vs stock4, same mode | 1 | 4 | 8 | 16 | 32 | 64 |
+|---|---:|---:|---:|---:|---:|---:|
+| aio4 O_DSYNC direct IO, threshold 4kB | +0.0% [4] | -0.8% [1] | -1.9% [0] | -4.3% [0] | -7.8% [0] | -2.6% [3] |
+| aio4 O_DSYNC direct IO, threshold 256kB | -0.2% [1] | -0.9% [1] | -1.8% [0] | -4.3% [0] | -7.9% [0] | -2.1% [1] |
+| aio4 fdatasync, threshold 4kB | -0.5% [2] | -1.1% [0] | -2.6% [0] | -5.2% [0] | -8.8% [3] | -15.0% [0] |
+
+Stock4 TPS (fdatasync): 848 / 2,022 / 3,802 / 6,945 / 12,207 / 18,216.
+
+- **Threshold 4kB and 256kB give the same result, to 0.5%.** So the
+  4kB setting never produces a second write in flight: as predicted, almost
+  every write ends mid-page, and the next write starts in that page and has
+  to wait for it. The pipeline is serialized by the partial last page, not
+  by the threshold. This is what change 2 addresses.
+- AIO is at parity at 1-4 clients and loses 2-8% at 8-32, the same shape
+  as with 8 kB pages (phase 1).
+- Absolute TPS is not comparable with phase 1: this run's spread between
+  rounds is much wider (32 clients: 8,017-16,349), i.e. the volume was
+  noisier today. Only the paired ratios are used.
+
+**Change 2 (next):** `wal_io_page_align`. While a write is in flight, a
+new O_DSYNC write ends at the last complete page; the partial page waits
+for the next write, so writes in flight never share a page.

@@ -1,0 +1,31 @@
+workload,config,clients,rounds,tps_median,tps_min,tps_max,latency_median_ms
+pgbench,stock4 odsync+DIO,1,6,854,568,881,1.172
+pgbench,stock4 odsync+DIO,4,6,2038,1658,2211,1.972
+pgbench,stock4 odsync+DIO,8,6,3829,3122,4377,2.124
+pgbench,stock4 odsync+DIO,16,6,6963,5329,8649,2.417
+pgbench,stock4 odsync+DIO,32,6,12226,7996,16490,2.961
+pgbench,stock4 odsync+DIO,64,6,17828,13804,21849,3.636
+pgbench,aio4 odsDIO thr=4kB,1,6,853,570,882,1.173
+pgbench,aio4 odsDIO thr=4kB,4,6,2019,1661,2166,1.99
+pgbench,aio4 odsDIO thr=4kB,8,6,3749,3091,4279,2.168
+pgbench,aio4 odsDIO thr=4kB,16,6,6670,5129,8149,2.515
+pgbench,aio4 odsDIO thr=4kB,32,6,11101,7769,14463,3.159
+pgbench,aio4 odsDIO thr=4kB,64,6,16771,13097,22021,3.955
+pgbench,aio4 odsDIO thr=256kB,1,6,851,571,878,1.176
+pgbench,aio4 odsDIO thr=256kB,4,6,2021,1662,2185,1.988
+pgbench,aio4 odsDIO thr=256kB,8,6,3759,3096,4280,2.163
+pgbench,aio4 odsDIO thr=256kB,16,6,6668,5122,8124,2.514
+pgbench,aio4 odsDIO thr=256kB,32,6,11075,7759,14422,3.159
+pgbench,aio4 odsDIO thr=256kB,64,6,17051,13396,22116,3.851
+pgbench,aio4 fds thr=4kB,1,6,845,566,875,1.184
+pgbench,aio4 fds thr=4kB,4,6,2001,1673,2171,2.009
+pgbench,aio4 fds thr=4kB,8,6,3699,3068,4224,2.197
+pgbench,aio4 fds thr=4kB,16,6,6538,5093,8133,2.561
+pgbench,aio4 fds thr=4kB,32,6,10650,8215,13235,3.159
+pgbench,aio4 fds thr=4kB,64,6,15347,13983,16208,4.178
+pgbench,stock4 fdatasync,1,6,848,569,875,1.18
+pgbench,stock4 fdatasync,4,6,2022,1674,2201,1.987
+pgbench,stock4 fdatasync,8,6,3802,3126,4336,2.138
+pgbench,stock4 fdatasync,16,6,6945,5330,8593,2.418
+pgbench,stock4 fdatasync,32,6,12207,8017,16349,2.956
+pgbench,stock4 fdatasync,64,6,18216,14359,20190,3.539
