@@ -542,3 +542,28 @@ I = `wal_io_max_inflight`), vs stock4 O_DSYNC + direct IO:
 - **Harness fix:** `bench.sh` option `QUIESCE=1`: after each run,
   `CHECKPOINT` that server and `sync`, so the next run starts on a quiet
   device. Phase 8f reruns this screening with it.
+
+## Phase 8f: the same screening with QUIESCE=1 (`08f-screening-quiesce/`)
+
+Identical to 8e, but `bench.sh` checkpoints and syncs after every run.
+
+| config | 1 | 4 | 32 |
+|---|---:|---:|---:|
+| T 256k, S 16k, I 8 | +56.4% [3/3] | +64.5% [3/3] | +6.0% [3/3] |
+| T 64k, S 16k, I 8 | +55.9% [3/3] | +66.1% [3/3] | +6.2% [3/3] |
+| **T 512k, S 16k, I 8** | **+56.1% [3/3]** | **+87.1% [3/3]** | **+8.5% [3/3]** |
+| T 1M, S 16k, I 8 | +56.8% [3/3] | +89.1% [3/3] | +8.2% [3/3] |
+| T 256k, S 32k, I 8 | +45.1% [3/3] | +66.6% [3/3] | +6.1% [3/3] |
+| T 256k, S 16k, I 4 | +44.5% [3/3] | +45.5% [3/3] | +2.9% [3/3] |
+| T 256k, S 16k, I 16 | +56.8% [3/3] | +84.8% [3/3] | +7.4% [3/3] |
+
+- **The alternation is gone**: 32-client TPS is 1,170-1,430 in every run
+  (before: ~520 or ~720 depending on the position). **The harness was the
+  cause**, and it was costing up to half the throughput at high load.
+- **Every AIO config now beats stock in every round at every client count
+  (63 of 63).**
+- Best: threshold 512 kB-1 MB, split 16 kB, 8-16 in flight (+56% / +87% /
+  +8%). Fewer chunks (S 32k, or I 4) are clearly weaker at 1-4 clients.
+- **Consequence:** all earlier 16-32 client results (phases 1-8d) were
+  measured with this interference and should be taken as unreliable; the
+  final benchmarks are rerun with QUIESCE=1.

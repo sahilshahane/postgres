@@ -23,6 +23,10 @@
 #   QUIESCE     1: after each run, CHECKPOINT that server and sync, so the next
 #               run doesn't share the device with this run's leftover data
 #               writes (dirty shared buffers and page cache); default 0
+#   Config items "sys.max_sectors_kb = N" are not written to postgresql.conf:
+#   before each run of that config, the WORKDIR device's max_sectors_kb (the
+#   largest request the kernel sends it; larger IOs are split) is set to N;
+#   configs without it get the device's value at start.  Needs sudo.
 #   EXTRA_CONF  extra postgresql.conf lines (default full_page_writes = off:
 #               the post-checkpoint FPI burst is identical for all configs)
 #   KEEP=1      keep the data directories afterwards
@@ -45,6 +49,21 @@ export PGHOST=/tmp PGDATABASE=postgres
 mapfile -t CFG < <(grep -v '^\s*\(#\|$\)' "$CONFIGS")
 N=${#CFG[@]}
 
+# device of WORKDIR, for sys.max_sectors_kb
+mkdir -p "$WORKDIR"
+SYSDEV=$(lsblk -no PKNAME "$(findmnt -no SOURCE --target "$WORKDIR")" 2>/dev/null)
+[ -n "$SYSDEV" ] || SYSDEV=$(basename "$(findmnt -no SOURCE --target "$WORKDIR")")
+MSK_FILE=/sys/block/$SYSDEV/queue/max_sectors_kb
+MSK_DEFAULT=$(cat "$MSK_FILE" 2>/dev/null)
+set_msk() {   # config index
+  local v=$MSK_DEFAULT kv
+  IFS='|' read -ra q <<< "${CFG[$1]}"
+  for kv in "${q[@]:2}"; do
+    case $kv in sys.max_sectors_kb*) v=$(echo "${kv#*=}" | tr -d ' ') ;; esac
+  done
+  [ "$(cat "$MSK_FILE")" = "$v" ] || echo "$v" | sudo tee "$MSK_FILE" >/dev/null
+}
+
 canary() {
   local t0 t1; t0=$(date +%s%N)
   dd if=/dev/zero of="$WORKDIR/canary" bs=8k count=200 oflag=dsync conv=notrunc 2>/dev/null
@@ -60,7 +79,7 @@ stop_all() {
     [ "${KEEP:-0}" = 1 ] || rm -rf "$WORKDIR/d$i"
   done
 }
-trap stop_all EXIT
+trap 'stop_all; [ -n "$MSK_DEFAULT" ] && echo "$MSK_DEFAULT" | sudo tee "$MSK_FILE" >/dev/null' EXIT
 
 mkdir -p "$WORKDIR"
 for i in $(seq 0 $((N-1))); do
@@ -80,7 +99,7 @@ wal_buffers = 64MB
 autovacuum = off
 $EXTRA_CONF
 EOF
-  for kv in "${p[@]:2}"; do echo "$kv" >> "$d/postgresql.conf"; done
+  for kv in "${p[@]:2}"; do case $kv in sys.*) ;; *) echo "$kv" >> "$d/postgresql.conf" ;; esac; done
 done
 sync; sleep 3
 for i in $(seq 0 $((N-1))); do
@@ -103,6 +122,7 @@ for r in $(seq 1 "$ROUNDS"); do
       IFS='|' read -ra p <<< "${CFG[$i]}"
       [ "$WORKLOAD" = big ] && PGPORT=$((BASEPORT + i)) "${p[1]}/bin/psql" -XAtqc "TRUNCATE big"
       [ "$WORKLOAD" = bigpc ] && PGPORT=$((BASEPORT + i)) "${p[1]}/bin/psql" -XAtqc "TRUNCATE bigc"
+      set_msk $i
       res=$(PGPORT=$((BASEPORT + i)) "${p[1]}/bin/pgbench" $PGB_ARGS -c $c -j $j -T "$SECS" 2>&1)
       if [ "$QUIESCE" = 1 ]; then
         PGPORT=$((BASEPORT + i)) "${p[1]}/bin/psql" -XAtqc "CHECKPOINT" >/dev/null 2>&1; sync

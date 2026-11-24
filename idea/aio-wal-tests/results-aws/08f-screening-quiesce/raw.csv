@@ -1,0 +1,73 @@
+run,workload,round,config,clients,seconds,tps,latency_avg_ms,canary_us
+paired,bigpc,1,"ref T256k S16k I8",1,8,480.282719,2.082,960
+paired,bigpc,1,"T64k S16k I8",1,8,480.663874,2.080,960
+paired,bigpc,1,"T512k S16k I8",1,8,435.518237,2.296,960
+paired,bigpc,1,"T1M S16k I8",1,8,457.501430,2.186,960
+paired,bigpc,1,"T256k S32k I8",1,8,445.944066,2.242,960
+paired,bigpc,1,"T256k S16k I4",1,8,447.451682,2.235,960
+paired,bigpc,1,"T256k S16k I16",1,8,482.509590,2.072,960
+paired,bigpc,1,"stock4 odsync+DIO",1,8,315.956201,3.165,960
+paired,bigpc,1,"ref T256k S16k I8",4,8,1121.420608,3.567,940
+paired,bigpc,1,"T64k S16k I8",4,8,1117.150294,3.581,940
+paired,bigpc,1,"T512k S16k I8",4,8,1127.334639,3.548,940
+paired,bigpc,1,"T1M S16k I8",4,8,1136.446170,3.520,940
+paired,bigpc,1,"T256k S32k I8",4,8,1113.016807,3.594,940
+paired,bigpc,1,"T256k S16k I4",4,8,996.239801,4.015,940
+paired,bigpc,1,"T256k S16k I16",4,8,1133.120375,3.530,940
+paired,bigpc,1,"stock4 odsync+DIO",4,8,704.167917,5.680,940
+paired,bigpc,1,"ref T256k S16k I8",32,8,1317.759920,24.284,941
+paired,bigpc,1,"T64k S16k I8",32,8,1261.265750,25.371,941
+paired,bigpc,1,"T512k S16k I8",32,8,1302.970014,24.559,941
+paired,bigpc,1,"T1M S16k I8",32,8,1295.124656,24.708,941
+paired,bigpc,1,"T256k S32k I8",32,8,1282.077236,24.959,941
+paired,bigpc,1,"T256k S16k I4",32,8,1222.721449,26.171,941
+paired,bigpc,1,"T256k S16k I16",32,8,1305.632667,24.509,941
+paired,bigpc,1,"stock4 odsync+DIO",32,8,1171.643317,27.312,941
+paired,bigpc,2,"T64k S16k I8",1,8,519.899630,1.923,929
+paired,bigpc,2,"T512k S16k I8",1,8,522.899446,1.912,929
+paired,bigpc,2,"T1M S16k I8",1,8,522.309217,1.915,929
+paired,bigpc,2,"T256k S32k I8",1,8,483.189868,2.070,929
+paired,bigpc,2,"T256k S16k I4",1,8,481.146110,2.078,929
+paired,bigpc,2,"T256k S16k I16",1,8,522.006199,1.916,929
+paired,bigpc,2,"stock4 odsync+DIO",1,8,333.014694,3.003,929
+paired,bigpc,2,"ref T256k S16k I8",1,8,521.419386,1.918,929
+paired,bigpc,2,"T64k S16k I8",4,8,1184.684070,3.376,935
+paired,bigpc,2,"T512k S16k I8",4,8,1334.903554,2.996,935
+paired,bigpc,2,"T1M S16k I8",4,8,1348.992194,2.965,935
+paired,bigpc,2,"T256k S32k I8",4,8,1188.310246,3.366,935
+paired,bigpc,2,"T256k S16k I4",4,8,1037.871367,3.854,935
+paired,bigpc,2,"T256k S16k I16",4,8,1318.081115,3.035,935
+paired,bigpc,2,"stock4 odsync+DIO",4,8,713.437544,5.607,935
+paired,bigpc,2,"ref T256k S16k I8",4,8,1173.862511,3.408,935
+paired,bigpc,2,"T64k S16k I8",32,8,1354.963358,23.617,933
+paired,bigpc,2,"T512k S16k I8",32,8,1384.784408,23.108,933
+paired,bigpc,2,"T1M S16k I8",32,8,1380.626548,23.178,933
+paired,bigpc,2,"T256k S32k I8",32,8,1353.451164,23.643,933
+paired,bigpc,2,"T256k S16k I4",32,8,1313.142427,24.369,933
+paired,bigpc,2,"T256k S16k I16",32,8,1370.729922,23.345,933
+paired,bigpc,2,"stock4 odsync+DIO",32,8,1275.769682,25.083,933
+paired,bigpc,2,"ref T256k S16k I8",32,8,1352.657338,23.657,933
+paired,bigpc,3,"T512k S16k I8",1,8,519.423631,1.925,926
+paired,bigpc,3,"T1M S16k I8",1,8,522.191318,1.915,926
+paired,bigpc,3,"T256k S32k I8",1,8,485.294647,2.061,926
+paired,bigpc,3,"T256k S16k I4",1,8,481.081303,2.079,926
+paired,bigpc,3,"T256k S16k I16",1,8,523.864392,1.909,926
+paired,bigpc,3,"stock4 odsync+DIO",1,8,332.699845,3.006,926
+paired,bigpc,3,"ref T256k S16k I8",1,8,520.288957,1.922,926
+paired,bigpc,3,"T64k S16k I8",1,8,518.554319,1.928,926
+paired,bigpc,3,"T512k S16k I8",4,8,1345.780777,2.972,934
+paired,bigpc,3,"T1M S16k I8",4,8,1352.937742,2.957,934
+paired,bigpc,3,"T256k S32k I8",4,8,1183.061667,3.381,934
+paired,bigpc,3,"T256k S16k I4",4,8,1038.802841,3.851,934
+paired,bigpc,3,"T256k S16k I16",4,8,1318.475050,3.034,934
+paired,bigpc,3,"stock4 odsync+DIO",4,8,626.022019,6.390,934
+paired,bigpc,3,"ref T256k S16k I8",4,8,1184.508326,3.377,934
+paired,bigpc,3,"T64k S16k I8",4,8,1183.643494,3.379,934
+paired,bigpc,3,"T512k S16k I8",32,8,1429.136519,22.391,936
+paired,bigpc,3,"T1M S16k I8",32,8,1420.611864,22.526,936
+paired,bigpc,3,"T256k S32k I8",32,8,1400.802954,22.844,936
+paired,bigpc,3,"T256k S16k I4",32,8,1361.687900,23.500,936
+paired,bigpc,3,"T256k S16k I16",32,8,1401.838925,22.827,936
+paired,bigpc,3,"stock4 odsync+DIO",32,8,1327.192830,24.111,936
+paired,bigpc,3,"ref T256k S16k I8",32,8,1388.437015,23.047,936
+paired,bigpc,3,"T64k S16k I8",32,8,1376.272644,23.251,936
