@@ -170,7 +170,7 @@ if [ -n "$PREWARM" ]; then
       WHERE c.relkind IN ('r', 'i', 't') AND (c.relname ~ '$PREWARM'
         OR c.oid IN (SELECT indexrelid FROM pg_index x JOIN pg_class t ON t.oid = x.indrelid WHERE t.relname ~ '$PREWARM')
         OR c.oid IN (SELECT reltoastrelid FROM pg_class WHERE relname ~ '$PREWARM'))" |
-    while read -r f; do cat "$WORKDIR/d$i/$f" "$WORKDIR/d$i/$f".[0-9]* 2>/dev/null; done | wc -c |
+    while read -r f; do cat "$WORKDIR/d$i/$f" "$WORKDIR/d$i/$f".[0-9]* 2>/dev/null || true; done | wc -c |
       awk -v i=$i '{printf "prewarmed d%d: %.0f MB\n", i, $1 / 1048576}'
   done
   free -m | awk '/^Mem/ {print "page cache after prewarm: " $6 " MB, available " $7 " MB"}'
