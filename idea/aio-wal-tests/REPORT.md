@@ -33,8 +33,8 @@ Correctness results: `results3/README.md`.
      First small-commit win at 64 clients (+5.5% in phase 5; **+1.5% [3/3] in the
      final, corrected-harness run**; +7% to +11% on YCSB-A and sysbench insert).
   3. *Split writes* (`wal_io_split_size`): a large flush is issued as several
-     parallel whole-page writes. **Large commits: +56% at 1 client, +84-87% at 4,
-     +8-20% at 16-32**, winning every round.
+     parallel whole-page writes. **Large commits: +59% at 1 client, +87% at 4,
+     +4% to +6% at 16-64** (where the volume's bandwidth is full), winning every round.
 - **Correctness.** Every change passed the full suite (regression, crash,
   chaos reloads, replication, power cuts) on release and assert builds:
   **450 test runs, 2,280 crashes or power cuts, 1.16 million acknowledged
@@ -42,7 +42,8 @@ Correctness results: `results3/README.md`.
   was found by the tests and fixed.
 - **The honest comparison.** Tuning stock with one kernel setting
   (`max_sectors_kb = 32` on the WAL device) gives stock the same large-commit
-  gain (+56% / +90% / +38% / +27%). Change 3's gain comes from splitting large
+  gain at 1-4 clients (+55% / +94%) and more at 16-64 (+14% to +32%, AIO +4% to
+  +6%). Change 3's gain comes from splitting large
   writes into parallel requests, which the block layer can also do. What
   stock cannot do is overlap *small* commits: there AIO keeps a real gain
   (+11% sysbench insert, +7% YCSB-A, +1.5% pgbench, all at 64 clients, every
@@ -340,43 +341,51 @@ time **without spending more IOs than the volume has**.
 
 ![Large commits](report/fig/f3_large.png)
 
-*(Phase 9 data shown; phase 11, which adds the 4 kB AIO configuration, 64
-clients and device counters, replaces it when finished.)*
+Phase 11, `bigpc` (500-row insert per client table, ~150 kB of WAL per
+commit), 3 paired rounds x 10 s, every cell won in all 3 rounds. Device
+columns: median per run.
 
-| clients | stock TPS | AIO 512 kB | stock + kernel split |
-|---:|---:|---:|---:|
-| 1 | 329 | 521 (**+59%**) | 513 (+56%) |
-| 4 | 714 | 1,311 (**+84%**) | 1,359 (+90%) |
-| 16 | 1,183 | 1,417 (**+20%**) | 1,627 (+38%) |
-| 32 | 1,303 | 1,448 (**+12%**) | 1,634 (+27%) |
+| clients | stock TPS | AIO 512 kB | AIO 4 kB | stock + kernel split | avg write size: stock / AIO / kernel split | writes in flight: stock / AIO 512k / kernel split |
+|---:|---:|---:|---:|---:|---|---|
+| 1 | 347 | **+59.5%** | +59.4% | +55.0% | 159 / 21 / 30 kB | 0.8 / 4.4 / 3.2 |
+| 4 | 701 | **+87.1%** | +68.4% | +94.0% | 200 / 51 / 32 kB | 1.5 / 8.1 / 12.1 |
+| 16 | 1,230 | +3.6% | +3.7% | **+32.4%** | 225 / 172 / 32 kB | 10.9 / 14.2 / 27.7 |
+| 32 | 1,374 | +3.9% | +3.5% | **+20.6%** | 223 / 190 / 32 kB | 13.8 / 20.5 / 39.5 |
+| 64 | 1,452 | +5.6% | +4.2% | **+14.1%** | 215 / 188 / 31 kB | 17.8 / 26.7 / 48.8 |
 
-**Why AIO gains at 1-4 clients (+59%, +84%).** A 500-row insert produces
-~150 kB of WAL, and its commit must wait for all of it to be durable. Stock
-issues that as **one** 150 kB write: ~3.2 ms on gp3. Change 3 issues it as
-~9 writes of 16 kB that the volume runs in parallel: ~1.4-2 ms. Since ~60%
-of the transaction's time is that wait (phase 8a: 313 TPS with synchronous
-commit vs 779 without), commit latency drops from 3.1 to 2.0 ms and
-throughput rises by the same ratio. At 4 clients the gain is larger still:
-the 512 kB threshold also lets several clients' WAL go into one flush that
-is then split, so the device runs both batching and parallelism.
+**Why AIO gains at 1-4 clients (+59%, +87%).** The counters show the
+mechanism directly. Stock writes each commit's WAL as **one ~160 kB write
+with less than one write in flight**; AIO writes it as **~21 kB pieces with
+4.4 in flight**. On gp3 a single 160 kB durable write takes ~3.2 ms while
+parallel 20 kB pieces finish in ~1.35 ms (7.2), and ~60% of this
+transaction's time is the commit wait (phase 8a), so commit latency drops
+from 2.88 to 1.81 ms and throughput rises +59%. At 4 clients the 512 kB
+threshold also batches several clients' WAL into one flush before splitting
+it (8.1 in flight, 51 kB writes): +87%, against +68% with the 4 kB
+threshold, which issues each commit separately.
 
-**Why the gain shrinks at 16-32 clients (+20%, +12%).** The device itself
-becomes the limit:
+**Why the gain almost disappears at 16-64 clients (+4% to +6%).** From 16
+clients on, **every configuration moves ~310 MB/s and keeps the volume
+97-99% busy**: the volume's 300 MiB/s bandwidth limit is reached (WAL plus
+table writes). Once the device is full, writing WAL in parallel cannot make
+it transfer more bytes. What remains is how long each commit waits in the
+queue. (Earlier runs without the quiesce step showed +20% / +12% here;
+section 6.3.)
 
-- *Bandwidth:* 1,450 TPS x ~150 kB = ~220 MB/s of WAL, plus the table
-  writes, against the volume's 300 MiB/s.
-- *IOPS:* splitting into 16 kB pieces multiplies the IO count. At high load
-  the volume's 6,400 IOPS budget, shared with data writes, caps how much
-  more parallelism helps.
-- *In-flight cap:* AIO allows 8 writes in flight. Once 8 are out, further
-  flushes wait.
+**Why tuned stock still gains at 16-64 clients (+14% to +32%).** With
+`max_sectors_kb = 32`, *every* write to the volume, WAL and table data
+alike, is cut into ~32 kB requests (10,000 requests/s, queue depth 28-49).
+On a saturated device, a commit's WAL then waits behind 32 kB pieces of
+data writeback instead of behind whole large writes, so commit latency
+drops (16 clients: 9.8 ms vs 13.0 ms stock, 12.6 ms AIO). AIO splits only
+WAL, and only up to 8 writes in flight, so its WAL still queues behind
+large data writes. (This is an interpretation of the counters; the
+per-request service order was not measured.) EBS counts sequential IOs up to
+256 kB as one operation, which is why 10,000 small sequential requests per
+second do not hit the 6,400 IOPS limit.
 
-**Why tuned stock does better at 16-32 clients.** `max_sectors_kb = 32`
-makes the *kernel* split stock's large write into 32 kB requests, the same
-idea as change 3. Its pieces are twice as large (half the IOs, so less IOPS
-pressure) and the kernel has no in-flight cap. At 1-4 clients both are
-equal: they do the same thing. *(Phase 11's device counters, IOs per second
-and average size, test this explanation directly.)*
+**Combining both** (AIO + `max_sectors_kb = 32`, measured in phase 10)
+gave the best bulk COPY result (+24% at 16 clients).
 
 **Why the kernel split must not be too small.** `max_sectors_kb = 16`
 splits *every* IO on the volume, data-file writes included: +65% at 1
@@ -460,11 +469,20 @@ gives -17% on YCSB-A and sysbench write-only at 64 clients (7.6).
 
 ![Device counters](report/fig/f4_device.png)
 
-*(Phase 11 records, for every run, the device's writes per second, average
-write size and average queue depth. This figure checks the explanations of
-7.3 and 7.4: split writes should show ~16 kB writes and a queue depth near
-8 at 1 client; the kernel split ~32 kB writes; stock ~150 kB writes at queue
-depth ~1.)*
+Phase 11 recorded, around every run, the volume's write requests per
+second, average request size and average queue depth (`/sys/block/*/stat`;
+data-file writes during the run are included). Three cases:
+
+- **Large commits, 1 client:** stock sends one ~160 kB write per commit with
+  0.8 in flight; AIO sends ~21 kB pieces, 4.4 in flight; the kernel split
+  ~30 kB pieces, 3.2 in flight. Same bytes, issued in parallel: +55-59%.
+- **Large commits, 32 clients:** all configurations push ~310 MB/s with the
+  volume 97-99% busy. AIO's queue depth is higher than stock's (20 vs 14) but
+  the device can't move more bytes; the kernel split runs 10,000 small
+  requests/s at queue depth 39, and only it gains clearly (+21%).
+- **Small commits, 64 clients:** AIO with the 4 kB threshold is the only
+  configuration above one write in flight (1.4 vs 0.9) with 58% more,
+  smaller writes: its +1.5%. AIO with 512 kB stays below one and loses 5%.
 
 ### 7.6 Standard benchmarks
 
@@ -501,8 +519,8 @@ single large write (+0.3% -> +56%).
 
 | case | AIO vs stock | reason |
 |---|---|---|
-| large commits, few clients | **+56% to +87%** | one large serial write becomes several parallel ones |
-| large commits, many clients | +8% to +20% | device bandwidth and IOPS budget become the limit; 8-in-flight cap |
+| large commits, 1-4 clients | **+59% to +87%** | one 160 kB serial write becomes ~21 kB pieces, 4-8 in flight (measured) |
+| large commits, 16-64 clients | +4% to +6% | the volume's 300 MiB/s bandwidth is full for every configuration (measured: ~310 MB/s, 97-99% busy) |
 | small commits, 1-4 clients | ~0% | nothing to overlap |
 | small commits, 8-32 clients | -1% to -3% (sysbench insert at 16: -13%) | fewer than one write in flight for every config (measured): AIO does what stock does, plus hand-off time between writes |
 | small commits, 64 clients, 4 kB threshold | **+1.5% (pgbench) to +11% (sysbench insert)** | complete pages go out while a write is in flight (1.36 writes in flight vs 0.88); stock cannot do this |
@@ -596,3 +614,4 @@ threshold would let it win without losing elsewhere.
 | 8d-8f | `08d-threshold-256k`, `08e-screening`, `08f-screening-quiesce` | threshold / split / in-flight; harness fix |
 | 9 | `09-tuned-stock` | can tuned stock match AIO? |
 | 10 | `10-standard` | standard benchmarks |
+| 11 | `11-final` | final stock vs AIO with device counters |

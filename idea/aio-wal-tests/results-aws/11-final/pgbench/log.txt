@@ -1,0 +1,73 @@
+r1  aio4 T4k S16k I8                         c=1          599 tps  (canary 1890 us)  dev 656 w/s 5.0 kB qd 0.86
+r1  aio4 T512k S16k I8                       c=1          595 tps  (canary 1890 us)  dev 671 w/s 5.3 kB qd 0.88
+r1  stock4 default                           c=1          596 tps  (canary 1890 us)  dev 652 w/s 5.0 kB qd 0.86
+r1  stock4 max_sectors_kb=32                 c=1          593 tps  (canary 1890 us)  dev 649 w/s 5.4 kB qd 0.86
+r1  aio4 T4k S16k I8                         c=4         1766 tps  (canary 936 us)  dev 1086 w/s 6.1 kB qd 1.54
+r1  aio4 T512k S16k I8                       c=4         1747 tps  (canary 936 us)  dev 1061 w/s 6.3 kB qd 1.52
+r1  stock4 default                           c=4         1751 tps  (canary 936 us)  dev 1090 w/s 6.5 kB qd 1.54
+r1  stock4 max_sectors_kb=32                 c=4         1765 tps  (canary 936 us)  dev 1076 w/s 5.7 kB qd 1.53
+r1  aio4 T4k S16k I8                         c=8         3108 tps  (canary 935 us)  dev 1038 w/s 7.9 kB qd 1.31
+r1  aio4 T512k S16k I8                       c=8         3106 tps  (canary 935 us)  dev 1057 w/s 7.9 kB qd 1.34
+r1  stock4 default                           c=8         3130 tps  (canary 935 us)  dev 1047 w/s 7.8 kB qd 1.34
+r1  stock4 max_sectors_kb=32                 c=8         3136 tps  (canary 935 us)  dev 1057 w/s 7.8 kB qd 1.34
+r1  aio4 T4k S16k I8                         c=16        5014 tps  (canary 927 us)  dev 1018 w/s 9.8 kB qd 1.00
+r1  aio4 T512k S16k I8                       c=16        5017 tps  (canary 927 us)  dev 1004 w/s 9.8 kB qd 0.98
+r1  stock4 default                           c=16        5159 tps  (canary 927 us)  dev 1033 w/s 9.8 kB qd 1.01
+r1  stock4 max_sectors_kb=32                 c=16        5159 tps  (canary 927 us)  dev 1032 w/s 9.8 kB qd 1.00
+r1  aio4 T4k S16k I8                         c=32        7743 tps  (canary 938 us)  dev 948 w/s 11.9 kB qd 0.90
+r1  aio4 T512k S16k I8                       c=32        7768 tps  (canary 938 us)  dev 939 w/s 11.9 kB qd 0.89
+r1  stock4 default                           c=32        8260 tps  (canary 938 us)  dev 1039 w/s 7.4 kB qd 0.94
+r1  stock4 max_sectors_kb=32                 c=32        8040 tps  (canary 938 us)  dev 1010 w/s 10.2 kB qd 0.94
+r1  aio4 T4k S16k I8                         c=64       14978 tps  (canary 934 us)  dev 1479 w/s 9.3 kB qd 1.36
+r1  aio4 T512k S16k I8                       c=64       14067 tps  (canary 934 us)  dev 879 w/s 12.2 kB qd 0.84
+r1  stock4 default                           c=64       14754 tps  (canary 934 us)  dev 924 w/s 12.4 kB qd 0.88
+r1  stock4 max_sectors_kb=32                 c=64       14838 tps  (canary 934 us)  dev 928 w/s 12.2 kB qd 0.88
+r2  aio4 T512k S16k I8                       c=1          846 tps  (canary 932 us)  dev 908 w/s 4.8 kB qd 0.80
+r2  stock4 default                           c=1          845 tps  (canary 932 us)  dev 907 w/s 4.8 kB qd 0.80
+r2  stock4 max_sectors_kb=32                 c=1          839 tps  (canary 932 us)  dev 907 w/s 4.7 kB qd 0.79
+r2  aio4 T4k S16k I8                         c=1          847 tps  (canary 932 us)  dev 909 w/s 4.5 kB qd 0.79
+r2  aio4 T512k S16k I8                       c=4         1888 tps  (canary 931 us)  dev 1081 w/s 5.0 kB qd 0.95
+r2  stock4 default                           c=4         1904 tps  (canary 931 us)  dev 1095 w/s 4.9 kB qd 0.96
+r2  stock4 max_sectors_kb=32                 c=4         1900 tps  (canary 931 us)  dev 1087 w/s 5.0 kB qd 0.96
+r2  aio4 T4k S16k I8                         c=4         1887 tps  (canary 931 us)  dev 1080 w/s 5.0 kB qd 0.95
+r2  aio4 T512k S16k I8                       c=8         3281 tps  (canary 939 us)  dev 1059 w/s 5.4 kB qd 0.93
+r2  stock4 default                           c=8         3329 tps  (canary 939 us)  dev 1068 w/s 5.8 kB qd 0.95
+r2  stock4 max_sectors_kb=32                 c=8         3334 tps  (canary 939 us)  dev 1070 w/s 5.8 kB qd 0.95
+r2  aio4 T4k S16k I8                         c=8         3291 tps  (canary 939 us)  dev 1061 w/s 5.2 kB qd 0.94
+r2  aio4 T512k S16k I8                       c=16        5332 tps  (canary 942 us)  dev 1034 w/s 5.5 kB qd 0.91
+r2  stock4 default                           c=16        5472 tps  (canary 942 us)  dev 1063 w/s 5.5 kB qd 0.94
+r2  stock4 max_sectors_kb=32                 c=16        5469 tps  (canary 942 us)  dev 1066 w/s 5.5 kB qd 0.94
+r2  aio4 T4k S16k I8                         c=16        5343 tps  (canary 942 us)  dev 1034 w/s 5.5 kB qd 0.91
+r2  aio4 T512k S16k I8                       c=32        8185 tps  (canary 941 us)  dev 979 w/s 6.3 kB qd 0.87
+r2  stock4 default                           c=32        8353 tps  (canary 941 us)  dev 1047 w/s 6.3 kB qd 0.93
+r2  stock4 max_sectors_kb=32                 c=32        8357 tps  (canary 941 us)  dev 1042 w/s 6.2 kB qd 0.93
+r2  aio4 T4k S16k I8                         c=32        8165 tps  (canary 941 us)  dev 984 w/s 6.3 kB qd 0.88
+r2  aio4 T512k S16k I8                       c=64       14609 tps  (canary 962 us)  dev 911 w/s 8.4 kB qd 0.83
+r2  stock4 default                           c=64       15398 tps  (canary 962 us)  dev 962 w/s 8.9 kB qd 0.88
+r2  stock4 max_sectors_kb=32                 c=64       15345 tps  (canary 962 us)  dev 964 w/s 8.4 kB qd 0.88
+r2  aio4 T4k S16k I8                         c=64       16240 tps  (canary 962 us)  dev 1770 w/s 4.9 kB qd 1.56
+r3  stock4 default                           c=1          846 tps  (canary 957 us)  dev 908 w/s 4.3 kB qd 0.79
+r3  stock4 max_sectors_kb=32                 c=1          842 tps  (canary 957 us)  dev 909 w/s 4.3 kB qd 0.79
+r3  aio4 T4k S16k I8                         c=1          846 tps  (canary 957 us)  dev 908 w/s 4.3 kB qd 0.79
+r3  aio4 T512k S16k I8                       c=1          851 tps  (canary 957 us)  dev 914 w/s 4.3 kB qd 0.80
+r3  stock4 default                           c=4         1908 tps  (canary 932 us)  dev 1096 w/s 4.5 kB qd 0.96
+r3  stock4 max_sectors_kb=32                 c=4         1908 tps  (canary 932 us)  dev 1092 w/s 4.5 kB qd 0.95
+r3  aio4 T4k S16k I8                         c=4         1895 tps  (canary 932 us)  dev 1085 w/s 4.5 kB qd 0.95
+r3  aio4 T512k S16k I8                       c=4         1904 tps  (canary 932 us)  dev 1094 w/s 4.5 kB qd 0.96
+r3  stock4 default                           c=8         3358 tps  (canary 942 us)  dev 1078 w/s 4.9 kB qd 0.95
+r3  stock4 max_sectors_kb=32                 c=8         3362 tps  (canary 942 us)  dev 1079 w/s 4.9 kB qd 0.95
+r3  aio4 T4k S16k I8                         c=8         3297 tps  (canary 942 us)  dev 1063 w/s 4.9 kB qd 0.93
+r3  aio4 T512k S16k I8                       c=8         3298 tps  (canary 942 us)  dev 1059 w/s 4.9 kB qd 0.93
+r3  stock4 default                           c=16        5412 tps  (canary 941 us)  dev 1050 w/s 6.8 kB qd 0.94
+r3  stock4 max_sectors_kb=32                 c=16        5387 tps  (canary 941 us)  dev 1054 w/s 6.8 kB qd 0.94
+r3  aio4 T4k S16k I8                         c=16        5277 tps  (canary 941 us)  dev 1022 w/s 6.8 kB qd 0.92
+r3  aio4 T512k S16k I8                       c=16        5248 tps  (canary 941 us)  dev 1021 w/s 6.8 kB qd 0.92
+r3  stock4 default                           c=32        8224 tps  (canary 947 us)  dev 1028 w/s 8.2 kB qd 0.93
+r3  stock4 max_sectors_kb=32                 c=32        8217 tps  (canary 947 us)  dev 1024 w/s 8.2 kB qd 0.93
+r3  aio4 T4k S16k I8                         c=32        8045 tps  (canary 947 us)  dev 970 w/s 8.2 kB qd 0.88
+r3  aio4 T512k S16k I8                       c=32        8042 tps  (canary 947 us)  dev 968 w/s 8.2 kB qd 0.88
+r3  stock4 default                           c=64       19932 tps  (canary 952 us)  dev 936 w/s 10.7 kB qd 0.87
+r3  stock4 max_sectors_kb=32                 c=64       19898 tps  (canary 952 us)  dev 971 w/s 11.0 kB qd 0.91
+r3  aio4 T4k S16k I8                         c=64       20155 tps  (canary 952 us)  dev 1169 w/s 9.1 kB qd 1.07
+r3  aio4 T512k S16k I8                       c=64       18248 tps  (canary 952 us)  dev 905 w/s 10.9 kB qd 0.85
+DONE
