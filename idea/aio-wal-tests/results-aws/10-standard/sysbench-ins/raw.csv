@@ -1,0 +1,61 @@
+run,workload,round,config,clients,seconds,tps,latency_avg_ms,canary_us
+paired,sysbench-ins,1,"aio4 T512k S16k I8",1,10,943.26,1.06,946
+paired,sysbench-ins,1,"aio4 T4k S16k I8",1,10,938.58,1.06,946
+paired,sysbench-ins,1,"aio4 T512k S16k I8 +msk32",1,10,934.24,1.07,946
+paired,sysbench-ins,1,"stock4 default",1,10,939.67,1.06,946
+paired,sysbench-ins,1,"stock4 max_sectors_kb=32",1,10,938.81,1.06,946
+paired,sysbench-ins,1,"aio4 T512k S16k I8",4,10,1757.38,2.27,931
+paired,sysbench-ins,1,"aio4 T4k S16k I8",4,10,1771.71,2.26,931
+paired,sysbench-ins,1,"aio4 T512k S16k I8 +msk32",4,10,1766.80,2.26,931
+paired,sysbench-ins,1,"stock4 default",4,10,1776.79,2.25,931
+paired,sysbench-ins,1,"stock4 max_sectors_kb=32",4,10,1784.23,2.24,931
+paired,sysbench-ins,1,"aio4 T512k S16k I8",16,10,4453.61,3.59,929
+paired,sysbench-ins,1,"aio4 T4k S16k I8",16,10,4359.63,3.67,929
+paired,sysbench-ins,1,"aio4 T512k S16k I8 +msk32",16,10,4410.76,3.62,929
+paired,sysbench-ins,1,"stock4 default",16,10,5252.92,3.04,929
+paired,sysbench-ins,1,"stock4 max_sectors_kb=32",16,10,4907.69,3.26,929
+paired,sysbench-ins,1,"aio4 T512k S16k I8",64,10,14889.92,4.29,930
+paired,sysbench-ins,1,"aio4 T4k S16k I8",64,10,17489.63,3.65,930
+paired,sysbench-ins,1,"aio4 T512k S16k I8 +msk32",64,10,14957.85,4.27,930
+paired,sysbench-ins,1,"stock4 default",64,10,15268.12,4.18,930
+paired,sysbench-ins,1,"stock4 max_sectors_kb=32",64,10,15270.16,4.18,930
+paired,sysbench-ins,2,"aio4 T4k S16k I8",1,10,938.86,1.06,937
+paired,sysbench-ins,2,"aio4 T512k S16k I8 +msk32",1,10,939.01,1.06,937
+paired,sysbench-ins,2,"stock4 default",1,10,942.41,1.06,937
+paired,sysbench-ins,2,"stock4 max_sectors_kb=32",1,10,934.43,1.07,937
+paired,sysbench-ins,2,"aio4 T512k S16k I8",1,10,932.53,1.07,937
+paired,sysbench-ins,2,"aio4 T4k S16k I8",4,10,1780.03,2.24,933
+paired,sysbench-ins,2,"aio4 T512k S16k I8 +msk32",4,10,1771.39,2.26,933
+paired,sysbench-ins,2,"stock4 default",4,10,1785.93,2.24,933
+paired,sysbench-ins,2,"stock4 max_sectors_kb=32",4,10,1793.27,2.23,933
+paired,sysbench-ins,2,"aio4 T512k S16k I8",4,10,1782.03,2.24,933
+paired,sysbench-ins,2,"aio4 T4k S16k I8",16,10,4500.30,3.55,946
+paired,sysbench-ins,2,"aio4 T512k S16k I8 +msk32",16,10,4510.85,3.54,946
+paired,sysbench-ins,2,"stock4 default",16,10,5167.04,3.09,946
+paired,sysbench-ins,2,"stock4 max_sectors_kb=32",16,10,5365.42,2.98,946
+paired,sysbench-ins,2,"aio4 T512k S16k I8",16,10,4503.20,3.55,946
+paired,sysbench-ins,2,"aio4 T4k S16k I8",64,10,17106.69,3.73,952
+paired,sysbench-ins,2,"aio4 T512k S16k I8 +msk32",64,10,15175.36,4.20,952
+paired,sysbench-ins,2,"stock4 default",64,10,15408.79,4.14,952
+paired,sysbench-ins,2,"stock4 max_sectors_kb=32",64,10,15373.95,4.15,952
+paired,sysbench-ins,2,"aio4 T512k S16k I8",64,10,15239.66,4.19,952
+paired,sysbench-ins,3,"aio4 T512k S16k I8 +msk32",1,10,938.78,1.06,939
+paired,sysbench-ins,3,"stock4 default",1,10,934.51,1.07,939
+paired,sysbench-ins,3,"stock4 max_sectors_kb=32",1,10,938.54,1.06,939
+paired,sysbench-ins,3,"aio4 T512k S16k I8",1,10,937.11,1.07,939
+paired,sysbench-ins,3,"aio4 T4k S16k I8",1,10,940.18,1.06,939
+paired,sysbench-ins,3,"aio4 T512k S16k I8 +msk32",4,10,1767.59,2.26,937
+paired,sysbench-ins,3,"stock4 default",4,10,1787.04,2.24,937
+paired,sysbench-ins,3,"stock4 max_sectors_kb=32",4,10,1789.54,2.23,937
+paired,sysbench-ins,3,"aio4 T512k S16k I8",4,10,1777.69,2.25,937
+paired,sysbench-ins,3,"aio4 T4k S16k I8",4,10,1777.69,2.25,937
+paired,sysbench-ins,3,"aio4 T512k S16k I8 +msk32",16,10,4461.08,3.58,944
+paired,sysbench-ins,3,"stock4 default",16,10,4485.37,3.56,944
+paired,sysbench-ins,3,"stock4 max_sectors_kb=32",16,10,4974.99,3.21,944
+paired,sysbench-ins,3,"aio4 T512k S16k I8",16,10,4446.47,3.59,944
+paired,sysbench-ins,3,"aio4 T4k S16k I8",16,10,4430.63,3.61,944
+paired,sysbench-ins,3,"aio4 T512k S16k I8 +msk32",64,10,15161.55,4.21,941
+paired,sysbench-ins,3,"stock4 default",64,10,15454.92,4.13,941
+paired,sysbench-ins,3,"stock4 max_sectors_kb=32",64,10,15411.85,4.14,941
+paired,sysbench-ins,3,"aio4 T512k S16k I8",64,10,15132.98,4.22,941
+paired,sysbench-ins,3,"aio4 T4k S16k I8",64,10,16939.36,3.76,941

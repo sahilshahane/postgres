@@ -1,0 +1,10 @@
+dropped 0 of 12 blocks as disturbed: []
+
+== sysbench-ins: median change vs stock of the same mode [rounds won/rounds]
+config                                          1              4             16             64
+aio4 T512k S16k I8                    +0.3% [2/3]    -0.5% [0/3]   -12.8% [0/3]    -2.1% [0/3]
+aio4 T4k S16k I8                      -0.1% [1/3]    -0.3% [0/3]   -12.9% [0/3]   +11.0% [3/3]
+aio4 T512k S16k I8 +msk32             -0.4% [1/3]    -0.8% [0/3]   -12.7% [0/3]    -1.9% [0/3]
+stock4 max_sectors_kb=32              -0.1% [1/3]    +0.4% [3/3]    +3.8% [2/3]    -0.2% [1/3]
+
+wrote /home/ubuntu/pgaio/results-aws-std/sysbench-ins/paired.csv, /home/ubuntu/pgaio/results-aws-std/sysbench-ins/tps.csv

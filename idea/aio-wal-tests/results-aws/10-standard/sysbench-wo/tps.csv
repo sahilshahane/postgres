@@ -1,0 +1,21 @@
+workload,config,clients,rounds,tps_median,tps_min,tps_max,latency_median_ms
+sysbench-wo,aio4 T512k S16k I8,1,3,742,737,744,1.35
+sysbench-wo,aio4 T512k S16k I8,4,3,1406,1374,1416,2.84
+sysbench-wo,aio4 T512k S16k I8,16,3,4320,4307,4346,3.7
+sysbench-wo,aio4 T512k S16k I8,64,3,10872,10804,10989,5.87
+sysbench-wo,aio4 T4k S16k I8,1,3,738,727,742,1.35
+sysbench-wo,aio4 T4k S16k I8,4,3,1405,1383,1405,2.85
+sysbench-wo,aio4 T4k S16k I8,16,3,3904,3818,3919,4.09
+sysbench-wo,aio4 T4k S16k I8,64,3,12985,12814,13812,4.91
+sysbench-wo,aio4 T512k S16k I8 +msk32,1,3,740,723,742,1.35
+sysbench-wo,aio4 T512k S16k I8 +msk32,4,3,1411,1385,1417,2.83
+sysbench-wo,aio4 T512k S16k I8 +msk32,16,3,4175,4145,4204,3.83
+sysbench-wo,aio4 T512k S16k I8 +msk32,64,3,10937,10811,11092,5.83
+sysbench-wo,stock4 default,1,3,739,728,740,1.35
+sysbench-wo,stock4 default,4,3,1416,1391,1424,2.82
+sysbench-wo,stock4 default,16,3,4154,4152,4173,3.85
+sysbench-wo,stock4 default,64,3,13045,12980,13056,4.89
+sysbench-wo,stock4 max_sectors_kb=32,1,3,730,724,744,1.37
+sysbench-wo,stock4 max_sectors_kb=32,4,3,1415,1392,1432,2.83
+sysbench-wo,stock4 max_sectors_kb=32,16,3,4209,4150,4310,3.8
+sysbench-wo,stock4 max_sectors_kb=32,64,3,13313,13171,13343,4.79

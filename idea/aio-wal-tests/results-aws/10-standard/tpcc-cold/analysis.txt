@@ -1,0 +1,10 @@
+dropped 0 of 12 blocks as disturbed: []
+
+== tpcc: median change vs stock of the same mode [rounds won/rounds]
+config                                          1              4             16             64
+aio4 T512k S16k I8                    +0.7% [3/3]   -21.8% [0/3]   -14.4% [0/3]    +4.6% [3/3]
+aio4 T4k S16k I8                      +1.6% [2/3]   -22.0% [0/3]    -7.6% [0/3]    -0.4% [1/3]
+aio4 T512k S16k I8 +msk32             +0.2% [2/3]    +0.0% [2/3]    -4.5% [0/3]    -0.6% [1/3]
+stock4 max_sectors_kb=32              +0.5% [2/3]   -20.5% [1/3]    -3.5% [1/3]    +1.1% [2/3]
+
+wrote /home/ubuntu/pgaio/results-aws-std/tpcc/paired.csv, /home/ubuntu/pgaio/results-aws-std/tpcc/tps.csv

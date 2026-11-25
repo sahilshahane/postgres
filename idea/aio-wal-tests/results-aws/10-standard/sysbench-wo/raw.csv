@@ -1,0 +1,61 @@
+run,workload,round,config,clients,seconds,tps,latency_avg_ms,canary_us
+paired,sysbench-wo,1,"aio4 T512k S16k I8",1,10,737.46,1.36,1912
+paired,sysbench-wo,1,"aio4 T4k S16k I8",1,10,726.60,1.38,1912
+paired,sysbench-wo,1,"aio4 T512k S16k I8 +msk32",1,10,723.21,1.38,1912
+paired,sysbench-wo,1,"stock4 default",1,10,728.41,1.37,1912
+paired,sysbench-wo,1,"stock4 max_sectors_kb=32",1,10,723.89,1.38,1912
+paired,sysbench-wo,1,"aio4 T512k S16k I8",4,10,1374.07,2.91,934
+paired,sysbench-wo,1,"aio4 T4k S16k I8",4,10,1383.27,2.89,934
+paired,sysbench-wo,1,"aio4 T512k S16k I8 +msk32",4,10,1384.54,2.89,934
+paired,sysbench-wo,1,"stock4 default",4,10,1390.77,2.87,934
+paired,sysbench-wo,1,"stock4 max_sectors_kb=32",4,10,1392.49,2.87,934
+paired,sysbench-wo,1,"aio4 T512k S16k I8",16,10,4346.18,3.68,934
+paired,sysbench-wo,1,"aio4 T4k S16k I8",16,10,3818.11,4.18,934
+paired,sysbench-wo,1,"aio4 T512k S16k I8 +msk32",16,10,4175.44,3.83,934
+paired,sysbench-wo,1,"stock4 default",16,10,4154.31,3.85,934
+paired,sysbench-wo,1,"stock4 max_sectors_kb=32",16,10,4310.32,3.71,934
+paired,sysbench-wo,1,"aio4 T512k S16k I8",64,10,10871.63,5.87,933
+paired,sysbench-wo,1,"aio4 T4k S16k I8",64,10,12985.14,4.91,933
+paired,sysbench-wo,1,"aio4 T512k S16k I8 +msk32",64,10,10937.26,5.83,933
+paired,sysbench-wo,1,"stock4 default",64,10,13044.68,4.89,933
+paired,sysbench-wo,1,"stock4 max_sectors_kb=32",64,10,13313.48,4.79,933
+paired,sysbench-wo,2,"aio4 T4k S16k I8",1,10,741.81,1.35,928
+paired,sysbench-wo,2,"aio4 T512k S16k I8 +msk32",1,10,741.82,1.35,928
+paired,sysbench-wo,2,"stock4 default",1,10,739.60,1.35,928
+paired,sysbench-wo,2,"stock4 max_sectors_kb=32",1,10,744.29,1.34,928
+paired,sysbench-wo,2,"aio4 T512k S16k I8",1,10,743.89,1.34,928
+paired,sysbench-wo,2,"aio4 T4k S16k I8",4,10,1404.52,2.85,940
+paired,sysbench-wo,2,"aio4 T512k S16k I8 +msk32",4,10,1410.82,2.83,940
+paired,sysbench-wo,2,"stock4 default",4,10,1416.17,2.82,940
+paired,sysbench-wo,2,"stock4 max_sectors_kb=32",4,10,1431.73,2.79,940
+paired,sysbench-wo,2,"aio4 T512k S16k I8",4,10,1406.44,2.84,940
+paired,sysbench-wo,2,"aio4 T4k S16k I8",16,10,3904.40,4.09,932
+paired,sysbench-wo,2,"aio4 T512k S16k I8 +msk32",16,10,4145.07,3.85,932
+paired,sysbench-wo,2,"stock4 default",16,10,4172.94,3.83,932
+paired,sysbench-wo,2,"stock4 max_sectors_kb=32",16,10,4150.49,3.85,932
+paired,sysbench-wo,2,"aio4 T512k S16k I8",16,10,4319.93,3.70,932
+paired,sysbench-wo,2,"aio4 T4k S16k I8",64,10,13811.61,4.61,944
+paired,sysbench-wo,2,"aio4 T512k S16k I8 +msk32",64,10,11092.37,5.74,944
+paired,sysbench-wo,2,"stock4 default",64,10,13056.12,4.88,944
+paired,sysbench-wo,2,"stock4 max_sectors_kb=32",64,10,13342.55,4.77,944
+paired,sysbench-wo,2,"aio4 T512k S16k I8",64,10,10988.75,5.80,944
+paired,sysbench-wo,3,"aio4 T512k S16k I8 +msk32",1,10,739.57,1.35,942
+paired,sysbench-wo,3,"stock4 default",1,10,738.60,1.35,942
+paired,sysbench-wo,3,"stock4 max_sectors_kb=32",1,10,730.32,1.37,942
+paired,sysbench-wo,3,"aio4 T512k S16k I8",1,10,741.64,1.35,942
+paired,sysbench-wo,3,"aio4 T4k S16k I8",1,10,738.37,1.35,942
+paired,sysbench-wo,3,"aio4 T512k S16k I8 +msk32",4,10,1416.77,2.82,935
+paired,sysbench-wo,3,"stock4 default",4,10,1424.23,2.81,935
+paired,sysbench-wo,3,"stock4 max_sectors_kb=32",4,10,1414.54,2.83,935
+paired,sysbench-wo,3,"aio4 T512k S16k I8",4,10,1415.82,2.82,935
+paired,sysbench-wo,3,"aio4 T4k S16k I8",4,10,1404.71,2.85,935
+paired,sysbench-wo,3,"aio4 T512k S16k I8 +msk32",16,10,4203.63,3.80,937
+paired,sysbench-wo,3,"stock4 default",16,10,4152.46,3.85,937
+paired,sysbench-wo,3,"stock4 max_sectors_kb=32",16,10,4208.96,3.80,937
+paired,sysbench-wo,3,"aio4 T512k S16k I8",16,10,4307.41,3.71,937
+paired,sysbench-wo,3,"aio4 T4k S16k I8",16,10,3918.63,4.08,937
+paired,sysbench-wo,3,"aio4 T512k S16k I8 +msk32",64,10,10811.30,5.89,939
+paired,sysbench-wo,3,"stock4 default",64,10,12979.81,4.91,939
+paired,sysbench-wo,3,"stock4 max_sectors_kb=32",64,10,13170.93,4.84,939
+paired,sysbench-wo,3,"aio4 T512k S16k I8",64,10,10803.90,5.89,939
+paired,sysbench-wo,3,"aio4 T4k S16k I8",64,10,12814.00,4.97,939

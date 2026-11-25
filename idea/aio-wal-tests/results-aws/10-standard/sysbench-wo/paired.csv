@@ -1,0 +1,17 @@
+workload,config,baseline,clients,rounds,median_change_pct,min_change_pct,max_change_pct,rounds_won
+sysbench-wo,aio4 T512k S16k I8,stock4 default,1,3,0.6,0.4,1.2,3
+sysbench-wo,aio4 T512k S16k I8,stock4 default,4,3,-0.7,-1.2,-0.6,0
+sysbench-wo,aio4 T512k S16k I8,stock4 default,16,3,3.7,3.5,4.6,3
+sysbench-wo,aio4 T512k S16k I8,stock4 default,64,3,-16.7,-16.8,-15.8,0
+sysbench-wo,aio4 T4k S16k I8,stock4 default,1,3,-0.0,-0.2,0.3,1
+sysbench-wo,aio4 T4k S16k I8,stock4 default,4,3,-0.8,-1.4,-0.5,0
+sysbench-wo,aio4 T4k S16k I8,stock4 default,16,3,-6.4,-8.1,-5.6,0
+sysbench-wo,aio4 T4k S16k I8,stock4 default,64,3,-0.5,-1.3,5.8,1
+sysbench-wo,aio4 T512k S16k I8 +msk32,stock4 default,1,3,0.1,-0.7,0.3,2
+sysbench-wo,aio4 T512k S16k I8 +msk32,stock4 default,4,3,-0.4,-0.5,-0.4,0
+sysbench-wo,aio4 T512k S16k I8 +msk32,stock4 default,16,3,0.5,-0.7,1.2,2
+sysbench-wo,aio4 T512k S16k I8 +msk32,stock4 default,64,3,-16.2,-16.7,-15.0,0
+sysbench-wo,stock4 max_sectors_kb=32,stock4 default,1,3,-0.6,-1.1,0.6,1
+sysbench-wo,stock4 max_sectors_kb=32,stock4 default,4,3,0.1,-0.7,1.1,2
+sysbench-wo,stock4 max_sectors_kb=32,stock4 default,16,3,1.4,-0.5,3.8,2
+sysbench-wo,stock4 max_sectors_kb=32,stock4 default,64,3,2.1,1.5,2.2,3

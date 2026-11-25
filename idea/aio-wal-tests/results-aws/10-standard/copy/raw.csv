@@ -1,0 +1,46 @@
+run,workload,round,config,clients,seconds,tps,latency_avg_ms,canary_us
+paired,copy,1,"aio4 T512k S16k I8",1,10,17.766852,56.285,972
+paired,copy,1,"aio4 T4k S16k I8",1,10,17.092203,58.506,972
+paired,copy,1,"aio4 T512k S16k I8 +msk32",1,10,17.377784,57.545,972
+paired,copy,1,"stock4 default",1,10,17.191521,58.168,972
+paired,copy,1,"stock4 max_sectors_kb=32",1,10,17.370410,57.569,972
+paired,copy,1,"aio4 T512k S16k I8",4,10,19.461773,205.531,933
+paired,copy,1,"aio4 T4k S16k I8",4,10,19.420004,205.973,933
+paired,copy,1,"aio4 T512k S16k I8 +msk32",4,10,20.385483,196.218,933
+paired,copy,1,"stock4 default",4,10,19.927840,200.724,933
+paired,copy,1,"stock4 max_sectors_kb=32",4,10,20.324320,196.809,933
+paired,copy,1,"aio4 T512k S16k I8",16,10,20.307690,787.879,931
+paired,copy,1,"aio4 T4k S16k I8",16,10,18.339593,872.429,931
+paired,copy,1,"aio4 T512k S16k I8 +msk32",16,10,19.354758,826.670,931
+paired,copy,1,"stock4 default",16,10,17.743751,901.726,931
+paired,copy,1,"stock4 max_sectors_kb=32",16,10,14.857008,1076.933,931
+paired,copy,2,"aio4 T4k S16k I8",1,10,17.424437,57.391,931
+paired,copy,2,"aio4 T512k S16k I8 +msk32",1,10,17.772284,56.267,931
+paired,copy,2,"stock4 default",1,10,17.227948,58.045,931
+paired,copy,2,"stock4 max_sectors_kb=32",1,10,17.617057,56.763,931
+paired,copy,2,"aio4 T512k S16k I8",1,10,17.174397,58.226,931
+paired,copy,2,"aio4 T4k S16k I8",4,10,19.431287,205.854,927
+paired,copy,2,"aio4 T512k S16k I8 +msk32",4,10,20.691461,193.316,927
+paired,copy,2,"stock4 default",4,10,20.065652,199.346,927
+paired,copy,2,"stock4 max_sectors_kb=32",4,10,19.851124,201.500,927
+paired,copy,2,"aio4 T512k S16k I8",4,10,19.095597,209.472,927
+paired,copy,2,"aio4 T4k S16k I8",16,10,19.659486,813.856,929
+paired,copy,2,"aio4 T512k S16k I8 +msk32",16,10,19.818013,807.346,929
+paired,copy,2,"stock4 default",16,10,15.183518,1053.774,929
+paired,copy,2,"stock4 max_sectors_kb=32",16,10,17.754453,901.182,929
+paired,copy,2,"aio4 T512k S16k I8",16,10,17.757100,901.048,929
+paired,copy,3,"aio4 T512k S16k I8 +msk32",1,10,17.970220,55.648,928
+paired,copy,3,"stock4 default",1,10,17.266280,57.916,928
+paired,copy,3,"stock4 max_sectors_kb=32",1,10,17.657056,56.635,928
+paired,copy,3,"aio4 T512k S16k I8",1,10,17.249235,57.974,928
+paired,copy,3,"aio4 T4k S16k I8",1,10,17.225493,58.053,928
+paired,copy,3,"aio4 T512k S16k I8 +msk32",4,10,20.108037,198.925,930
+paired,copy,3,"stock4 default",4,10,19.218765,208.130,930
+paired,copy,3,"stock4 max_sectors_kb=32",4,10,19.716812,202.873,930
+paired,copy,3,"aio4 T512k S16k I8",4,10,19.381075,206.387,930
+paired,copy,3,"aio4 T4k S16k I8",4,10,18.963244,210.934,930
+paired,copy,3,"aio4 T512k S16k I8 +msk32",16,10,19.966033,801.361,928
+paired,copy,3,"stock4 default",16,10,16.055345,996.553,928
+paired,copy,3,"stock4 max_sectors_kb=32",16,10,17.864658,895.623,928
+paired,copy,3,"aio4 T512k S16k I8",16,10,18.480461,865.779,928
+paired,copy,3,"aio4 T4k S16k I8",16,10,18.928245,845.298,928

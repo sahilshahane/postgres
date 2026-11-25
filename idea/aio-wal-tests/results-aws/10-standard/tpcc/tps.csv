@@ -1,0 +1,21 @@
+workload,config,clients,rounds,tps_median,tps_min,tps_max,latency_median_ms
+tpcc,aio4 T512k S16k I8,1,3,410,407,410,2.437
+tpcc,aio4 T512k S16k I8,4,3,1227,1032,1327,3.254
+tpcc,aio4 T512k S16k I8,16,3,2783,2601,3034,5.741
+tpcc,aio4 T512k S16k I8,64,3,2547,2526,3002,25.048
+tpcc,aio4 T4k S16k I8,1,3,398,394,400,2.509
+tpcc,aio4 T4k S16k I8,4,3,1035,1026,1230,3.858
+tpcc,aio4 T4k S16k I8,16,3,2813,2674,2840,5.679
+tpcc,aio4 T4k S16k I8,64,3,2769,2673,2877,23.056
+tpcc,aio4 T512k S16k I8 +msk32,1,3,408,399,408,2.448
+tpcc,aio4 T512k S16k I8 +msk32,4,3,1030,985,1226,3.877
+tpcc,aio4 T512k S16k I8 +msk32,16,3,2619,2389,2831,6.102
+tpcc,aio4 T512k S16k I8 +msk32,64,3,2946,2454,3082,21.677
+tpcc,stock4 default,1,3,406,383,409,2.458
+tpcc,stock4 default,4,3,1227,1026,1326,3.255
+tpcc,stock4 default,16,3,2888,2768,3055,5.532
+tpcc,stock4 default,64,3,2740,2606,3024,23.288
+tpcc,stock4 max_sectors_kb=32,1,3,401,390,408,2.491
+tpcc,stock4 max_sectors_kb=32,4,3,1331,1233,1430,2.998
+tpcc,stock4 max_sectors_kb=32,16,3,3068,2759,3299,5.206
+tpcc,stock4 max_sectors_kb=32,64,3,2707,2582,2999,23.587

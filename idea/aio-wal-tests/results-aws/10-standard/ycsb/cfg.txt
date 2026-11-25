@@ -1,0 +1,7 @@
+# phase 10: standard benchmarks (TPC-C, YCSB-A, sysbench write-only/insert, bulk COPY), QUIESCE=1
+# (the default stock config is last: analyze.py uses the last stock config of a mode as baseline)
+stock4 max_sectors_kb=32|/home/ubuntu/pgaio/inst/stock4|wal_sync_method = open_datasync|debug_io_direct = wal|sys.max_sectors_kb = 32
+aio4 T512k S16k I8|/home/ubuntu/pgaio/inst/aio4|wal_io_method = aio|io_method = io_uring|wal_sync_method = open_datasync|debug_io_direct = wal|wal_io_page_align = on|wal_io_pipeline_threshold = 512kB|wal_io_split_size = 16kB|wal_io_max_inflight = 8
+aio4 T4k S16k I8|/home/ubuntu/pgaio/inst/aio4|wal_io_method = aio|io_method = io_uring|wal_sync_method = open_datasync|debug_io_direct = wal|wal_io_page_align = on|wal_io_pipeline_threshold = 4kB|wal_io_split_size = 16kB|wal_io_max_inflight = 8
+aio4 T512k S16k I8 +msk32|/home/ubuntu/pgaio/inst/aio4|wal_io_method = aio|io_method = io_uring|wal_sync_method = open_datasync|debug_io_direct = wal|wal_io_page_align = on|wal_io_pipeline_threshold = 512kB|wal_io_split_size = 16kB|wal_io_max_inflight = 8|sys.max_sectors_kb = 32
+stock4 default|/home/ubuntu/pgaio/inst/stock4|wal_sync_method = open_datasync|debug_io_direct = wal

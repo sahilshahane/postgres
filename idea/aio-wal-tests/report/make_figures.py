@@ -156,8 +156,10 @@ def standard_small_multiples(base, fname):
     wls = [(w, t) for w, t in wls if base and read(os.path.join(base, w, "paired.csv"))]
     if not wls:
         print(f"skip {fname}: no standard-benchmark data"); return
-    fig, axes = plt.subplots(1, len(wls), figsize=(3.3 * len(wls), 3.6), sharey=True, squeeze=False)
-    for ax, (w, t) in zip(axes[0], wls):
+    ncol = 3; nrow = (len(wls) + 1 + ncol - 1) // ncol
+    fig, axes = plt.subplots(nrow, ncol, figsize=(11, 3.3 * nrow), sharey=True, squeeze=False)
+    flat = [a for row in axes for a in row]
+    for ax, (w, t) in zip(flat, wls):
         paired = read(os.path.join(base, w, "paired.csv"))
         clients = sorted({int(r["clients"]) for r in paired})
         ax.axhline(0, color=INK2, linewidth=1)
@@ -171,12 +173,15 @@ def standard_small_multiples(base, fname):
                         markeredgecolor=SURFACE, markeredgewidth=1)
         clients_axis(ax, clients)
         ax.set_title(t, fontsize=10)
-    axes[0][0].set_ylabel("change vs stock (%)")
-    handles, labels = axes[0][0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc="lower center", ncol=3, bbox_to_anchor=(0.5, -0.08))
+    for row in axes:
+        row[0].set_ylabel("change vs stock (%)")
+    handles, labels = flat[0].get_legend_handles_labels()
+    for ax in flat[len(wls):]:
+        ax.axis("off")
+    flat[len(wls)].legend(handles, labels, loc="center", fontsize=10)
     fig.suptitle("Standard benchmarks: change vs stock PostgreSQL (median of 3 paired rounds)",
                  x=0.01, ha="left", fontsize=12, fontweight="bold")
-    fig.tight_layout(rect=(0, 0.05, 1, 0.93))
+    fig.tight_layout(rect=(0, 0, 1, 0.95))
     save(fig, fname)
 
 

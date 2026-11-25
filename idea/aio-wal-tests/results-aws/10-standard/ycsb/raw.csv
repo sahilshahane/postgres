@@ -1,0 +1,61 @@
+run,workload,round,config,clients,seconds,tps,latency_avg_ms,canary_us
+paired,ycsb,1,"aio4 T512k S16k I8",1,15,1432.00,0.696,1887
+paired,ycsb,1,"aio4 T4k S16k I8",1,15,1414.53,0.705,1887
+paired,ycsb,1,"aio4 T512k S16k I8 +msk32",1,15,1436.93,0.694,1887
+paired,ycsb,1,"stock4 default",1,15,1406.57,0.709,1887
+paired,ycsb,1,"stock4 max_sectors_kb=32",1,15,1431.38,0.697,1887
+paired,ycsb,1,"aio4 T512k S16k I8",4,15,2542.13,1.570,935
+paired,ycsb,1,"aio4 T4k S16k I8",4,15,2501.00,1.596,935
+paired,ycsb,1,"aio4 T512k S16k I8 +msk32",4,15,2556.59,1.562,935
+paired,ycsb,1,"stock4 default",4,15,2574.67,1.551,935
+paired,ycsb,1,"stock4 max_sectors_kb=32",4,15,2562.33,1.558,935
+paired,ycsb,1,"aio4 T512k S16k I8",16,15,7609.69,2.098,938
+paired,ycsb,1,"aio4 T4k S16k I8",16,15,8019.82,1.991,938
+paired,ycsb,1,"aio4 T512k S16k I8 +msk32",16,15,7564.75,2.111,938
+paired,ycsb,1,"stock4 default",16,15,7795.40,2.049,938
+paired,ycsb,1,"stock4 max_sectors_kb=32",16,15,7785.73,2.051,938
+paired,ycsb,1,"aio4 T512k S16k I8",64,15,18411.18,3.471,936
+paired,ycsb,1,"aio4 T4k S16k I8",64,15,24220.62,2.638,936
+paired,ycsb,1,"aio4 T512k S16k I8 +msk32",64,15,18498.16,3.456,936
+paired,ycsb,1,"stock4 default",64,15,22635.50,2.824,936
+paired,ycsb,1,"stock4 max_sectors_kb=32",64,15,23200.73,2.755,936
+paired,ycsb,2,"aio4 T4k S16k I8",1,15,1354.75,0.736,938
+paired,ycsb,2,"aio4 T512k S16k I8 +msk32",1,15,1429.73,0.698,938
+paired,ycsb,2,"stock4 default",1,15,1442.75,0.691,938
+paired,ycsb,2,"stock4 max_sectors_kb=32",1,15,1439.81,0.693,938
+paired,ycsb,2,"aio4 T512k S16k I8",1,15,1427.87,0.699,938
+paired,ycsb,2,"aio4 T4k S16k I8",4,15,2546.50,1.568,937
+paired,ycsb,2,"aio4 T512k S16k I8 +msk32",4,15,2525.27,1.581,937
+paired,ycsb,2,"stock4 default",4,15,2554.20,1.563,937
+paired,ycsb,2,"stock4 max_sectors_kb=32",4,15,2571.60,1.552,937
+paired,ycsb,2,"aio4 T512k S16k I8",4,15,2506.47,1.593,937
+paired,ycsb,2,"aio4 T4k S16k I8",16,15,8307.13,1.922,945
+paired,ycsb,2,"aio4 T512k S16k I8 +msk32",16,15,7486.63,2.133,945
+paired,ycsb,2,"stock4 default",16,15,7671.58,2.081,945
+paired,ycsb,2,"stock4 max_sectors_kb=32",16,15,7625.47,2.094,945
+paired,ycsb,2,"aio4 T512k S16k I8",16,15,7414.93,2.153,945
+paired,ycsb,2,"aio4 T4k S16k I8",64,15,22984.87,2.780,938
+paired,ycsb,2,"aio4 T512k S16k I8 +msk32",64,15,18360.13,3.481,938
+paired,ycsb,2,"stock4 default",64,15,22112.93,2.891,938
+paired,ycsb,2,"stock4 max_sectors_kb=32",64,15,22930.28,2.786,938
+paired,ycsb,2,"aio4 T512k S16k I8",64,15,18421.19,3.469,938
+paired,ycsb,3,"aio4 T512k S16k I8 +msk32",1,15,1439.31,0.693,932
+paired,ycsb,3,"stock4 default",1,15,1419.25,0.703,932
+paired,ycsb,3,"stock4 max_sectors_kb=32",1,15,1438.47,0.693,932
+paired,ycsb,3,"aio4 T512k S16k I8",1,15,1435.73,0.695,932
+paired,ycsb,3,"aio4 T4k S16k I8",1,15,1429.75,0.698,932
+paired,ycsb,3,"aio4 T512k S16k I8 +msk32",4,15,2552.81,1.564,902
+paired,ycsb,3,"stock4 default",4,15,2569.07,1.554,902
+paired,ycsb,3,"stock4 max_sectors_kb=32",4,15,2605.75,1.532,902
+paired,ycsb,3,"aio4 T512k S16k I8",4,15,2570.46,1.553,902
+paired,ycsb,3,"aio4 T4k S16k I8",4,15,2329.80,1.714,902
+paired,ycsb,3,"aio4 T512k S16k I8 +msk32",16,15,7668.26,2.082,941
+paired,ycsb,3,"stock4 default",16,15,7725.00,2.067,941
+paired,ycsb,3,"stock4 max_sectors_kb=32",16,15,7721.73,2.068,941
+paired,ycsb,3,"aio4 T512k S16k I8",16,15,7642.26,2.090,941
+paired,ycsb,3,"aio4 T4k S16k I8",16,15,8159.67,1.957,941
+paired,ycsb,3,"aio4 T512k S16k I8 +msk32",64,15,18535.37,3.449,946
+paired,ycsb,3,"stock4 default",64,15,22356.19,2.859,946
+paired,ycsb,3,"stock4 max_sectors_kb=32",64,15,23094.33,2.767,946
+paired,ycsb,3,"aio4 T512k S16k I8",64,15,18408.71,3.472,946
+paired,ycsb,3,"aio4 T4k S16k I8",64,15,24369.74,2.622,946
