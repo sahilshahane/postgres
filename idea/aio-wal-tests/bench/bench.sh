@@ -38,6 +38,9 @@
 #   before each run of that config, the WORKDIR device's max_sectors_kb (the
 #   largest request the kernel sends it; larger IOs are split) is set to N;
 #   configs without it get the device's value at start.  Needs sudo.
+#   Device counters: around each measured run, /sys/block/DEV/stat is read
+#   and the run's write IOPS, average write size (kB), average queue depth
+#   (time in queue / elapsed) and busy % are added to the output.
 #   EXTRA_CONF  extra postgresql.conf lines (default full_page_writes = off:
 #               the post-checkpoint FPI burst is identical for all configs)
 #   KEEP=1      keep the data directories afterwards
@@ -88,6 +91,7 @@ set_msk() {   # config index
   [ "$(cat "$MSK_FILE")" = "$v" ] || echo "$v" | sudo tee "$MSK_FILE" >/dev/null
 }
 
+devstat() { awk '{print $5, $7, $10, $11}' /sys/block/$SYSDEV/stat; }   # writes, sectors written, io ticks ms, time in queue ms
 canary() {
   local t0 t1; t0=$(date +%s%N)
   dd if=/dev/zero of="$WORKDIR/canary" bs=8k count=200 oflag=dsync conv=notrunc 2>/dev/null
@@ -176,7 +180,7 @@ if [ -n "$PREWARM" ]; then
   free -m | awk '/^Mem/ {print "page cache after prewarm: " $6 " MB, available " $7 " MB"}'
 fi
 
-[ -f "$OUT" ] || echo "run,workload,round,config,clients,seconds,tps,latency_avg_ms,canary_us" > "$OUT"
+[ -f "$OUT" ] || echo "run,workload,round,config,clients,seconds,tps,latency_avg_ms,canary_us,dev_wps,dev_wkb,dev_qd,dev_busy_pct" > "$OUT"
 for r in $(seq 1 "$ROUNDS"); do
   for c in $CLIENTS; do
     for w in $(seq 1 40); do
@@ -190,12 +194,16 @@ for r in $(seq 1 "$ROUNDS"); do
       [ "$WORKLOAD" = bigpc ] && PGPORT=$((BASEPORT + i)) "${p[1]}/bin/psql" -XAtqc "TRUNCATE bigc"
       [ "$WORKLOAD" = copy ] && PGPORT=$((BASEPORT + i)) "${p[1]}/bin/psql" -XAtqc "TRUNCATE bulk"
       set_msk $i
+      read -r w0 s0 b0 q0 < <(devstat); t0=$(date +%s%N)
       read -r tps lat < <(run_one $i $c "$SECS")
+      read -r w1 s1 b1 q1 < <(devstat); t1=$(date +%s%N)
+      read -r dwps dwkb dqd dbusy < <(awk -v w=$((w1-w0)) -v s=$((s1-s0)) -v b=$((b1-b0)) -v q=$((q1-q0)) -v t=$(( (t1-t0)/1000000 )) \
+        'BEGIN {printf "%.0f %.1f %.2f %.0f\n", w*1000/t, (w ? s/2/w : 0), q/t, 100*b/t}')
       if [ "$QUIESCE" = 1 ]; then
         PGPORT=$((BASEPORT + i)) "${p[1]}/bin/psql" -XAtqc "CHECKPOINT" >/dev/null 2>&1; sync
       fi
-      echo "$RUN,$WORKLOAD,$r,\"${p[0]}\",$c,$SECS,$tps,$lat,$cus" >> "$OUT"
-      printf "r%-2s %-40s c=%-4s %9.0f tps  (canary %s us)\n" "$r" "${p[0]}" "$c" "$tps" "$cus"
+      echo "$RUN,$WORKLOAD,$r,\"${p[0]}\",$c,$SECS,$tps,$lat,$cus,$dwps,$dwkb,$dqd,$dbusy" >> "$OUT"
+      printf "r%-2s %-40s c=%-4s %9.0f tps  (canary %s us)  dev %s w/s %s kB qd %s\n" "$r" "${p[0]}" "$c" "$tps" "$cus" "$dwps" "$dwkb" "$dqd"
     done
   done
 done
