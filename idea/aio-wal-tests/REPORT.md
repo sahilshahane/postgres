@@ -453,7 +453,7 @@ depth ~1.)*
 | YCSB-A | one row update (< 0.5 kB WAL) | **+7.0% at 64 [3/3]**, +5.6% at 16 [3/3] | **-17.7% at 64 [0/3]** | the small-commit case of 7.4: at 16-64 clients, complete pages pipeline; the 512 kB threshold never pipelines |
 | sysbench write-only | 2 updates + delete + insert (~1-2 kB WAL) | -0.5% at 64 | **-16.7% at 64 [0/3]** | small commits, but fewer per second than YCSB; at 16 clients the 4 kB threshold starts second writes that carry only a few pages (-6.4% [0/3]) |
 | sysbench insert | one single-row insert (< 0.5 kB WAL) | **+11.0% at 64 [3/3]** | -2.1% at 64 [0/3] | at 64 clients complete pages pipeline (4 kB) or don't (512 kB), as in YCSB; at 16 clients **every** AIO configuration loses ~13% [0/3]: the 8-32 client band of 7.4, where stock's group commit is already near optimal and AIO adds hand-off time to every flush cycle |
-| bulk COPY | 13 MB per transaction | *pending* | *pending* | expected: bandwidth-bound (300 MiB/s) for all |
+| bulk COPY | 13 MB per transaction | **+17.9% at 16 [3/3]** | +15.1% at 16 [3/3] (with kernel split too: **+24.4%**) | bandwidth-bound: ~17-20 transactions/s x 13 MB of WAL plus the table data is near the volume's 300 MiB/s. Stock reaches 20 txn/s at 4 clients but **falls back to ~16 at 16 clients**: 16 backends whose WAL buffers are full queue on `WALWriteLock` and write one large serial IO at a time. AIO keeps several (split) writes in flight and holds the device at its ceiling; at 1-4 clients all are within 3% |
 | TPC-C | 5 transaction types, a few kB each, plus reads | *pending* | *pending* | |
 
 Tuned stock is within +-3% of stock on YCSB and sysbench: their writes are
