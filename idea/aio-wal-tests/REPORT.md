@@ -30,8 +30,8 @@ Correctness results: `results3/README.md`.
      -3.1%), but costs 8 clients; off by default.
   2. *Page-aligned pipelining* (`wal_io_page_align`): writes in flight never
      share a WAL page, so full pages can go out while a write is in flight.
-     First small-commit win: **+5.5% at 64 clients** (later +11.8% with change 3
-     settings).
+     First small-commit win at 64 clients (+5.5% in phase 5; **+1.5% [3/3] in the
+     final, corrected-harness run**; +7% to +11% on YCSB-A and sysbench insert).
   3. *Split writes* (`wal_io_split_size`): a large flush is issued as several
      parallel whole-page writes. **Large commits: +56% at 1 client, +84-87% at 4,
      +8-20% at 16-32**, winning every round.
@@ -45,7 +45,8 @@ Correctness results: `results3/README.md`.
   gain (+56% / +90% / +38% / +27%). Change 3's gain comes from splitting large
   writes into parallel requests, which the block layer can also do. What
   stock cannot do is overlap *small* commits: there AIO keeps a real gain
-  (+11.8% pgbench at 64 clients, +7% YCSB-A at 64 clients).
+  (+11% sysbench insert, +7% YCSB-A, +1.5% pgbench, all at 64 clients, every
+  round won; +18% on bulk COPY at 16 clients).
 - **Open problem.** No single `wal_io_pipeline_threshold` is best for both:
   large commits want 512 kB (batch several commits per flush), small commits
   want 4 kB (pipeline single pages). With 512 kB, YCSB-A loses 18% at 64
@@ -387,14 +388,30 @@ flushes of at least twice the split size.
 
 ![Small commits](report/fig/f2_small.png)
 
-*(Phase 11, pgbench -N at 1-64 clients with all four configurations;
-figure produced when the run finishes.)* Earlier runs of the same
-configurations (phases 5 and 8d) showed:
+Phase 11, pgbench -N, 3 paired rounds x 10 s. Device counters are medians
+per run: writes per second and average number of writes in flight (queue
+depth) on the volume.
 
-| clients | 1 | 4 | 8 | 16 | 32 | 64 |
-|---|---:|---:|---:|---:|---:|---:|
-| AIO 4 kB threshold, vs stock | 0% | -1% | -2% | -4% | -8% | **+6% to +12%** |
-| AIO 512 kB threshold, vs stock | | | | -4% | | **-4%** |
+| clients | stock TPS | AIO 4 kB vs stock | AIO 512 kB vs stock | stock + kernel split | writes in flight: stock / AIO 4k / AIO 512k |
+|---:|---:|---:|---:|---:|---|
+| 1 | 845 | +0.2% [3/3] | +0.1% | -0.4% | 0.80 / 0.79 / 0.80 |
+| 4 | 1,904 | -0.6% | -0.2% | 0.0% | 0.96 / 0.95 / 0.96 |
+| 8 | 3,329 | -1.1% [0/3] | -1.4% [0/3] | +0.2% | 0.95 / 0.94 / 0.93 |
+| 16 | 5,412 | -2.5% [0/3] | -2.8% [0/3] | -0.1% | 0.94 / 0.92 / 0.92 |
+| 32 | 8,260 | -2.2% [0/3] | -2.2% [0/3] | -0.1% | 0.93 / 0.88 / 0.88 |
+| 64 | 15,398 | **+1.5% [3/3]** (16,240 TPS) | **-5.1% [0/3]** (14,609) | -0.2% | 0.88 / **1.36** / 0.84 |
+
+**The device counters explain the whole table.** From 1 to 32 clients every
+configuration keeps **less than one write in flight** on average (0.8-0.95),
+and all do the same number of writes per commit (e.g. 0.19 at 16 clients:
+one write carries ~5 commits). So at 1-32 clients **AIO never overlaps two
+WAL writes**: it does exactly what stock's group commit does, plus its own
+bookkeeping. Only at 64 clients with the 4 kB threshold does the queue depth
+rise above one (1.36), with 58% more writes per second than stock, and that is
+the one cell where AIO wins.
+
+(Earlier, non-quiesced runs showed +5.5% and +11.8% at 64 clients, phases
+5 and 8d; with the corrected harness the gain is +1.5%, won in all 3 rounds.)
 
 **Why there is no gain at 1-4 clients.** A pgbench transaction writes
 ~0.5 kB of WAL. With one client there is never a second commit to overlap
@@ -402,7 +419,10 @@ with: every commit waits for one ~1.9 ms device round trip, with or without
 AIO. AIO only adds bookkeeping (in-flight tracker, condition-variable
 wake-ups), hence 0% to -1%.
 
-**Why AIO loses a little at 8-32 clients.** Stock's group commit is
+**Why AIO loses a little at 8-32 clients (-1% to -3%).** Average commit
+latency is 0.03-0.11 ms higher (16 clients: 3.03 vs 2.96 ms; 32: 3.98 vs
+3.87 ms) with the same writes and the same queue depth, so the loss is time
+spent between writes, not in them. Stock's group commit is
 already very efficient here: one leader writes everything that is waiting
 in one IO, and stock commit latency stays at 1.9-2.0 ms from 4 to 32 clients
 while throughput scales linearly. AIO can only beat that by starting a
@@ -426,13 +446,15 @@ while a write is in flight is **more than a page**. Page alignment lets
 those complete pages go out immediately as a second write, while the device
 is still busy with the first, instead of waiting a whole cycle. That is the
 case stock cannot handle: no stock setting starts a second WAL write while
-one is in progress. Result: +5.5% (change 2 alone), +11.8% with change 3's
-settings (`wal_io_max_inflight = 8`).
+one is in progress. The counters confirm it: 1.36 writes in flight and
+1,479 writes/s vs stock's 0.88 and 936, and commit latency 3.94 vs 4.16 ms.
 
-**Why the 512 kB threshold loses at 64 clients.** A second write is
-started only once 512 kB of WAL is waiting, which small commits never
-reach. So AIO never overlaps writes, and it pays the hand-off cost on every
-cycle without gaining anything.
+**Why the 512 kB threshold loses at 64 clients (-5.1%).** A second write
+is started only once 512 kB of WAL is waiting, which small commits never
+reach. The counters show it: 0.84 writes in flight, *fewer* writes per second
+than stock (905 vs 936). So AIO never overlaps writes, and it pays the
+hand-off cost on every cycle without gaining anything. The same mechanism
+gives -17% on YCSB-A and sysbench write-only at 64 clients (7.6).
 
 ### 7.5 What the device sees
 
@@ -482,9 +504,11 @@ single large write (+0.3% -> +56%).
 | large commits, few clients | **+56% to +87%** | one large serial write becomes several parallel ones |
 | large commits, many clients | +8% to +20% | device bandwidth and IOPS budget become the limit; 8-in-flight cap |
 | small commits, 1-4 clients | ~0% | nothing to overlap |
-| small commits, 8-32 clients | -2% to -8% | stock's group commit is already near optimal; a second write costs a full round trip; hand-off overhead |
-| small commits, 64 clients, 4 kB threshold | **+6% to +12%** | complete pages pipeline while a write is in flight; stock cannot do this |
-| small commits, 64 clients, 512 kB threshold | **-17% to -18%** | never pipelines, pays the hand-off overhead |
+| small commits, 8-32 clients | -1% to -3% (sysbench insert at 16: -13%) | fewer than one write in flight for every config (measured): AIO does what stock does, plus hand-off time between writes |
+| small commits, 64 clients, 4 kB threshold | **+1.5% (pgbench) to +11% (sysbench insert)** | complete pages go out while a write is in flight (1.36 writes in flight vs 0.88); stock cannot do this |
+| small commits, 64 clients, 512 kB threshold | **-5% (pgbench) to -18% (YCSB-A)** | never pipelines (0.84 writes in flight), pays the hand-off overhead |
+| bulk load (COPY), 16 clients | **+15% to +18%** | stock's backends queue on WALWriteLock to write full WAL buffers one large IO at a time; AIO keeps split writes in flight |
+| TPC-C | -4% to +1% | not WAL-bound (lock contention); nothing for AIO to gain |
 
 ### Why parallel writes are not always a gain
 
@@ -512,7 +536,7 @@ dedicated WAL volume it is a cheap, effective setting.
 
 For many small commits, **no**: overlapping a second WAL write with one in
 flight needs a change to PostgreSQL. That is AIO's lasting contribution
-(+7% YCSB-A, +12% pgbench at 64 clients), and it is where an adaptive
+(+11% sysbench insert, +7% YCSB-A, +1.5% pgbench at 64 clients), and it is where an adaptive
 threshold would let it win without losing elsewhere.
 
 ## 9. Limitations and threats to validity
