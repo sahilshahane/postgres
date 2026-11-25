@@ -1,7 +1,7 @@
 #!/bin/bash
 # phase 10: standard benchmarks, 3 rounds, QUIESCE=1; one results dir per workload
 P=$HOME/pgaio; B=$P/results-aws-std; mkdir -p $B
-for w in tpcc:15 ycsb:15 sysbench-wo:10 sysbench-ins:10 copy:10; do
+for w in ycsb:15 sysbench-wo:10 sysbench-ins:10 copy:10 tpcc:15; do
   W=${w%:*}; R=$B/$W; mkdir -p $R
   C="1 4 16 64"; [ $W = copy ] && C="1 4 16"
   sed "s|INST|$P/inst|" $P/bench/cfg_std.txt > $R/cfg.txt

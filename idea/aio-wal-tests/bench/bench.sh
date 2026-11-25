@@ -23,6 +23,10 @@
 #               sysbench-wo (sysbench oltp_write_only) |
 #               sysbench-ins (sysbench oltp_insert) |
 #               copy (copy.sql: COPY of 50,000 rows, ~13 MB, into one table)
+#   Standard workloads read their tables: before measuring, the page cache is
+#   dropped and each config's copy of the workload's tables and indexes is read
+#   into it (cat of the relation files), so no run reads from the device (cold
+#   copies made TPC-C runs bimodal: reads compete with WAL writes for IOPS).
 #   BB_HOME     unpacked BenchBase (postgres profile), default ~/benchbase
 #   CLIENTS ("16 32 64"), SECONDS_ per run (5), ROUNDS (8), BASEPORT (58500)
 #   CANARY_MAX  before each block, wait until 200 x 8 kB O_DSYNC writes average
@@ -53,6 +57,11 @@ case $WORKLOAD in
   sysbench-wo)  KIND=sysbench; SB_TEST=oltp_write_only ;;
   sysbench-ins) KIND=sysbench; SB_TEST=oltp_insert ;;
   *) echo "WORKLOAD must be pgbench, big, bigpc, copy, tpcc, ycsb, sysbench-wo or sysbench-ins" >&2; exit 1 ;;
+esac
+case $WORKLOAD in
+  tpcc) PREWARM='^(warehouse|district|customer|history|oorder|new_order|order_line|stock|item)$' ;;
+  ycsb) PREWARM='^usertable$' ;;
+  sysbench-*) PREWARM='^sbtest[0-9]+$' ;;
 esac
 KIND=${KIND:-pgbench}; BB_HOME=${BB_HOME:-$HOME/benchbase}
 BB_SCALE=${BB_SCALE:-$([ "$WORKLOAD" = ycsb ] && echo 1000 || echo 16)}
@@ -151,6 +160,21 @@ for i in $(seq 0 $((N-1))); do
   run_one $i 8 3 >/dev/null 2>&1
   [ "$WORKLOAD" = copy ] && PGPORT=$((BASEPORT + i)) "${p[1]}/bin/psql" -XAtqc "TRUNCATE bulk"
 done
+
+if [ -n "$PREWARM" ]; then
+  sync; echo 3 | sudo tee /proc/sys/vm/drop_caches >/dev/null
+  for i in $(seq 0 $((N-1))); do
+    IFS='|' read -ra p <<< "${CFG[$i]}"
+    PGPORT=$((BASEPORT + i)) "${p[1]}/bin/psql" -XAtc "
+      SELECT pg_relation_filepath(c.oid) FROM pg_class c
+      WHERE c.relkind IN ('r', 'i', 't') AND (c.relname ~ '$PREWARM'
+        OR c.oid IN (SELECT indexrelid FROM pg_index x JOIN pg_class t ON t.oid = x.indrelid WHERE t.relname ~ '$PREWARM')
+        OR c.oid IN (SELECT reltoastrelid FROM pg_class WHERE relname ~ '$PREWARM'))" |
+    while read -r f; do cat "$WORKDIR/d$i/$f" "$WORKDIR/d$i/$f".[0-9]* 2>/dev/null; done | wc -c |
+      awk -v i=$i '{printf "prewarmed d%d: %.0f MB\n", i, $1 / 1048576}'
+  done
+  free -m | awk '/^Mem/ {print "page cache after prewarm: " $6 " MB, available " $7 " MB"}'
+fi
 
 [ -f "$OUT" ] || echo "run,workload,round,config,clients,seconds,tps,latency_avg_ms,canary_us" > "$OUT"
 for r in $(seq 1 "$ROUNDS"); do
