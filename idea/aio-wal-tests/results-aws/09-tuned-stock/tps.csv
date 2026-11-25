@@ -1,0 +1,25 @@
+workload,config,clients,rounds,tps_median,tps_min,tps_max,latency_median_ms
+bigpc,stock4 commit_delay=100us,1,6,332,315,333,3.013
+bigpc,stock4 commit_delay=100us,4,6,714,645,716,5.598
+bigpc,stock4 commit_delay=100us,16,6,1184,1131,1309,13.514
+bigpc,stock4 commit_delay=100us,32,6,1303,1249,1322,24.568
+bigpc,stock4 max_sectors_kb=32,1,6,513,462,514,1.948
+bigpc,stock4 max_sectors_kb=32,4,6,1359,1142,1364,2.944
+bigpc,stock4 max_sectors_kb=32,16,6,1627,1364,1643,9.835
+bigpc,stock4 max_sectors_kb=32,32,6,1634,1469,1683,19.581
+bigpc,stock4 max_sectors_kb=16,1,6,543,351,546,1.841
+bigpc,stock4 max_sectors_kb=16,4,6,686,657,688,5.829
+bigpc,stock4 max_sectors_kb=16,16,6,692,672,693,23.107
+bigpc,stock4 max_sectors_kb=16,32,6,694,684,695,46.127
+bigpc,aio4 T512k S16k I8,1,6,521,482,523,1.919
+bigpc,aio4 T512k S16k I8,4,6,1311,1111,1321,3.051
+bigpc,aio4 T512k S16k I8,16,6,1417,1302,1425,11.293
+bigpc,aio4 T512k S16k I8,32,6,1448,1393,1471,22.095
+bigpc,stock4 default,1,6,329,296,330,3.044
+bigpc,stock4 default,4,6,714,623,716,5.603
+bigpc,stock4 default,16,6,1183,985,1192,13.53
+bigpc,stock4 default,32,6,1303,1152,1326,24.564
+bigpc,stock4 wal_writer_delay=1ms,1,6,332,316,333,3.014
+bigpc,stock4 wal_writer_delay=1ms,4,6,710,699,713,5.636
+bigpc,stock4 wal_writer_delay=1ms,16,6,1183,995,1329,13.527
+bigpc,stock4 wal_writer_delay=1ms,32,6,1285,1158,1318,24.899

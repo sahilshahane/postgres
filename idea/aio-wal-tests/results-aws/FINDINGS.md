@@ -567,3 +567,38 @@ Identical to 8e, but `bench.sh` checkpoints and syncs after every run.
 - **Consequence:** all earlier 16-32 client results (phases 1-8d) were
   measured with this interference and should be taken as unreliable; the
   final benchmarks are rerun with QUIESCE=1.
+
+## Phase 9: tuned stock vs AIO (`09-tuned-stock/`)
+
+Can stock reach AIO's large-commit gain by tuning? `bigpc`, 4 kB builds,
+O_DSYNC + direct IO for all, 6 paired rounds x 10 s, QUIESCE=1, 0 blocks
+dropped. `max_sectors_kb` is the largest request the kernel sends the WAL
+device (default 256); larger IOs are split into parallel requests. It was
+set per run (`sys.max_sectors_kb` in `bench.sh`) and restored afterwards.
+
+| vs stock4 default | 1 | 4 | 16 | 32 |
+|---|---:|---:|---:|---:|
+| stock + `wal_writer_delay = 1ms` | +1.0% [6] | -0.4% [2] | 0.0% [3] | -0.9% [2] |
+| stock + `commit_delay = 100` | +1.1% [6] | +0.2% [4] | +0.5% [4] | +0.5% [4] |
+| **stock + `max_sectors_kb = 32`** | **+56.3% [6/6]** | **+90.2% [6/6]** | **+38.0% [6/6]** | **+27.3% [6/6]** |
+| stock + `max_sectors_kb = 16` | +65.2% [6/6] | -3.7% [1] | -41.5% [0] | -46.7% [0] |
+| AIO: T 512k, S 16k, I 8 | +59.0% [6/6] | +83.8% [6/6] | +19.8% [6/6] | +11.7% [6/6] |
+
+TPS: stock default 329 / 714 / 1,183 / 1,303; stock + max_sectors_kb 32:
+513 / 1,359 / 1,627 / 1,634; AIO: 521 / 1,311 / 1,417 / 1,448.
+
+- **Kernel tuning gives stock the same gain, and more at high load.** With
+  `max_sectors_kb = 32` the kernel splits stock's large WAL write into
+  parallel 32 kB requests: equal to AIO at 1-4 clients, and ahead of it at
+  16-32 (+38% / +27% vs AIO's +20% / +12%).
+- So **change 3's gain comes from splitting large writes into parallel
+  requests, which the block layer can also do for stock.** It is not a
+  benefit only AIO can deliver.
+- `max_sectors_kb = 16` is too small: it splits every IO on the device
+  (heap writes too) and hits the IOPS cap from 4 clients on (-42% to -47%).
+- `wal_writer_delay` and `commit_delay` do nothing here.
+- Caveats: `max_sectors_kb` applies to the whole device (data files share
+  this volume here; on a dedicated WAL device that wouldn't matter) and
+  needs root. The AIO config is capped at 8 writes in flight while the
+  kernel split has no such cap, which is a likely reason AIO falls behind
+  at 16-32 clients (not tested yet).

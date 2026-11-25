@@ -17,6 +17,7 @@ phase on the VM, wait for the marker and copy the results into `results-aws/`.
 | 8d: threshold 256 kB + split | `cfg_thr_big.txt`, `cfg_thr_small.txt` | `run_thr.sh` | `results-aws/08d-threshold-256k/` |
 | 8e: screening (short runs) | `cfg_screen.txt` | `run_screen.sh` | `results-aws/08e-screening/` |
 | 8f: screening with QUIESCE=1 | `cfg_screen.txt` | `run_screen_q.sh` | `results-aws/08f-screening-quiesce/` |
+| 9: tuned stock vs AIO | `cfg_tuned.txt` | `run_tuned.sh` | `results-aws/09-tuned-stock/` |
 
 `run_align_tests.sh`: change 2 correctness suite on the lab server
 (`~/pgaio/latest`), results in `results3/change2_align_*.csv`.

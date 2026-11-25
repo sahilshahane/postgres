@@ -1,0 +1,8 @@
+# phase 9: tuned stock vs AIO, large commits (bigpc), QUIESCE=1
+# (the default stock config is last: analyze.py uses the last stock config of a mode as baseline)
+stock4 wal_writer_delay=1ms|INST/stock4|wal_sync_method = open_datasync|debug_io_direct = wal|wal_writer_delay = 1ms
+stock4 commit_delay=100us|INST/stock4|wal_sync_method = open_datasync|debug_io_direct = wal|commit_delay = 100
+stock4 max_sectors_kb=32|INST/stock4|wal_sync_method = open_datasync|debug_io_direct = wal|sys.max_sectors_kb = 32
+stock4 max_sectors_kb=16|INST/stock4|wal_sync_method = open_datasync|debug_io_direct = wal|sys.max_sectors_kb = 16
+aio4 T512k S16k I8|INST/aio4|wal_io_method = aio|io_method = io_uring|wal_sync_method = open_datasync|debug_io_direct = wal|wal_io_page_align = on|wal_io_pipeline_threshold = 512kB|wal_io_split_size = 16kB|wal_io_max_inflight = 8
+stock4 default|INST/stock4|wal_sync_method = open_datasync|debug_io_direct = wal

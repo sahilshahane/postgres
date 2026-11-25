@@ -1,0 +1,21 @@
+workload,config,baseline,clients,rounds,median_change_pct,min_change_pct,max_change_pct,rounds_won
+bigpc,stock4 commit_delay=100us,stock4 default,1,6,1.1,0.6,6.5,6
+bigpc,stock4 commit_delay=100us,stock4 default,4,6,0.2,-9.7,12.6,4
+bigpc,stock4 commit_delay=100us,stock4 default,16,6,0.5,-1.7,14.9,4
+bigpc,stock4 commit_delay=100us,stock4 default,32,6,0.5,-0.7,8.4,4
+bigpc,stock4 max_sectors_kb=32,stock4 default,1,6,56.3,55.2,56.6,6
+bigpc,stock4 max_sectors_kb=32,stock4 default,4,6,90.2,83.2,97.9,6
+bigpc,stock4 max_sectors_kb=32,stock4 default,16,6,38.0,29.4,39.0,6
+bigpc,stock4 max_sectors_kb=32,stock4 default,32,6,27.3,23.8,27.8,6
+bigpc,stock4 max_sectors_kb=16,stock4 default,1,6,65.2,18.7,65.6,6
+bigpc,stock4 max_sectors_kb=16,stock4 default,4,6,-3.7,-4.2,5.5,1
+bigpc,stock4 max_sectors_kb=16,stock4 default,16,6,-41.5,-41.8,-31.8,0
+bigpc,stock4 max_sectors_kb=16,stock4 default,32,6,-46.7,-47.6,-40.6,0
+bigpc,aio4 T512k S16k I8,stock4 default,1,6,59.0,57.7,63.1,6
+bigpc,aio4 T512k S16k I8,stock4 default,4,6,83.8,78.4,90.2,6
+bigpc,aio4 T512k S16k I8,stock4 default,16,6,19.8,19.1,32.2,6
+bigpc,aio4 T512k S16k I8,stock4 default,32,6,11.7,9.8,20.9,6
+bigpc,stock4 wal_writer_delay=1ms,stock4 default,1,6,1.0,0.9,6.9,6
+bigpc,stock4 wal_writer_delay=1ms,stock4 default,4,6,-0.4,-0.9,12.2,2
+bigpc,stock4 wal_writer_delay=1ms,stock4 default,16,6,-0.0,-1.5,12.4,3
+bigpc,stock4 wal_writer_delay=1ms,stock4 default,32,6,-0.9,-1.5,0.6,2

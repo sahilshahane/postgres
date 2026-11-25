@@ -1,0 +1,145 @@
+run,workload,round,config,clients,seconds,tps,latency_avg_ms,canary_us
+paired,bigpc,1,"stock4 commit_delay=100us",1,10,314.897859,3.176,1936
+paired,bigpc,1,"stock4 max_sectors_kb=32",1,10,462.266659,2.163,1936
+paired,bigpc,1,"stock4 max_sectors_kb=16",1,10,350.837469,2.850,1936
+paired,bigpc,1,"aio4 T512k S16k I8",1,10,482.212489,2.074,1936
+paired,bigpc,1,"stock4 default",1,10,295.670906,3.382,1936
+paired,bigpc,1,"stock4 wal_writer_delay=1ms",1,10,316.108187,3.163,1936
+paired,bigpc,1,"stock4 commit_delay=100us",4,10,701.652583,5.701,934
+paired,bigpc,1,"stock4 max_sectors_kb=32",4,10,1141.678897,3.504,934
+paired,bigpc,1,"stock4 max_sectors_kb=16",4,10,657.370775,6.085,934
+paired,bigpc,1,"aio4 T512k S16k I8",4,10,1111.252438,3.600,934
+paired,bigpc,1,"stock4 default",4,10,623.017949,6.420,934
+paired,bigpc,1,"stock4 wal_writer_delay=1ms",4,10,698.821242,5.724,934
+paired,bigpc,1,"stock4 commit_delay=100us",16,10,1131.302565,14.143,938
+paired,bigpc,1,"stock4 max_sectors_kb=32",16,10,1363.767663,11.732,938
+paired,bigpc,1,"stock4 max_sectors_kb=16",16,10,671.717871,23.820,938
+paired,bigpc,1,"aio4 T512k S16k I8",16,10,1301.578606,12.293,938
+paired,bigpc,1,"stock4 default",16,10,984.742116,16.248,938
+paired,bigpc,1,"stock4 wal_writer_delay=1ms",16,10,994.892738,16.082,938
+paired,bigpc,1,"stock4 commit_delay=100us",32,10,1249.445935,25.611,935
+paired,bigpc,1,"stock4 max_sectors_kb=32",32,10,1468.651557,21.789,935
+paired,bigpc,1,"stock4 max_sectors_kb=16",32,10,683.936904,46.788,935
+paired,bigpc,1,"aio4 T512k S16k I8",32,10,1393.368720,22.966,935
+paired,bigpc,1,"stock4 default",32,10,1152.347772,27.769,935
+paired,bigpc,1,"stock4 wal_writer_delay=1ms",32,10,1158.458900,27.623,935
+paired,bigpc,2,"stock4 max_sectors_kb=32",1,10,514.429117,1.944,926
+paired,bigpc,2,"stock4 max_sectors_kb=16",1,10,542.757098,1.842,926
+paired,bigpc,2,"aio4 T512k S16k I8",1,10,522.639930,1.913,926
+paired,bigpc,2,"stock4 default",1,10,328.441646,3.045,926
+paired,bigpc,2,"stock4 wal_writer_delay=1ms",1,10,331.690480,3.015,926
+paired,bigpc,2,"stock4 commit_delay=100us",1,10,332.659914,3.006,926
+paired,bigpc,2,"stock4 max_sectors_kb=32",4,10,1357.717531,2.946,928
+paired,bigpc,2,"stock4 max_sectors_kb=16",4,10,687.890557,5.815,928
+paired,bigpc,2,"aio4 T512k S16k I8",4,10,1311.296105,3.050,928
+paired,bigpc,2,"stock4 default",4,10,713.493658,5.606,928
+paired,bigpc,2,"stock4 wal_writer_delay=1ms",4,10,711.593048,5.621,928
+paired,bigpc,2,"stock4 commit_delay=100us",4,10,716.124091,5.586,928
+paired,bigpc,2,"stock4 max_sectors_kb=32",16,10,1525.166280,10.491,935
+paired,bigpc,2,"stock4 max_sectors_kb=16",16,10,692.736058,23.097,935
+paired,bigpc,2,"aio4 T512k S16k I8",16,10,1410.925290,11.340,935
+paired,bigpc,2,"stock4 default",16,10,1178.632716,13.575,935
+paired,bigpc,2,"stock4 wal_writer_delay=1ms",16,10,1160.869446,13.783,935
+paired,bigpc,2,"stock4 commit_delay=100us",16,10,1186.278213,13.488,935
+paired,bigpc,2,"stock4 max_sectors_kb=32",32,10,1592.884021,20.089,932
+paired,bigpc,2,"stock4 max_sectors_kb=16",32,10,683.815725,46.796,932
+paired,bigpc,2,"aio4 T512k S16k I8",32,10,1432.882824,22.333,932
+paired,bigpc,2,"stock4 default",32,10,1246.145463,25.679,932
+paired,bigpc,2,"stock4 wal_writer_delay=1ms",32,10,1253.473918,25.529,932
+paired,bigpc,2,"stock4 commit_delay=100us",32,10,1282.550327,24.950,932
+paired,bigpc,3,"stock4 max_sectors_kb=16",1,10,544.040640,1.838,939
+paired,bigpc,3,"aio4 T512k S16k I8",1,10,523.190983,1.911,939
+paired,bigpc,3,"stock4 default",1,10,328.617581,3.043,939
+paired,bigpc,3,"stock4 wal_writer_delay=1ms",1,10,331.966339,3.012,939
+paired,bigpc,3,"stock4 commit_delay=100us",1,10,331.632500,3.015,939
+paired,bigpc,3,"stock4 max_sectors_kb=32",1,10,513.386608,1.948,939
+paired,bigpc,3,"stock4 max_sectors_kb=16",4,10,687.259322,5.820,936
+paired,bigpc,3,"aio4 T512k S16k I8",4,10,1304.695846,3.066,936
+paired,bigpc,3,"stock4 default",4,10,715.623527,5.590,936
+paired,bigpc,3,"stock4 wal_writer_delay=1ms",4,10,712.097835,5.617,936
+paired,bigpc,3,"stock4 commit_delay=100us",4,10,714.497755,5.598,936
+paired,bigpc,3,"stock4 max_sectors_kb=32",4,10,1359.092525,2.943,936
+paired,bigpc,3,"stock4 max_sectors_kb=16",16,10,691.917219,23.124,925
+paired,bigpc,3,"aio4 T512k S16k I8",16,10,1425.339184,11.225,925
+paired,bigpc,3,"stock4 default",16,10,1183.585788,13.518,925
+paired,bigpc,3,"stock4 wal_writer_delay=1ms",16,10,1186.941725,13.480,925
+paired,bigpc,3,"stock4 commit_delay=100us",16,10,1187.456667,13.474,925
+paired,bigpc,3,"stock4 max_sectors_kb=32",16,10,1611.982506,9.926,925
+paired,bigpc,3,"stock4 max_sectors_kb=16",32,10,693.141623,46.167,932
+paired,bigpc,3,"aio4 T512k S16k I8",32,10,1440.268165,22.218,932
+paired,bigpc,3,"stock4 default",32,10,1293.448983,24.740,932
+paired,bigpc,3,"stock4 wal_writer_delay=1ms",32,10,1273.586150,25.126,932
+paired,bigpc,3,"stock4 commit_delay=100us",32,10,1301.560139,24.586,932
+paired,bigpc,3,"stock4 max_sectors_kb=32",32,10,1644.106531,19.463,932
+paired,bigpc,4,"aio4 T512k S16k I8",1,10,520.180628,1.922,939
+paired,bigpc,4,"stock4 default",1,10,329.757791,3.033,939
+paired,bigpc,4,"stock4 wal_writer_delay=1ms",1,10,332.580078,3.007,939
+paired,bigpc,4,"stock4 commit_delay=100us",1,10,331.823858,3.014,939
+paired,bigpc,4,"stock4 max_sectors_kb=32",1,10,513.230948,1.948,939
+paired,bigpc,4,"stock4 max_sectors_kb=16",1,10,545.892849,1.832,939
+paired,bigpc,4,"aio4 T512k S16k I8",4,10,1320.571839,3.029,924
+paired,bigpc,4,"stock4 default",4,10,714.331346,5.600,924
+paired,bigpc,4,"stock4 wal_writer_delay=1ms",4,10,707.666959,5.652,924
+paired,bigpc,4,"stock4 commit_delay=100us",4,10,714.480440,5.598,924
+paired,bigpc,4,"stock4 max_sectors_kb=32",4,10,1358.697554,2.944,924
+paired,bigpc,4,"stock4 max_sectors_kb=16",4,10,687.533168,5.818,924
+paired,bigpc,4,"aio4 T512k S16k I8",16,10,1418.972780,11.276,937
+paired,bigpc,4,"stock4 default",16,10,1191.506339,13.428,937
+paired,bigpc,4,"stock4 wal_writer_delay=1ms",16,10,1180.213915,13.557,937
+paired,bigpc,4,"stock4 commit_delay=100us",16,10,1181.569552,13.541,937
+paired,bigpc,4,"stock4 max_sectors_kb=32",16,10,1642.329604,9.742,937
+paired,bigpc,4,"stock4 max_sectors_kb=16",16,10,693.218516,23.081,937
+paired,bigpc,4,"aio4 T512k S16k I8",32,10,1470.554954,21.760,932
+paired,bigpc,4,"stock4 default",32,10,1312.129339,24.388,932
+paired,bigpc,4,"stock4 wal_writer_delay=1ms",32,10,1297.014419,24.672,932
+paired,bigpc,4,"stock4 commit_delay=100us",32,10,1303.471262,24.550,932
+paired,bigpc,4,"stock4 max_sectors_kb=32",32,10,1624.550448,19.698,932
+paired,bigpc,4,"stock4 max_sectors_kb=16",32,10,694.641644,46.067,932
+paired,bigpc,5,"stock4 default",1,10,329.537139,3.035,932
+paired,bigpc,5,"stock4 wal_writer_delay=1ms",1,10,332.612240,3.007,932
+paired,bigpc,5,"stock4 commit_delay=100us",1,10,331.907202,3.013,932
+paired,bigpc,5,"stock4 max_sectors_kb=32",1,10,511.291052,1.956,932
+paired,bigpc,5,"stock4 max_sectors_kb=16",1,10,543.435432,1.840,932
+paired,bigpc,5,"aio4 T512k S16k I8",1,10,520.553617,1.921,932
+paired,bigpc,5,"stock4 default",4,10,688.972097,5.806,939
+paired,bigpc,5,"stock4 wal_writer_delay=1ms",4,10,712.569341,5.613,939
+paired,bigpc,5,"stock4 commit_delay=100us",4,10,714.536514,5.598,939
+paired,bigpc,5,"stock4 max_sectors_kb=32",4,10,1363.620504,2.933,939
+paired,bigpc,5,"stock4 max_sectors_kb=16",4,10,685.192737,5.838,939
+paired,bigpc,5,"aio4 T512k S16k I8",4,10,1310.277928,3.053,939
+paired,bigpc,5,"stock4 default",16,10,1189.045005,13.456,930
+paired,bigpc,5,"stock4 wal_writer_delay=1ms",16,10,1185.447428,13.497,930
+paired,bigpc,5,"stock4 commit_delay=100us",16,10,1168.505204,13.693,930
+paired,bigpc,5,"stock4 max_sectors_kb=32",16,10,1642.193617,9.743,930
+paired,bigpc,5,"stock4 max_sectors_kb=16",16,10,693.359284,23.076,930
+paired,bigpc,5,"aio4 T512k S16k I8",16,10,1417.188459,11.290,930
+paired,bigpc,5,"stock4 default",32,10,1318.034999,24.279,934
+paired,bigpc,5,"stock4 wal_writer_delay=1ms",32,10,1301.146774,24.594,934
+paired,bigpc,5,"stock4 commit_delay=100us",32,10,1322.302449,24.200,934
+paired,bigpc,5,"stock4 max_sectors_kb=32",32,10,1681.993607,19.025,934
+paired,bigpc,5,"stock4 max_sectors_kb=16",32,10,694.344085,46.087,934
+paired,bigpc,5,"aio4 T512k S16k I8",32,10,1456.421614,21.972,934
+paired,bigpc,6,"stock4 wal_writer_delay=1ms",1,10,331.413919,3.017,937
+paired,bigpc,6,"stock4 commit_delay=100us",1,10,332.513434,3.007,937
+paired,bigpc,6,"stock4 max_sectors_kb=32",1,10,514.333689,1.944,937
+paired,bigpc,6,"stock4 max_sectors_kb=16",1,10,542.343659,1.844,937
+paired,bigpc,6,"aio4 T512k S16k I8",1,10,521.425341,1.918,937
+paired,bigpc,6,"stock4 default",1,10,328.386438,3.045,937
+paired,bigpc,6,"stock4 wal_writer_delay=1ms",4,10,707.716560,5.652,938
+paired,bigpc,6,"stock4 commit_delay=100us",4,10,645.061828,6.201,938
+paired,bigpc,6,"stock4 max_sectors_kb=32",4,10,1360.339117,2.940,938
+paired,bigpc,6,"stock4 max_sectors_kb=16",4,10,684.565605,5.843,938
+paired,bigpc,6,"aio4 T512k S16k I8",4,10,1313.090307,3.046,938
+paired,bigpc,6,"stock4 default",4,10,714.231441,5.600,938
+paired,bigpc,6,"stock4 wal_writer_delay=1ms",16,10,1328.605768,12.043,926
+paired,bigpc,6,"stock4 commit_delay=100us",16,10,1309.001132,12.223,926
+paired,bigpc,6,"stock4 max_sectors_kb=32",16,10,1642.506740,9.741,926
+paired,bigpc,6,"stock4 max_sectors_kb=16",16,10,692.140953,23.117,926
+paired,bigpc,6,"aio4 T512k S16k I8",16,10,1416.526784,11.295,926
+paired,bigpc,6,"stock4 default",16,10,1181.542605,13.542,926
+paired,bigpc,6,"stock4 wal_writer_delay=1ms",32,10,1318.329484,24.273,928
+paired,bigpc,6,"stock4 commit_delay=100us",32,10,1320.215370,24.238,928
+paired,bigpc,6,"stock4 max_sectors_kb=32",32,10,1682.835082,19.016,928
+paired,bigpc,6,"stock4 max_sectors_kb=16",32,10,695.138125,46.034,928
+paired,bigpc,6,"aio4 T512k S16k I8",32,10,1456.490725,21.971,928
+paired,bigpc,6,"stock4 default",32,10,1325.943697,24.134,928
