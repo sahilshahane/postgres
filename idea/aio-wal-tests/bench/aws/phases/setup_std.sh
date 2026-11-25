@@ -2,7 +2,10 @@
 # phase 10 setup on the VM: sysbench, JDK 21, BenchBase (postgres profile), golden-std
 set -e; P=$HOME/pgaio; L=$P/setup_std.log; exec > $L 2>&1
 sudo DEBIAN_FRONTEND=noninteractive apt-get update -q
-sudo DEBIAN_FRONTEND=noninteractive apt-get install -yq sysbench openjdk-21-jdk-headless git
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -yq sysbench openjdk-25-jdk-headless git
+sudo update-java-alternatives -s $(update-java-alternatives -l | awk "/-25-/ {print \$1}") || true
+export JAVA_HOME=$(ls -d /usr/lib/jvm/java-25-openjdk-*)
+sudo update-alternatives --set java $JAVA_HOME/bin/java; sudo update-alternatives --set javac $JAVA_HOME/bin/javac || true; java -version
 if [ ! -f $HOME/benchbase/benchbase.jar ]; then
   rm -rf $HOME/bb-src; git clone --depth 1 https://github.com/cmu-db/benchbase.git $HOME/bb-src
   (cd $HOME/bb-src && ./mvnw -q clean package -P postgres -DskipTests)
