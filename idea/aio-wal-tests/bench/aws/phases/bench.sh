@@ -66,7 +66,7 @@ esac
 KIND=${KIND:-pgbench}; BB_HOME=${BB_HOME:-$HOME/benchbase}
 BB_SCALE=${BB_SCALE:-$([ "$WORKLOAD" = ycsb ] && echo 1000 || echo 16)}
 SB_TABLES=${SB_TABLES:-8}; SB_SIZE=${SB_SIZE:-100000}
-LISTEN=$([ "$KIND" = benchbase ] && echo localhost)   # JDBC needs TCP
+LISTEN=; [ "$KIND" = benchbase ] && LISTEN=localhost   # JDBC needs TCP
 EXTRA_CONF=${EXTRA_CONF-"full_page_writes = off"}; RUN=${RUN:-paired}; QUIESCE=${QUIESCE:-0}
 export PGHOST=/tmp PGDATABASE=postgres
 
